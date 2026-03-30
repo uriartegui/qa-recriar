@@ -1,0 +1,4 @@
+BASE_URL: https://prd.mihmo.com.br
+API_URL: https://prd.mihmo.com.br/api
+BROWSER: chromium
+HEADLESS: true

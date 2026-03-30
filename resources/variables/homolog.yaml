@@ -1,0 +1,6 @@
+BASE_URL: https://homolog.mihmo.com.br
+API_URL: https://homolog.mihmo.com.br/backend-nest
+BROWSER: chromium
+HEADLESS: false
+EMAIL_VALIDO: adm.castela@mihmo.com.br
+SENHA_VALIDA: REMOVIDO
