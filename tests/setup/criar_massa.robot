@@ -2,6 +2,7 @@
 Library       ../../resources/keywords/pericia_helper.py
 Resource      ../../resources/keywords/mihmo_auth.robot
 Variables     ../../resources/variables/homolog.yaml
+Suite Setup   Limpar Massa Antes Do Suite
 
 *** Variables ***
 ${COMPANY_PMV}      32e94042-51d1-4270-a5ea-88b9915f22d4
@@ -23,14 +24,20 @@ ${ADMISSIONAL}      Admission
 ${ACIDENTE}         FirstWorkAccidentAttendance
 ${PROCESSOS_ADM}    AdministrativeProcesses
 
+*** Keywords ***
+Limpar Massa Antes Do Suite
+    Limpar Massa
+
 *** Test Cases ***
 
 # ══════════════════════════════════════════════════════════
-# LTS — CID GERAL
+# LTS — CID GERAL (vazio)
+# Regras: 1-3d → Médico Trabalho | 4-14d → Clínico Geral
+#         15-59d → Clínico Geral  | 60+d → Junta/Clínico Geral
 # ══════════════════════════════════════════════════════════
 
 LTS - 1 Dia - CID Geral - Medico Trabalho
-    [Tags]    setup    pmv    lts    lts_geral    1dia
+    [Tags]    setup    pmv    lts    lts_geral    borda
     ${token}=    Autenticar No Mihmo
     ${id}    ${cpf}    ${nome}=    Criar Customer
     ...    ${API_URL}    ${token}    LTS_1DIA_GERAL    ${COMPANY_PMV}
@@ -38,7 +45,7 @@ LTS - 1 Dia - CID Geral - Medico Trabalho
     ...    ${API_URL}    ${token}    ${id}    ${cpf}
     ...    ${CELL_TESTE}    ${EMAIL_TESTE}
     ...    2026-04-01    1    ${LTS}    ${CID_GERAL}    ${FIXTURE}
-    Should Be True    ${status} < 300
+    Should Be True    ${status} < 300    API retornou ${status}: ${body}
 
 LTS - 3 Dias - CID Geral - Limite Medico Trabalho
     [Tags]    setup    pmv    lts    lts_geral    borda
@@ -49,7 +56,7 @@ LTS - 3 Dias - CID Geral - Limite Medico Trabalho
     ...    ${API_URL}    ${token}    ${id}    ${cpf}
     ...    ${CELL_TESTE}    ${EMAIL_TESTE}
     ...    2026-04-01    3    ${LTS}    ${CID_GERAL}    ${FIXTURE}
-    Should Be True    ${status} < 300
+    Should Be True    ${status} < 300    API retornou ${status}: ${body}
 
 LTS - 4 Dias - CID Geral - Inicio Clinico Geral
     [Tags]    setup    pmv    lts    lts_geral    borda
@@ -60,9 +67,9 @@ LTS - 4 Dias - CID Geral - Inicio Clinico Geral
     ...    ${API_URL}    ${token}    ${id}    ${cpf}
     ...    ${CELL_TESTE}    ${EMAIL_TESTE}
     ...    2026-04-01    4    ${LTS}    ${CID_GERAL}    ${FIXTURE}
-    Should Be True    ${status} < 300
+    Should Be True    ${status} < 300    API retornou ${status}: ${body}
 
-LTS - 14 Dias - CID Geral - Limite Clinico Geral
+LTS - 14 Dias - CID Geral - Limite Faixa 4-14
     [Tags]    setup    pmv    lts    lts_geral    borda
     ${token}=    Autenticar No Mihmo
     ${id}    ${cpf}    ${nome}=    Criar Customer
@@ -71,10 +78,10 @@ LTS - 14 Dias - CID Geral - Limite Clinico Geral
     ...    ${API_URL}    ${token}    ${id}    ${cpf}
     ...    ${CELL_TESTE}    ${EMAIL_TESTE}
     ...    2026-04-01    14    ${LTS}    ${CID_GERAL}    ${FIXTURE}
-    Should Be True    ${status} < 300
+    Should Be True    ${status} < 300    API retornou ${status}: ${body}
 
-LTS - 15 Dias - CID Geral - Limite Clinica Homologa
-    [Tags]    setup    pmv    lts    lts_geral    borda    inss_borda
+LTS - 15 Dias - CID Geral - Inicio Faixa 15-59
+    [Tags]    setup    pmv    lts    lts_geral    borda
     ${token}=    Autenticar No Mihmo
     ${id}    ${cpf}    ${nome}=    Criar Customer
     ...    ${API_URL}    ${token}    LTS_15DIAS_GERAL    ${COMPANY_PMV}
@@ -82,18 +89,7 @@ LTS - 15 Dias - CID Geral - Limite Clinica Homologa
     ...    ${API_URL}    ${token}    ${id}    ${cpf}
     ...    ${CELL_TESTE}    ${EMAIL_TESTE}
     ...    2026-04-01    15    ${LTS}    ${CID_GERAL}    ${FIXTURE}
-    Should Be True    ${status} < 300
-
-LTS - 16 Dias - CID Geral - Inicio INSS
-    [Tags]    setup    pmv    lts    lts_geral    borda    inss_borda    inss
-    ${token}=    Autenticar No Mihmo
-    ${id}    ${cpf}    ${nome}=    Criar Customer
-    ...    ${API_URL}    ${token}    LTS_16DIAS_GERAL    ${COMPANY_PMV}
-    ${status}    ${body}=    Criar Pericia Api
-    ...    ${API_URL}    ${token}    ${id}    ${cpf}
-    ...    ${CELL_TESTE}    ${EMAIL_TESTE}
-    ...    2026-04-01    16    ${LTS}    ${CID_GERAL}    ${FIXTURE}
-    Should Be True    ${status} < 300
+    Should Be True    ${status} < 300    API retornou ${status}: ${body}
 
 LTS - 59 Dias - CID Geral - Limite Antes Junta
     [Tags]    setup    pmv    lts    lts_geral    borda
@@ -104,10 +100,10 @@ LTS - 59 Dias - CID Geral - Limite Antes Junta
     ...    ${API_URL}    ${token}    ${id}    ${cpf}
     ...    ${CELL_TESTE}    ${EMAIL_TESTE}
     ...    2026-04-01    59    ${LTS}    ${CID_GERAL}    ${FIXTURE}
-    Should Be True    ${status} < 300
+    Should Be True    ${status} < 300    API retornou ${status}: ${body}
 
-LTS - 60 Dias - CID Geral - Junta Medica
-    [Tags]    setup    pmv    lts    lts_geral    junta
+LTS - 60 Dias - CID Geral - Junta Medica Clinico Geral
+    [Tags]    setup    pmv    lts    lts_geral    borda    junta
     ${token}=    Autenticar No Mihmo
     ${id}    ${cpf}    ${nome}=    Criar Customer
     ...    ${API_URL}    ${token}    LTS_60DIAS_GERAL    ${COMPANY_PMV}
@@ -115,83 +111,37 @@ LTS - 60 Dias - CID Geral - Junta Medica
     ...    ${API_URL}    ${token}    ${id}    ${cpf}
     ...    ${CELL_TESTE}    ${EMAIL_TESTE}
     ...    2026-04-01    60    ${LTS}    ${CID_GERAL}    ${FIXTURE}
-    Should Be True    ${status} < 300
+    Should Be True    ${status} < 300    API retornou ${status}: ${body}
 
 # ══════════════════════════════════════════════════════════
-# LTS — CID M e S (ORTOPEDIA)
+# LTS — CID F (Psiquiatria)
+# Regras: 4-29d → Clínico Geral | 30-59d → Clínico Geral
+#         60+d → Junta/Psiquiatra+Clínico Geral
 # ══════════════════════════════════════════════════════════
 
-LTS - 4 a 14 Dias - CID M S - Clinico Geral Ortopedista
-    [Tags]    setup    pmv    lts    lts_ortopedia
-    ${token}=    Autenticar No Mihmo
-    ${id}    ${cpf}    ${nome}=    Criar Customer
-    ...    ${API_URL}    ${token}    LTS_4DIAS_ORTOP    ${COMPANY_PMV}
-    ${status}    ${body}=    Criar Pericia Api
-    ...    ${API_URL}    ${token}    ${id}    ${cpf}
-    ...    ${CELL_TESTE}    ${EMAIL_TESTE}
-    ...    2026-04-01    10    ${LTS}    ${CID_ORTOPEDIA}    ${FIXTURE}
-    Should Be True    ${status} < 300
-
-LTS - 15 Dias - CID M S - Limite Clinica Ortopedista
-    [Tags]    setup    pmv    lts    lts_ortopedia    borda    inss_borda
-    ${token}=    Autenticar No Mihmo
-    ${id}    ${cpf}    ${nome}=    Criar Customer
-    ...    ${API_URL}    ${token}    LTS_15DIAS_ORTOP    ${COMPANY_PMV}
-    ${status}    ${body}=    Criar Pericia Api
-    ...    ${API_URL}    ${token}    ${id}    ${cpf}
-    ...    ${CELL_TESTE}    ${EMAIL_TESTE}
-    ...    2026-04-01    15    ${LTS}    ${CID_ORTOPEDIA}    ${FIXTURE}
-    Should Be True    ${status} < 300
-
-LTS - 16 Dias - CID M S - Inicio INSS Ortopedista
-    [Tags]    setup    pmv    lts    lts_ortopedia    borda    inss
-    ${token}=    Autenticar No Mihmo
-    ${id}    ${cpf}    ${nome}=    Criar Customer
-    ...    ${API_URL}    ${token}    LTS_16DIAS_ORTOP    ${COMPANY_PMV}
-    ${status}    ${body}=    Criar Pericia Api
-    ...    ${API_URL}    ${token}    ${id}    ${cpf}
-    ...    ${CELL_TESTE}    ${EMAIL_TESTE}
-    ...    2026-04-01    16    ${LTS}    ${CID_ORTOPEDIA}    ${FIXTURE}
-    Should Be True    ${status} < 300
-
-LTS - 59 Dias - CID M S - Limite Antes Junta Ortopedista
-    [Tags]    setup    pmv    lts    lts_ortopedia    borda
-    ${token}=    Autenticar No Mihmo
-    ${id}    ${cpf}    ${nome}=    Criar Customer
-    ...    ${API_URL}    ${token}    LTS_59DIAS_ORTOP    ${COMPANY_PMV}
-    ${status}    ${body}=    Criar Pericia Api
-    ...    ${API_URL}    ${token}    ${id}    ${cpf}
-    ...    ${CELL_TESTE}    ${EMAIL_TESTE}
-    ...    2026-04-01    59    ${LTS}    ${CID_ORTOPEDIA}    ${FIXTURE}
-    Should Be True    ${status} < 300
-
-LTS - 60 Dias - CID M S - Junta Medica Ortopedista
-    [Tags]    setup    pmv    lts    lts_ortopedia    junta
-    ${token}=    Autenticar No Mihmo
-    ${id}    ${cpf}    ${nome}=    Criar Customer
-    ...    ${API_URL}    ${token}    LTS_60DIAS_ORTOP    ${COMPANY_PMV}
-    ${status}    ${body}=    Criar Pericia Api
-    ...    ${API_URL}    ${token}    ${id}    ${cpf}
-    ...    ${CELL_TESTE}    ${EMAIL_TESTE}
-    ...    2026-04-01    60    ${LTS}    ${CID_ORTOPEDIA}    ${FIXTURE}
-    Should Be True    ${status} < 300
-
-# ══════════════════════════════════════════════════════════
-# LTS — CID F (PSIQUIATRIA)
-# ══════════════════════════════════════════════════════════
-
-LTS - 4 Dias - CID F - Clinico Geral
-    [Tags]    setup    pmv    lts    lts_psiquiatria
+LTS - 4 Dias - CID F - Inicio Clinico Geral
+    [Tags]    setup    pmv    lts    lts_psiquiatria    borda
     ${token}=    Autenticar No Mihmo
     ${id}    ${cpf}    ${nome}=    Criar Customer
     ...    ${API_URL}    ${token}    LTS_4DIAS_PSIQ    ${COMPANY_PMV}
     ${status}    ${body}=    Criar Pericia Api
     ...    ${API_URL}    ${token}    ${id}    ${cpf}
     ...    ${CELL_TESTE}    ${EMAIL_TESTE}
-    ...    2026-04-01    15    ${LTS}    ${CID_PSIQ}    ${FIXTURE}
-    Should Be True    ${status} < 300
+    ...    2026-04-01    4    ${LTS}    ${CID_PSIQ}    ${FIXTURE}
+    Should Be True    ${status} < 300    API retornou ${status}: ${body}
 
-LTS - 30 Dias - CID F - Clinico Geral
+LTS - 29 Dias - CID F - Limite Faixa 4-30
+    [Tags]    setup    pmv    lts    lts_psiquiatria    borda
+    ${token}=    Autenticar No Mihmo
+    ${id}    ${cpf}    ${nome}=    Criar Customer
+    ...    ${API_URL}    ${token}    LTS_29DIAS_PSIQ    ${COMPANY_PMV}
+    ${status}    ${body}=    Criar Pericia Api
+    ...    ${API_URL}    ${token}    ${id}    ${cpf}
+    ...    ${CELL_TESTE}    ${EMAIL_TESTE}
+    ...    2026-04-01    29    ${LTS}    ${CID_PSIQ}    ${FIXTURE}
+    Should Be True    ${status} < 300    API retornou ${status}: ${body}
+
+LTS - 30 Dias - CID F - Inicio Faixa 30-59
     [Tags]    setup    pmv    lts    lts_psiquiatria    borda
     ${token}=    Autenticar No Mihmo
     ${id}    ${cpf}    ${nome}=    Criar Customer
@@ -200,7 +150,7 @@ LTS - 30 Dias - CID F - Clinico Geral
     ...    ${API_URL}    ${token}    ${id}    ${cpf}
     ...    ${CELL_TESTE}    ${EMAIL_TESTE}
     ...    2026-04-01    30    ${LTS}    ${CID_PSIQ}    ${FIXTURE}
-    Should Be True    ${status} < 300
+    Should Be True    ${status} < 300    API retornou ${status}: ${body}
 
 LTS - 59 Dias - CID F - Limite Antes Junta
     [Tags]    setup    pmv    lts    lts_psiquiatria    borda
@@ -211,10 +161,10 @@ LTS - 59 Dias - CID F - Limite Antes Junta
     ...    ${API_URL}    ${token}    ${id}    ${cpf}
     ...    ${CELL_TESTE}    ${EMAIL_TESTE}
     ...    2026-04-01    59    ${LTS}    ${CID_PSIQ}    ${FIXTURE}
-    Should Be True    ${status} < 300
+    Should Be True    ${status} < 300    API retornou ${status}: ${body}
 
-LTS - 60 Dias - CID F - Junta Medica Psiquiatra
-    [Tags]    setup    pmv    lts    lts_psiquiatria    junta
+LTS - 60 Dias - CID F - Junta Medica Psiquiatra e Clinico Geral
+    [Tags]    setup    pmv    lts    lts_psiquiatria    borda    junta
     ${token}=    Autenticar No Mihmo
     ${id}    ${cpf}    ${nome}=    Criar Customer
     ...    ${API_URL}    ${token}    LTS_60DIAS_PSIQ    ${COMPANY_PMV}
@@ -222,14 +172,75 @@ LTS - 60 Dias - CID F - Junta Medica Psiquiatra
     ...    ${API_URL}    ${token}    ${id}    ${cpf}
     ...    ${CELL_TESTE}    ${EMAIL_TESTE}
     ...    2026-04-01    60    ${LTS}    ${CID_PSIQ}    ${FIXTURE}
-    Should Be True    ${status} < 300
+    Should Be True    ${status} < 300    API retornou ${status}: ${body}
 
 # ══════════════════════════════════════════════════════════
-# LTS - INSS
+# LTS — CID M e S (Ortopedia)
+# Regras: 4-14d → Clínico Geral | 15-59d → Ortopedista
+#         60+d → Junta/Ortopedista+Clínico Geral
+# ══════════════════════════════════════════════════════════
+
+LTS - 4 Dias - CID M S - Inicio Clinico Geral
+    [Tags]    setup    pmv    lts    lts_ortopedia    borda
+    ${token}=    Autenticar No Mihmo
+    ${id}    ${cpf}    ${nome}=    Criar Customer
+    ...    ${API_URL}    ${token}    LTS_4DIAS_ORTOP    ${COMPANY_PMV}
+    ${status}    ${body}=    Criar Pericia Api
+    ...    ${API_URL}    ${token}    ${id}    ${cpf}
+    ...    ${CELL_TESTE}    ${EMAIL_TESTE}
+    ...    2026-04-01    4    ${LTS}    ${CID_ORTOPEDIA}    ${FIXTURE}
+    Should Be True    ${status} < 300    API retornou ${status}: ${body}
+
+LTS - 14 Dias - CID M S - Limite Faixa 4-14 Clinico Geral
+    [Tags]    setup    pmv    lts    lts_ortopedia    borda
+    ${token}=    Autenticar No Mihmo
+    ${id}    ${cpf}    ${nome}=    Criar Customer
+    ...    ${API_URL}    ${token}    LTS_14DIAS_ORTOP    ${COMPANY_PMV}
+    ${status}    ${body}=    Criar Pericia Api
+    ...    ${API_URL}    ${token}    ${id}    ${cpf}
+    ...    ${CELL_TESTE}    ${EMAIL_TESTE}
+    ...    2026-04-01    14    ${LTS}    ${CID_ORTOPEDIA}    ${FIXTURE}
+    Should Be True    ${status} < 300    API retornou ${status}: ${body}
+
+LTS - 15 Dias - CID M S - Inicio Ortopedista
+    [Tags]    setup    pmv    lts    lts_ortopedia    borda
+    ${token}=    Autenticar No Mihmo
+    ${id}    ${cpf}    ${nome}=    Criar Customer
+    ...    ${API_URL}    ${token}    LTS_15DIAS_ORTOP    ${COMPANY_PMV}
+    ${status}    ${body}=    Criar Pericia Api
+    ...    ${API_URL}    ${token}    ${id}    ${cpf}
+    ...    ${CELL_TESTE}    ${EMAIL_TESTE}
+    ...    2026-04-01    15    ${LTS}    ${CID_ORTOPEDIA}    ${FIXTURE}
+    Should Be True    ${status} < 300    API retornou ${status}: ${body}
+
+LTS - 59 Dias - CID M S - Limite Antes Junta Ortopedista
+    [Tags]    setup    pmv    lts    lts_ortopedia    borda
+    ${token}=    Autenticar No Mihmo
+    ${id}    ${cpf}    ${nome}=    Criar Customer
+    ...    ${API_URL}    ${token}    LTS_59DIAS_ORTOP    ${COMPANY_PMV}
+    ${status}    ${body}=    Criar Pericia Api
+    ...    ${API_URL}    ${token}    ${id}    ${cpf}
+    ...    ${CELL_TESTE}    ${EMAIL_TESTE}
+    ...    2026-04-01    59    ${LTS}    ${CID_ORTOPEDIA}    ${FIXTURE}
+    Should Be True    ${status} < 300    API retornou ${status}: ${body}
+
+LTS - 60 Dias - CID M S - Junta Medica Ortopedista e Clinico Geral
+    [Tags]    setup    pmv    lts    lts_ortopedia    borda    junta
+    ${token}=    Autenticar No Mihmo
+    ${id}    ${cpf}    ${nome}=    Criar Customer
+    ...    ${API_URL}    ${token}    LTS_60DIAS_ORTOP    ${COMPANY_PMV}
+    ${status}    ${body}=    Criar Pericia Api
+    ...    ${API_URL}    ${token}    ${id}    ${cpf}
+    ...    ${CELL_TESTE}    ${EMAIL_TESTE}
+    ...    2026-04-01    60    ${LTS}    ${CID_ORTOPEDIA}    ${FIXTURE}
+    Should Be True    ${status} < 300    API retornou ${status}: ${body}
+
+# ══════════════════════════════════════════════════════════
+# LTS INSS (tipo separado) → Clínico Geral
 # ══════════════════════════════════════════════════════════
 
 LTS INSS - 1 Dia - Clinico Geral
-    [Tags]    setup    pmv    lts_inss    inss
+    [Tags]    setup    pmv    lts_inss
     ${token}=    Autenticar No Mihmo
     ${id}    ${cpf}    ${nome}=    Criar Customer
     ...    ${API_URL}    ${token}    LTS_INSS_1DIA    ${COMPANY_PMV}
@@ -237,22 +248,24 @@ LTS INSS - 1 Dia - Clinico Geral
     ...    ${API_URL}    ${token}    ${id}    ${cpf}
     ...    ${CELL_TESTE}    ${EMAIL_TESTE}
     ...    2026-04-01    1    ${LTS_INSS}    ${CID_GERAL}    ${FIXTURE}
-    Should Be True    ${status} < 300
+    Should Be True    ${status} < 300    API retornou ${status}: ${body}
 
 # ══════════════════════════════════════════════════════════
-# LTF
+# LTF — Licença para Tratamento de Pessoa da Família
+# Regras: 1-3d → Médico Trabalho | 4-59d → Clínico Geral
+#         60+d → Junta/Clínico Geral
 # ══════════════════════════════════════════════════════════
 
 LTF - 1 Dia - Medico Trabalho
-    [Tags]    setup    pmv    ltf
+    [Tags]    setup    pmv    ltf    borda
     ${token}=    Autenticar No Mihmo
     ${id}    ${cpf}    ${nome}=    Criar Customer
     ...    ${API_URL}    ${token}    LTF_1DIA    ${COMPANY_PMV}
     ${status}    ${body}=    Criar Pericia Api
     ...    ${API_URL}    ${token}    ${id}    ${cpf}
     ...    ${CELL_TESTE}    ${EMAIL_TESTE}
-    ...    2026-04-01    2    ${LTF}    ${CID_GERAL}    ${FIXTURE}
-    Should Be True    ${status} < 300
+    ...    2026-04-01    1    ${LTF}    ${CID_GERAL}    ${FIXTURE}
+    Should Be True    ${status} < 300    API retornou ${status}: ${body}
 
 LTF - 3 Dias - Limite Medico Trabalho
     [Tags]    setup    pmv    ltf    borda
@@ -263,7 +276,7 @@ LTF - 3 Dias - Limite Medico Trabalho
     ...    ${API_URL}    ${token}    ${id}    ${cpf}
     ...    ${CELL_TESTE}    ${EMAIL_TESTE}
     ...    2026-04-01    3    ${LTF}    ${CID_GERAL}    ${FIXTURE}
-    Should Be True    ${status} < 300
+    Should Be True    ${status} < 300    API retornou ${status}: ${body}
 
 LTF - 4 Dias - Inicio Clinico Geral
     [Tags]    setup    pmv    ltf    borda
@@ -274,7 +287,7 @@ LTF - 4 Dias - Inicio Clinico Geral
     ...    ${API_URL}    ${token}    ${id}    ${cpf}
     ...    ${CELL_TESTE}    ${EMAIL_TESTE}
     ...    2026-04-01    4    ${LTF}    ${CID_GERAL}    ${FIXTURE}
-    Should Be True    ${status} < 300
+    Should Be True    ${status} < 300    API retornou ${status}: ${body}
 
 LTF - 59 Dias - Limite Antes Junta
     [Tags]    setup    pmv    ltf    borda
@@ -285,10 +298,10 @@ LTF - 59 Dias - Limite Antes Junta
     ...    ${API_URL}    ${token}    ${id}    ${cpf}
     ...    ${CELL_TESTE}    ${EMAIL_TESTE}
     ...    2026-04-01    59    ${LTF}    ${CID_GERAL}    ${FIXTURE}
-    Should Be True    ${status} < 300
+    Should Be True    ${status} < 300    API retornou ${status}: ${body}
 
-LTF - 60 Dias - Junta Medica
-    [Tags]    setup    pmv    ltf    junta
+LTF - 60 Dias - Junta Medica Clinico Geral
+    [Tags]    setup    pmv    ltf    borda    junta
     ${token}=    Autenticar No Mihmo
     ${id}    ${cpf}    ${nome}=    Criar Customer
     ...    ${API_URL}    ${token}    LTF_60DIAS    ${COMPANY_PMV}
@@ -296,7 +309,7 @@ LTF - 60 Dias - Junta Medica
     ...    ${API_URL}    ${token}    ${id}    ${cpf}
     ...    ${CELL_TESTE}    ${EMAIL_TESTE}
     ...    2026-04-01    60    ${LTF}    ${CID_GERAL}    ${FIXTURE}
-    Should Be True    ${status} < 300
+    Should Be True    ${status} < 300    API retornou ${status}: ${body}
 
 # ══════════════════════════════════════════════════════════
 # OUTROS TIPOS
@@ -311,7 +324,7 @@ Consulta Medica - 1 Dia - Medico Trabalho
     ...    ${API_URL}    ${token}    ${id}    ${cpf}
     ...    ${CELL_TESTE}    ${EMAIL_TESTE}
     ...    2026-04-01    1    ${CONSULTA}    ${CID_GERAL}    ${FIXTURE}
-    Should Be True    ${status} < 300
+    Should Be True    ${status} < 300    API retornou ${status}: ${body}
 
 Exame Admissional - 1 Dia - Clinico Geral
     [Tags]    setup    pmv    outros    admissional
@@ -322,7 +335,7 @@ Exame Admissional - 1 Dia - Clinico Geral
     ...    ${API_URL}    ${token}    ${id}    ${cpf}
     ...    ${CELL_TESTE}    ${EMAIL_TESTE}
     ...    2026-04-01    1    ${ADMISSIONAL}    ${CID_GERAL}    ${FIXTURE}
-    Should Be True    ${status} < 300
+    Should Be True    ${status} < 300    API retornou ${status}: ${body}
 
 Licenca Gestacao - 120 Dias - Clinico Geral
     [Tags]    setup    pmv    outros    gestacao
@@ -333,10 +346,10 @@ Licenca Gestacao - 120 Dias - Clinico Geral
     ...    ${API_URL}    ${token}    ${id}    ${cpf}
     ...    ${CELL_TESTE}    ${EMAIL_TESTE}
     ...    2026-04-01    120    ${GESTACAO}    ${CID_GERAL}    ${FIXTURE}
-    Should Be True    ${status} < 300
+    Should Be True    ${status} < 300    API retornou ${status}: ${body}
 
-Atividade Com Restricao - 1 Dia - Junta Medica
-    [Tags]    setup    pmv    outros    restricao
+Atividade Com Restricao - 1 Dia - Junta Medica Clinico Geral
+    [Tags]    setup    pmv    outros    restricao    junta
     ${token}=    Autenticar No Mihmo
     ${id}    ${cpf}    ${nome}=    Criar Customer
     ...    ${API_URL}    ${token}    RESTRICAO_1DIA    ${COMPANY_PMV}
@@ -344,7 +357,7 @@ Atividade Com Restricao - 1 Dia - Junta Medica
     ...    ${API_URL}    ${token}    ${id}    ${cpf}
     ...    ${CELL_TESTE}    ${EMAIL_TESTE}
     ...    2026-04-01    1    ${RESTRICAO}    ${CID_GERAL}    ${FIXTURE}
-    Should Be True    ${status} < 300
+    Should Be True    ${status} < 300    API retornou ${status}: ${body}
 
 Acidente de Trabalho - 1 Dia - Medico Trabalho
     [Tags]    setup    pmv    outros    acidente
@@ -355,7 +368,7 @@ Acidente de Trabalho - 1 Dia - Medico Trabalho
     ...    ${API_URL}    ${token}    ${id}    ${cpf}
     ...    ${CELL_TESTE}    ${EMAIL_TESTE}
     ...    2026-04-01    1    ${ACIDENTE}    ${CID_GERAL}    ${FIXTURE}
-    Should Be True    ${status} < 300
+    Should Be True    ${status} < 300    API retornou ${status}: ${body}
 
 Processos Administrativos - 1 Dia - Medico Trabalho
     [Tags]    setup    pmv    outros    adm
@@ -366,4 +379,4 @@ Processos Administrativos - 1 Dia - Medico Trabalho
     ...    ${API_URL}    ${token}    ${id}    ${cpf}
     ...    ${CELL_TESTE}    ${EMAIL_TESTE}
     ...    2026-04-01    1    ${PROCESSOS_ADM}    ${CID_GERAL}    ${FIXTURE}
-    Should Be True    ${status} < 300
+    Should Be True    ${status} < 300    API retornou ${status}: ${body}

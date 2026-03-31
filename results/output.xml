@@ -1,92 +1,96 @@
 <?xml version="1.0" encoding="UTF-8"?>
-<robot generator="Robot 7.0 (Python 3.14.3 on win32)" generated="2026-03-30T16:41:20.075741" rpa="false" schemaversion="5">
+<robot generator="Robot 7.0 (Python 3.14.3 on win32)" generated="2026-03-31T16:55:36.507852" rpa="false" schemaversion="5">
 <suite id="s1" name="Qa" source="c:\dev\qa">
 <suite id="s1-s1" name="Tests" source="c:\dev\qa\tests">
 <suite id="s1-s1-s1" name="Setup" source="c:\dev\qa\tests\setup">
+<kw name="Limpar Massa" owner="pericia_helper" type="SETUP">
+<msg time="2026-03-31T16:55:36.635103" level="INFO">massa_criada.json limpo para nova execução.</msg>
+<status status="PASS" start="2026-03-31T16:55:36.634377" elapsed="0.001001"/>
+</kw>
 <suite id="s1-s1-s1-s1" name="Criar Massa" source="c:\dev\qa\tests\setup\criar_massa.robot">
 <kw name="Limpar Massa Antes Do Suite" type="SETUP">
 <kw name="Limpar Massa" owner="pericia_helper">
-<msg time="2026-03-30T16:41:20.305217" level="INFO">massa_criada.json limpo para nova execução.</msg>
-<status status="PASS" start="2026-03-30T16:41:20.304666" elapsed="0.000748"/>
+<msg time="2026-03-31T16:55:36.663619" level="INFO">massa_criada.json limpo para nova execução.</msg>
+<status status="PASS" start="2026-03-31T16:55:36.663369" elapsed="0.000422"/>
 </kw>
-<status status="PASS" start="2026-03-30T16:41:20.304063" elapsed="0.001739"/>
+<status status="PASS" start="2026-03-31T16:55:36.662931" elapsed="0.000984"/>
 </kw>
-<test id="s1-s1-s1-s1-t1" name="Acidente de Trabalho - 1 Dia - Medico Trabalho" line="354">
+<test id="s1-s1-s1-s1-t1" name="LTS - 60 Dias - CID F - Junta Medica Psiquiatra e Clinico Geral" line="166">
 <kw name="Autenticar No Mihmo" owner="mihmo_auth">
 <kw name="Create Dictionary" owner="BuiltIn">
-<msg time="2026-03-30T16:41:20.311445" level="INFO">${body} = {'email': 'adm.castela@mihmo.com.br', 'password': 'REMOVIDO', 'returnSecureToken': True}</msg>
+<msg time="2026-03-31T16:55:36.668932" level="INFO">${body} = {'email': 'adm.castela@mihmo.com.br', 'password': 'REMOVIDO', 'returnSecureToken': True}</msg>
 <var>${body}</var>
 <arg>email=${EMAIL_VALIDO}</arg>
 <arg>password=${SENHA_VALIDA}</arg>
 <arg>returnSecureToken=${TRUE}</arg>
 <doc>Creates and returns a dictionary based on the given ``items``.</doc>
-<status status="PASS" start="2026-03-30T16:41:20.310940" elapsed="0.000661"/>
+<status status="PASS" start="2026-03-31T16:55:36.668295" elapsed="0.000838"/>
 </kw>
 <kw name="POST" owner="RequestsLibrary">
-<msg time="2026-03-30T16:41:21.187769" level="INFO">POST Request : url=https://www.googleapis.com/identitytoolkit/v3/relyingparty/verifyPassword?key=REMOVIDO 
+<msg time="2026-03-31T16:55:37.329714" level="INFO">POST Request : url=https://www.googleapis.com/identitytoolkit/v3/relyingparty/verifyPassword?key=REMOVIDO 
  path_url=/identitytoolkit/v3/relyingparty/verifyPassword?key=REMOVIDO 
  headers={'User-Agent': 'python-requests/2.31.0', 'Accept-Encoding': 'gzip, deflate, zstd', 'Accept': '*/*', 'Connection': 'keep-alive', 'Content-Length': '87', 'Content-Type': 'application/json'} 
  body=b'{"email": "adm.castela@mihmo.com.br", "password": "REMOVIDO", "returnSecureToken": true}' 
  </msg>
-<msg time="2026-03-30T16:41:21.188092" level="INFO">POST Response : url=https://www.googleapis.com/identitytoolkit/v3/relyingparty/verifyPassword?key=REMOVIDO 
+<msg time="2026-03-31T16:55:37.329960" level="INFO">POST Response : url=https://www.googleapis.com/identitytoolkit/v3/relyingparty/verifyPassword?key=REMOVIDO 
  status=200, reason=OK 
- headers={'Date': 'Mon, 30 Mar 2026 19:41:21 GMT', 'Pragma': 'no-cache', 'Expires': 'Mon, 01 Jan 1990 00:00:00 GMT', 'Cache-Control': 'no-cache, no-store, max-age=0, must-revalidate', 'Content-Type': 'application/json; charset=UTF-8', 'Vary': 'Origin, X-Origin, Referer', 'Content-Encoding': 'gzip', 'Server': 'ESF', 'X-XSS-Protection': '0', 'X-Frame-Options': 'SAMEORIGIN', 'X-Content-Type-Options': 'nosniff', 'Alt-Svc': 'h3=":443"; ma=2592000,h3-29=":443"; ma=2592000', 'Transfer-Encoding': 'chunked'} 
+ headers={'Cache-Control': 'no-cache, no-store, max-age=0, must-revalidate', 'Date': 'Tue, 31 Mar 2026 19:55:38 GMT', 'Expires': 'Mon, 01 Jan 1990 00:00:00 GMT', 'Pragma': 'no-cache', 'Content-Type': 'application/json; charset=UTF-8', 'Vary': 'Origin, X-Origin, Referer', 'Content-Encoding': 'gzip', 'Server': 'ESF', 'X-XSS-Protection': '0', 'X-Frame-Options': 'SAMEORIGIN', 'X-Content-Type-Options': 'nosniff', 'Alt-Svc': 'h3=":443"; ma=2592000,h3-29=":443"; ma=2592000', 'Transfer-Encoding': 'chunked'} 
  body={
   "kind": "identitytoolkit#VerifyPasswordResponse",
   "localId": "82fcf9fc-2737-431d-ac08-06db189f0868",
   "email": "adm.castela@mihmo.com.br",
   "displayName": "adm.castela",
-  "idToken": "eyJhbGciOiJSUzI1NiIsImtpZCI6IjM3MzAwNzY5YTA3ZTA1MTE2ZjdlNTEzOGZhOTA5MzY4NWVlYmMyNDAiLCJ0eXAiOiJKV1QifQ.eyJuYW1lIjoiYWRtLmNhc3RlbGEiLCJpc3MiOiJodHRwczovL3NlY3VyZXRva2VuLmdvb2dsZS5jb20vbG9raS1kZXYtNDQ0OGUiLCJhdWQiOiJsb2tpLWRldi00NDQ4ZSIsImF1dGhfdGltZSI6MTc3NDg5OTY4MSwidXNlcl9pZCI6IjgyZmNmOWZjLTI3MzctNDMxZC1hYzA4LTA2ZGIxODlmMDg2OCIsInN1YiI6IjgyZmNmOWZjLTI3MzctNDMxZC1hYzA4LTA2ZGIxODlmMDg2OCIsImlhdCI6MTc3NDg5OTY4MSwiZXhwIjoxNzc0OTAzMjgxLCJlbWFpbCI6ImFkbS5jYXN0ZWxhQG1paG1vLmNvbS5iciIsImVtYWlsX3ZlcmlmaWVkIjpmYWxzZSwicGhvbmVfbnVtYmVyIjoiKzU1MTE4OTg4NzQzNjYiLCJmaXJlYmFzZSI6eyJpZGVudGl0aWVzIjp7ImVtYWlsIjpbImFkbS5jYXN0ZWxhQG1paG1vLmNvbS5iciJdLCJwaG9uZSI6WyIrNTUxMTg5ODg3NDM2NiJdfSwic2lnbl9pbl9wcm92aWRlciI6InBhc3N3b3JkIn19.fuwTTtIvmYI38pyr-zVXLbJL50vbx0TV6jyxGlYvuHZNhZfDNx8p7_O3efTWJiIVjTGHtAulTROfvTjHI2wSv_h21BDdThPdtAkaJ578o3ToRFEP_sA6mH-hTaGCMIMf6bk-wO7Su7fHs0iZ1lKXPthbhcue-de0-v9KWxyNDEYcfN5ZjjU5ZsRBmu-UB70Po4ySYEKDqst-VA3RVI7VRn8egQIe_LB73uJVbOBcSGO2MTTNrXedFiblo54fYVpiaiPCMLkj4f6nwJfnkoKfGQy23Z-NNS71LnIKgNWdxY_E1SNEcExZGc6KD4vqMeMDxYhlL5kWXf3w28Zm5PscUg",
+  "idToken": "eyJhbGciOiJSUzI1NiIsImtpZCI6IjM3MzAwNzY5YTA3ZTA1MTE2ZjdlNTEzOGZhOTA5MzY4NWVlYmMyNDAiLCJ0eXAiOiJKV1QifQ.eyJuYW1lIjoiYWRtLmNhc3RlbGEiLCJpc3MiOiJodHRwczovL3NlY3VyZXRva2VuLmdvb2dsZS5jb20vbG9raS1kZXYtNDQ0OGUiLCJhdWQiOiJsb2tpLWRldi00NDQ4ZSIsImF1dGhfdGltZSI6MTc3NDk4NjkzOCwidXNlcl9pZCI6IjgyZmNmOWZjLTI3MzctNDMxZC1hYzA4LTA2ZGIxODlmMDg2OCIsInN1YiI6IjgyZmNmOWZjLTI3MzctNDMxZC1hYzA4LTA2ZGIxODlmMDg2OCIsImlhdCI6MTc3NDk4NjkzOCwiZXhwIjoxNzc0OTkwNTM4LCJlbWFpbCI6ImFkbS5jYXN0ZWxhQG1paG1vLmNvbS5iciIsImVtYWlsX3ZlcmlmaWVkIjpmYWxzZSwicGhvbmVfbnVtYmVyIjoiKzU1MTE4OTg4NzQzNjYiLCJmaXJlYmFzZSI6eyJpZGVudGl0aWVzIjp7ImVtYWlsIjpbImFkbS5jYXN0ZWxhQG1paG1vLmNvbS5iciJdLCJwaG9uZSI6WyIrNTUxMTg5ODg3NDM2NiJdfSwic2lnbl9pbl9wcm92aWRlciI6InBhc3N3b3JkIn19.hIAjBMhnm8nVv1UDvRmOVhXCJEWCj7MypzVtWFumke-HX6XE0dzSrH3ZedR7GAWUbE0yFL2b1jaSoln4P1GDr3er9o-mmF1LFpk825R3k9OSxEX4XHsRTugLMk495H-7wKKxfjtoes_Bp6cPLAvT2V_qxmYCs_N6uUdP9FerYyDHM8iDuZ5sEQdowTEtLW5J0-0N89gldeDlcIej7ydf_fMoQ86o5wlu5bo79bQd-SKsvB-IjmCJMct6RFnNvU14j0SvX5zVCvNgEDeHVGglbwYKqUL0zsX4g-i4b_5jX1m_IKOVYX2EjehHYjexrnoMx-R8d1i2ZvaOgXCEQQvmaA",
   "registered": true,
-  "refreshToken": "AMf-vBwlkPI-a3QFt0lSrIjDtN-tXfLPDgOL9PpmOJz5dSh50qgpC386kOn7kV5SjQb-_qIXZc0MD-PgQEkI2hffh-fqQBzZu-LMounClCq4bFJ-D0272gc81JyoEHaJd41m8ILNQ3FMcH01LmplfBHFnIWCMLMT35NPE_TYQtLVKYUBrwWIY_ZiIYeqe33eqy4oxj256ngfP1YMge-TJUCIorml9mAEPWjh6p6JTeygu_Vf_JKXcUQ",
+  "refreshToken": "AMf-vBzzaSKvw_aQYi0TwTKzU-MJ4km3dMxha7D3k23qgWEBuMrZgR_IPEwIMTqOvcRvJQlk-AW3f9zOeZkBS0GQLE3pn27PlyzF9Hf7F7hzyAYYD1IXbsYiCP_mzwr9JrSLI08CWuX6uCG2iiXMp1bXJWITiTSzeGKFwYuXSo7HYbxg2zNNEup4eLFzs-4VyiB23w1LVG_CmxFq-IE84VF2FoyTfZMwld0_hj95Sgbs328676TOOgY",
   "expiresIn": "3600"
 }
  
  </msg>
-<msg time="2026-03-30T16:41:21.188330" level="INFO">${response} = &lt;Response [200]&gt;</msg>
+<msg time="2026-03-31T16:55:37.330175" level="INFO">${response} = &lt;Response [200]&gt;</msg>
 <var>${response}</var>
 <arg>${FIREBASE_URL}</arg>
 <arg>params=key=${FIREBASE_KEY}</arg>
 <arg>json=${body}</arg>
 <arg>expected_status=200</arg>
 <doc>Sends a POST request.</doc>
-<status status="PASS" start="2026-03-30T16:41:20.311775" elapsed="0.876660"/>
+<status status="PASS" start="2026-03-31T16:55:36.669350" elapsed="0.660924"/>
 </kw>
 <kw name="Get From Dictionary" owner="Collections">
-<msg time="2026-03-30T16:41:21.189435" level="INFO">${token} = eyJhbGciOiJSUzI1NiIsImtpZCI6IjM3MzAwNzY5YTA3ZTA1MTE2ZjdlNTEzOGZhOTA5MzY4NWVlYmMyNDAiLCJ0eXAiOiJKV1QifQ.eyJuYW1lIjoiYWRtLmNhc3RlbGEiLCJpc3MiOiJodHRwczovL3NlY3VyZXRva2VuLmdvb2dsZS5jb20vbG9raS1kZXYtNDQ0O...</msg>
+<msg time="2026-03-31T16:55:37.331269" level="INFO">${token} = eyJhbGciOiJSUzI1NiIsImtpZCI6IjM3MzAwNzY5YTA3ZTA1MTE2ZjdlNTEzOGZhOTA5MzY4NWVlYmMyNDAiLCJ0eXAiOiJKV1QifQ.eyJuYW1lIjoiYWRtLmNhc3RlbGEiLCJpc3MiOiJodHRwczovL3NlY3VyZXRva2VuLmdvb2dsZS5jb20vbG9raS1kZXYtNDQ0O...</msg>
 <var>${token}</var>
 <arg>${response.json()}</arg>
 <arg>idToken</arg>
 <doc>Returns a value from the given ``dictionary`` based on the given ``key``.</doc>
-<status status="PASS" start="2026-03-30T16:41:21.188651" elapsed="0.001152"/>
+<status status="PASS" start="2026-03-31T16:55:37.330476" elapsed="0.000909"/>
 </kw>
 <return>
 <value>${token}</value>
-<status status="PASS" start="2026-03-30T16:41:21.189931" elapsed="0.000205"/>
+<status status="PASS" start="2026-03-31T16:55:37.331494" elapsed="0.000327"/>
 </return>
-<msg time="2026-03-30T16:41:21.190316" level="INFO">${token} = eyJhbGciOiJSUzI1NiIsImtpZCI6IjM3MzAwNzY5YTA3ZTA1MTE2ZjdlNTEzOGZhOTA5MzY4NWVlYmMyNDAiLCJ0eXAiOiJKV1QifQ.eyJuYW1lIjoiYWRtLmNhc3RlbGEiLCJpc3MiOiJodHRwczovL3NlY3VyZXRva2VuLmdvb2dsZS5jb20vbG9raS1kZXYtNDQ0O...</msg>
+<msg time="2026-03-31T16:55:37.331991" level="INFO">${token} = eyJhbGciOiJSUzI1NiIsImtpZCI6IjM3MzAwNzY5YTA3ZTA1MTE2ZjdlNTEzOGZhOTA5MzY4NWVlYmMyNDAiLCJ0eXAiOiJKV1QifQ.eyJuYW1lIjoiYWRtLmNhc3RlbGEiLCJpc3MiOiJodHRwczovL3NlY3VyZXRva2VuLmdvb2dsZS5jb20vbG9raS1kZXYtNDQ0O...</msg>
 <var>${token}</var>
-<status status="PASS" start="2026-03-30T16:41:20.310517" elapsed="0.879916"/>
+<status status="PASS" start="2026-03-31T16:55:36.667652" elapsed="0.664448"/>
 </kw>
 <kw name="Criar Customer" owner="pericia_helper">
-<msg time="2026-03-30T16:41:22.102222" level="INFO">Criar customer [TESTE_ACIDENTE_1DIA_20260330_ZAJ2] status: 201
-Massa salva: ACIDENTE_1DIA → TESTE_ACIDENTE_1DIA_20260330_ZAJ2</msg>
-<msg time="2026-03-30T16:41:22.102684" level="INFO">${id} = 45110074-b792-42f8-94c1-278a70d3019a</msg>
-<msg time="2026-03-30T16:41:22.102820" level="INFO">${cpf} = 25926899472</msg>
-<msg time="2026-03-30T16:41:22.102935" level="INFO">${nome} = TESTE_ACIDENTE_1DIA_20260330_ZAJ2</msg>
+<msg time="2026-03-31T16:55:38.268294" level="INFO">Criar customer [TESTE_LTS_60DIAS_PSIQ_20260331_FE6M] status: 201
+Massa salva: LTS_60DIAS_PSIQ → TESTE_LTS_60DIAS_PSIQ_20260331_FE6M</msg>
+<msg time="2026-03-31T16:55:38.268723" level="INFO">${id} = 867259d0-cb3a-4a0c-8e8c-a8332bd6f159</msg>
+<msg time="2026-03-31T16:55:38.269032" level="INFO">${cpf} = 48619232345</msg>
+<msg time="2026-03-31T16:55:38.269405" level="INFO">${nome} = TESTE_LTS_60DIAS_PSIQ_20260331_FE6M</msg>
 <var>${id}</var>
 <var>${cpf}</var>
 <var>${nome}</var>
 <arg>${API_URL}</arg>
 <arg>${token}</arg>
-<arg>ACIDENTE_1DIA</arg>
+<arg>LTS_60DIAS_PSIQ</arg>
 <arg>${COMPANY_PMV}</arg>
-<status status="PASS" start="2026-03-30T16:41:21.190959" elapsed="0.912142"/>
+<status status="PASS" start="2026-03-31T16:55:37.332614" elapsed="0.936961"/>
 </kw>
 <kw name="Criar Pericia Api" owner="pericia_helper">
-<msg time="2026-03-30T16:41:27.941981" level="INFO">Status: 201</msg>
-<msg time="2026-03-30T16:41:27.942279" level="INFO">${status} = 201</msg>
-<msg time="2026-03-30T16:41:27.943333" level="INFO">${body} = {"files":[{"id":"371f0b67-c769-429b-af30-36513896c04b","link":"https://guidance-mages-results.s3.amazonaws.com/medical-expert-report-request/files/a99b8f90-e5f2-4840-974e-f7c8ac396202.png","extension"...</msg>
+<msg time="2026-03-31T16:55:44.264910" level="INFO">Status: 201</msg>
+<msg time="2026-03-31T16:55:44.265183" level="INFO">${status} = 201</msg>
+<msg time="2026-03-31T16:55:44.266188" level="INFO">${body} = {"files":[{"id":"c9887fbf-b0f4-40a1-aabe-bd154af176cb","link":"https://guidance-mages-results.s3.amazonaws.com/medical-expert-report-request/files/3ae18718-0534-4b86-aea3-2f638d535a2a.png","extension"...</msg>
 <var>${status}</var>
 <var>${body}</var>
 <arg>${API_URL}</arg>
@@ -96,38 +100,43 @@ Massa salva: ACIDENTE_1DIA → TESTE_ACIDENTE_1DIA_20260330_ZAJ2</msg>
 <arg>${CELL_TESTE}</arg>
 <arg>${EMAIL_TESTE}</arg>
 <arg>2026-04-01</arg>
-<arg>1</arg>
-<arg>${ACIDENTE}</arg>
-<arg>${CID_GERAL}</arg>
+<arg>60</arg>
+<arg>${LTS}</arg>
+<arg>${CID_PSIQ}</arg>
 <arg>${FIXTURE}</arg>
-<status status="PASS" start="2026-03-30T16:41:22.103588" elapsed="5.839856"/>
+<status status="PASS" start="2026-03-31T16:55:38.270227" elapsed="5.996081"/>
 </kw>
 <kw name="Should Be True" owner="BuiltIn">
 <arg>${status} &lt; 300</arg>
+<arg>API retornou ${status}: ${body}</arg>
 <doc>Fails if the given condition is not true.</doc>
-<status status="PASS" start="2026-03-30T16:41:27.944185" elapsed="0.000387"/>
+<status status="PASS" start="2026-03-31T16:55:44.267035" elapsed="0.000488"/>
 </kw>
-<tag>acidente</tag>
-<tag>outros</tag>
+<tag>borda</tag>
+<tag>junta</tag>
+<tag>lts</tag>
+<tag>lts_psiquiatria</tag>
 <tag>pmv</tag>
 <tag>setup</tag>
-<status status="PASS" start="2026-03-30T16:41:20.305920" elapsed="7.639006"/>
+<status status="PASS" start="2026-03-31T16:55:36.664012" elapsed="7.603873"/>
 </test>
-<status status="PASS" start="2026-03-30T16:41:20.138260" elapsed="7.815469"/>
+<status status="PASS" start="2026-03-31T16:55:36.635549" elapsed="7.637280"/>
 </suite>
-<status status="PASS" start="2026-03-30T16:41:20.129786" elapsed="7.827040"/>
+<status status="PASS" start="2026-03-31T16:55:36.544241" elapsed="7.732589"/>
 </suite>
-<status status="PASS" start="2026-03-30T16:41:20.126200" elapsed="7.833126"/>
+<status status="PASS" start="2026-03-31T16:55:36.541145" elapsed="7.738070"/>
 </suite>
-<status status="PASS" start="2026-03-30T16:41:20.083832" elapsed="7.877724"/>
+<status status="PASS" start="2026-03-31T16:55:36.513583" elapsed="7.767837"/>
 </suite>
 <statistics>
 <total>
 <stat pass="1" fail="0" skip="0">All Tests</stat>
 </total>
 <tag>
-<stat pass="1" fail="0" skip="0">acidente</stat>
-<stat pass="1" fail="0" skip="0">outros</stat>
+<stat pass="1" fail="0" skip="0">borda</stat>
+<stat pass="1" fail="0" skip="0">junta</stat>
+<stat pass="1" fail="0" skip="0">lts</stat>
+<stat pass="1" fail="0" skip="0">lts_psiquiatria</stat>
 <stat pass="1" fail="0" skip="0">pmv</stat>
 <stat pass="1" fail="0" skip="0">setup</stat>
 </tag>

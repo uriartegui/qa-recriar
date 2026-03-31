@@ -6,6 +6,7 @@ import os
 from datetime import datetime
 
 MASSA_FILE = os.path.join(os.path.dirname(__file__), '..', '..', 'results', 'massa_criada.json')
+_customer_regra = {}
 
 def gerar_sufixo():
     chars = "ABCDEFGHIJKLMNOPQRSTUVWXYZ0123456789"
@@ -33,12 +34,14 @@ def salvar_massa(regra, customer_id, cpf, nome):
         "customer_id": customer_id,
         "cpf": cpf,
         "nome": nome,
+        "cid": None,
         "data_criacao": datetime.now().strftime("%Y-%m-%d %H:%M:%S")
     }
     os.makedirs(os.path.dirname(MASSA_FILE), exist_ok=True)
     with open(MASSA_FILE, 'w') as f:
         json.dump(dados, f, indent=2, ensure_ascii=False)
     print(f"Massa salva: {regra} → {nome}")
+    _customer_regra[customer_id] = regra
 
 def criar_customer(api_url, token, regra, company_id, tipo="Main"):
     url = f"{api_url}/customer"
@@ -96,5 +99,14 @@ def criar_pericia_api(api_url, token, customer_id, cpf, cellphone, email,
     with open(file_path, "rb") as f:
         files = {"files": ("atestado.png", f, "image/png")}
         response = requests.post(url, data=data, files=files, headers=headers)
+    if response.status_code < 300 and customer_id in _customer_regra:
+        regra = _customer_regra[customer_id]
+        if os.path.exists(MASSA_FILE):
+            with open(MASSA_FILE, 'r') as f:
+                dados = json.load(f)
+            if regra in dados:
+                dados[regra]["cid"] = cid
+                with open(MASSA_FILE, 'w') as f:
+                    json.dump(dados, f, indent=2, ensure_ascii=False)
     print(f"Status: {response.status_code}")
     return response.status_code, response.text
