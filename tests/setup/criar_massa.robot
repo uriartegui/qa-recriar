@@ -2,7 +2,6 @@
 Library       ../../resources/keywords/pericia_helper.py
 Resource      ../../resources/keywords/mihmo_auth.robot
 Variables     ../../resources/variables/homolog.yaml
-Suite Setup   Limpar Massa Antes Do Suite
 
 *** Variables ***
 ${COMPANY_PMV}      32e94042-51d1-4270-a5ea-88b9915f22d4
@@ -23,10 +22,6 @@ ${RESTRICAO}        RestrictedActivity
 ${ADMISSIONAL}      Admission
 ${ACIDENTE}         FirstWorkAccidentAttendance
 ${PROCESSOS_ADM}    AdministrativeProcesses
-
-*** Keywords ***
-Limpar Massa Antes Do Suite
-    Limpar Massa
 
 *** Test Cases ***
 
@@ -102,7 +97,7 @@ LTS - 59 Dias - CID Geral - Limite Antes Junta
     ...    2026-04-01    59    ${LTS}    ${CID_GERAL}    ${FIXTURE}
     Should Be True    ${status} < 300    API retornou ${status}: ${body}
 
-LTS - 60 Dias - CID Geral - Junta Medica Clinico Geral
+LTS - 61 Dias - CID Geral - Junta Medica Clinico Geral
     [Tags]    setup    pmv    lts    lts_geral    borda    junta
     ${token}=    Autenticar No Mihmo
     ${id}    ${cpf}    ${nome}=    Criar Customer
@@ -110,7 +105,7 @@ LTS - 60 Dias - CID Geral - Junta Medica Clinico Geral
     ${status}    ${body}=    Criar Pericia Api
     ...    ${API_URL}    ${token}    ${id}    ${cpf}
     ...    ${CELL_TESTE}    ${EMAIL_TESTE}
-    ...    2026-04-01    60    ${LTS}    ${CID_GERAL}    ${FIXTURE}
+    ...    2026-04-01    61    ${LTS}    ${CID_GERAL}    ${FIXTURE}
     Should Be True    ${status} < 300    API retornou ${status}: ${body}
 
 # ══════════════════════════════════════════════════════════
@@ -163,7 +158,7 @@ LTS - 59 Dias - CID F - Limite Antes Junta
     ...    2026-04-01    59    ${LTS}    ${CID_PSIQ}    ${FIXTURE}
     Should Be True    ${status} < 300    API retornou ${status}: ${body}
 
-LTS - 60 Dias - CID F - Junta Medica Psiquiatra e Clinico Geral
+LTS - 61 Dias - CID F - Junta Medica Psiquiatra e Clinico Geral
     [Tags]    setup    pmv    lts    lts_psiquiatria    borda    junta
     ${token}=    Autenticar No Mihmo
     ${id}    ${cpf}    ${nome}=    Criar Customer
@@ -171,7 +166,7 @@ LTS - 60 Dias - CID F - Junta Medica Psiquiatra e Clinico Geral
     ${status}    ${body}=    Criar Pericia Api
     ...    ${API_URL}    ${token}    ${id}    ${cpf}
     ...    ${CELL_TESTE}    ${EMAIL_TESTE}
-    ...    2026-04-01    60    ${LTS}    ${CID_PSIQ}    ${FIXTURE}
+    ...    2026-04-01    61    ${LTS}    ${CID_PSIQ}    ${FIXTURE}
     Should Be True    ${status} < 300    API retornou ${status}: ${body}
 
 # ══════════════════════════════════════════════════════════
@@ -224,7 +219,7 @@ LTS - 59 Dias - CID M S - Limite Antes Junta Ortopedista
     ...    2026-04-01    59    ${LTS}    ${CID_ORTOPEDIA}    ${FIXTURE}
     Should Be True    ${status} < 300    API retornou ${status}: ${body}
 
-LTS - 60 Dias - CID M S - Junta Medica Ortopedista e Clinico Geral
+LTS - 61 Dias - CID M S - Junta Medica Ortopedista e Clinico Geral
     [Tags]    setup    pmv    lts    lts_ortopedia    borda    junta
     ${token}=    Autenticar No Mihmo
     ${id}    ${cpf}    ${nome}=    Criar Customer
@@ -232,7 +227,7 @@ LTS - 60 Dias - CID M S - Junta Medica Ortopedista e Clinico Geral
     ${status}    ${body}=    Criar Pericia Api
     ...    ${API_URL}    ${token}    ${id}    ${cpf}
     ...    ${CELL_TESTE}    ${EMAIL_TESTE}
-    ...    2026-04-01    60    ${LTS}    ${CID_ORTOPEDIA}    ${FIXTURE}
+    ...    2026-04-01    61    ${LTS}    ${CID_ORTOPEDIA}    ${FIXTURE}
     Should Be True    ${status} < 300    API retornou ${status}: ${body}
 
 # ══════════════════════════════════════════════════════════
@@ -300,7 +295,7 @@ LTF - 59 Dias - Limite Antes Junta
     ...    2026-04-01    59    ${LTF}    ${CID_GERAL}    ${FIXTURE}
     Should Be True    ${status} < 300    API retornou ${status}: ${body}
 
-LTF - 60 Dias - Junta Medica Clinico Geral
+LTF - 61 Dias - Junta Medica Clinico Geral
     [Tags]    setup    pmv    ltf    borda    junta
     ${token}=    Autenticar No Mihmo
     ${id}    ${cpf}    ${nome}=    Criar Customer
@@ -308,7 +303,7 @@ LTF - 60 Dias - Junta Medica Clinico Geral
     ${status}    ${body}=    Criar Pericia Api
     ...    ${API_URL}    ${token}    ${id}    ${cpf}
     ...    ${CELL_TESTE}    ${EMAIL_TESTE}
-    ...    2026-04-01    60    ${LTF}    ${CID_GERAL}    ${FIXTURE}
+    ...    2026-04-01    61    ${LTF}    ${CID_GERAL}    ${FIXTURE}
     Should Be True    ${status} < 300    API retornou ${status}: ${body}
 
 # ══════════════════════════════════════════════════════════
