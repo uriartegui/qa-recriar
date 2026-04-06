@@ -2,6 +2,12 @@
 Library       ../../resources/keywords/pericia_helper.py
 Resource      ../../resources/keywords/mihmo_auth.robot
 Variables     ../../resources/variables/homolog.yaml
+Suite Setup   Inicializar Data
+
+*** Keywords ***
+Inicializar Data
+    ${data}=    Gerar Data Hoje
+    Set Suite Variable    ${DATA_HOJE}    ${data}
 
 *** Variables ***
 ${COMPANY_PMV}      32e94042-51d1-4270-a5ea-88b9915f22d4
@@ -39,7 +45,7 @@ LTS - 1 Dia - CID Geral - Medico Trabalho
     ${status}    ${body}=    Criar Pericia Api
     ...    ${API_URL}    ${token}    ${id}    ${cpf}
     ...    ${CELL_TESTE}    ${EMAIL_TESTE}
-    ...    2026-04-01    1    ${LTS}    ${CID_GERAL}    ${FIXTURE}
+    ...    ${DATA_HOJE}    1    ${LTS}    ${CID_GERAL}    ${FIXTURE}
     Should Be True    ${status} < 300    API retornou ${status}: ${body}
 
 LTS - 3 Dias - CID Geral - Limite Medico Trabalho
@@ -50,7 +56,7 @@ LTS - 3 Dias - CID Geral - Limite Medico Trabalho
     ${status}    ${body}=    Criar Pericia Api
     ...    ${API_URL}    ${token}    ${id}    ${cpf}
     ...    ${CELL_TESTE}    ${EMAIL_TESTE}
-    ...    2026-04-01    3    ${LTS}    ${CID_GERAL}    ${FIXTURE}
+    ...    ${DATA_HOJE}    3    ${LTS}    ${CID_GERAL}    ${FIXTURE}
     Should Be True    ${status} < 300    API retornou ${status}: ${body}
 
 LTS - 4 Dias - CID Geral - Inicio Clinico Geral
@@ -61,7 +67,7 @@ LTS - 4 Dias - CID Geral - Inicio Clinico Geral
     ${status}    ${body}=    Criar Pericia Api
     ...    ${API_URL}    ${token}    ${id}    ${cpf}
     ...    ${CELL_TESTE}    ${EMAIL_TESTE}
-    ...    2026-04-01    4    ${LTS}    ${CID_GERAL}    ${FIXTURE}
+    ...    ${DATA_HOJE}    4    ${LTS}    ${CID_GERAL}    ${FIXTURE}
     Should Be True    ${status} < 300    API retornou ${status}: ${body}
 
 LTS - 14 Dias - CID Geral - Limite Faixa 4-14
@@ -72,7 +78,7 @@ LTS - 14 Dias - CID Geral - Limite Faixa 4-14
     ${status}    ${body}=    Criar Pericia Api
     ...    ${API_URL}    ${token}    ${id}    ${cpf}
     ...    ${CELL_TESTE}    ${EMAIL_TESTE}
-    ...    2026-04-01    14    ${LTS}    ${CID_GERAL}    ${FIXTURE}
+    ...    ${DATA_HOJE}    14    ${LTS}    ${CID_GERAL}    ${FIXTURE}
     Should Be True    ${status} < 300    API retornou ${status}: ${body}
 
 LTS - 15 Dias - CID Geral - Inicio Faixa 15-59
@@ -83,7 +89,7 @@ LTS - 15 Dias - CID Geral - Inicio Faixa 15-59
     ${status}    ${body}=    Criar Pericia Api
     ...    ${API_URL}    ${token}    ${id}    ${cpf}
     ...    ${CELL_TESTE}    ${EMAIL_TESTE}
-    ...    2026-04-01    15    ${LTS}    ${CID_GERAL}    ${FIXTURE}
+    ...    ${DATA_HOJE}    15    ${LTS}    ${CID_GERAL}    ${FIXTURE}
     Should Be True    ${status} < 300    API retornou ${status}: ${body}
 
 LTS - 59 Dias - CID Geral - Limite Antes Junta
@@ -94,7 +100,7 @@ LTS - 59 Dias - CID Geral - Limite Antes Junta
     ${status}    ${body}=    Criar Pericia Api
     ...    ${API_URL}    ${token}    ${id}    ${cpf}
     ...    ${CELL_TESTE}    ${EMAIL_TESTE}
-    ...    2026-04-01    59    ${LTS}    ${CID_GERAL}    ${FIXTURE}
+    ...    ${DATA_HOJE}    59    ${LTS}    ${CID_GERAL}    ${FIXTURE}
     Should Be True    ${status} < 300    API retornou ${status}: ${body}
 
 LTS - 61 Dias - CID Geral - Junta Medica Clinico Geral
@@ -105,7 +111,7 @@ LTS - 61 Dias - CID Geral - Junta Medica Clinico Geral
     ${status}    ${body}=    Criar Pericia Api
     ...    ${API_URL}    ${token}    ${id}    ${cpf}
     ...    ${CELL_TESTE}    ${EMAIL_TESTE}
-    ...    2026-04-01    61    ${LTS}    ${CID_GERAL}    ${FIXTURE}
+    ...    ${DATA_HOJE}    61    ${LTS}    ${CID_GERAL}    ${FIXTURE}
     Should Be True    ${status} < 300    API retornou ${status}: ${body}
 
 # ══════════════════════════════════════════════════════════
@@ -122,7 +128,7 @@ LTS - 4 Dias - CID F - Inicio Clinico Geral
     ${status}    ${body}=    Criar Pericia Api
     ...    ${API_URL}    ${token}    ${id}    ${cpf}
     ...    ${CELL_TESTE}    ${EMAIL_TESTE}
-    ...    2026-04-01    4    ${LTS}    ${CID_PSIQ}    ${FIXTURE}
+    ...    ${DATA_HOJE}    4    ${LTS}    ${CID_PSIQ}    ${FIXTURE}
     Should Be True    ${status} < 300    API retornou ${status}: ${body}
 
 LTS - 29 Dias - CID F - Limite Faixa 4-30
@@ -133,7 +139,7 @@ LTS - 29 Dias - CID F - Limite Faixa 4-30
     ${status}    ${body}=    Criar Pericia Api
     ...    ${API_URL}    ${token}    ${id}    ${cpf}
     ...    ${CELL_TESTE}    ${EMAIL_TESTE}
-    ...    2026-04-01    29    ${LTS}    ${CID_PSIQ}    ${FIXTURE}
+    ...    ${DATA_HOJE}    29    ${LTS}    ${CID_PSIQ}    ${FIXTURE}
     Should Be True    ${status} < 300    API retornou ${status}: ${body}
 
 LTS - 30 Dias - CID F - Inicio Faixa 30-59
@@ -144,7 +150,7 @@ LTS - 30 Dias - CID F - Inicio Faixa 30-59
     ${status}    ${body}=    Criar Pericia Api
     ...    ${API_URL}    ${token}    ${id}    ${cpf}
     ...    ${CELL_TESTE}    ${EMAIL_TESTE}
-    ...    2026-04-01    30    ${LTS}    ${CID_PSIQ}    ${FIXTURE}
+    ...    ${DATA_HOJE}    30    ${LTS}    ${CID_PSIQ}    ${FIXTURE}
     Should Be True    ${status} < 300    API retornou ${status}: ${body}
 
 LTS - 59 Dias - CID F - Limite Antes Junta
@@ -155,7 +161,7 @@ LTS - 59 Dias - CID F - Limite Antes Junta
     ${status}    ${body}=    Criar Pericia Api
     ...    ${API_URL}    ${token}    ${id}    ${cpf}
     ...    ${CELL_TESTE}    ${EMAIL_TESTE}
-    ...    2026-04-01    59    ${LTS}    ${CID_PSIQ}    ${FIXTURE}
+    ...    ${DATA_HOJE}    59    ${LTS}    ${CID_PSIQ}    ${FIXTURE}
     Should Be True    ${status} < 300    API retornou ${status}: ${body}
 
 LTS - 61 Dias - CID F - Junta Medica Psiquiatra e Clinico Geral
@@ -166,7 +172,7 @@ LTS - 61 Dias - CID F - Junta Medica Psiquiatra e Clinico Geral
     ${status}    ${body}=    Criar Pericia Api
     ...    ${API_URL}    ${token}    ${id}    ${cpf}
     ...    ${CELL_TESTE}    ${EMAIL_TESTE}
-    ...    2026-04-01    61    ${LTS}    ${CID_PSIQ}    ${FIXTURE}
+    ...    ${DATA_HOJE}    61    ${LTS}    ${CID_PSIQ}    ${FIXTURE}
     Should Be True    ${status} < 300    API retornou ${status}: ${body}
 
 # ══════════════════════════════════════════════════════════
@@ -183,7 +189,7 @@ LTS - 4 Dias - CID M S - Inicio Clinico Geral
     ${status}    ${body}=    Criar Pericia Api
     ...    ${API_URL}    ${token}    ${id}    ${cpf}
     ...    ${CELL_TESTE}    ${EMAIL_TESTE}
-    ...    2026-04-01    4    ${LTS}    ${CID_ORTOPEDIA}    ${FIXTURE}
+    ...    ${DATA_HOJE}    4    ${LTS}    ${CID_ORTOPEDIA}    ${FIXTURE}
     Should Be True    ${status} < 300    API retornou ${status}: ${body}
 
 LTS - 14 Dias - CID M S - Limite Faixa 4-14 Clinico Geral
@@ -194,7 +200,7 @@ LTS - 14 Dias - CID M S - Limite Faixa 4-14 Clinico Geral
     ${status}    ${body}=    Criar Pericia Api
     ...    ${API_URL}    ${token}    ${id}    ${cpf}
     ...    ${CELL_TESTE}    ${EMAIL_TESTE}
-    ...    2026-04-01    14    ${LTS}    ${CID_ORTOPEDIA}    ${FIXTURE}
+    ...    ${DATA_HOJE}    14    ${LTS}    ${CID_ORTOPEDIA}    ${FIXTURE}
     Should Be True    ${status} < 300    API retornou ${status}: ${body}
 
 LTS - 15 Dias - CID M S - Inicio Ortopedista
@@ -205,7 +211,7 @@ LTS - 15 Dias - CID M S - Inicio Ortopedista
     ${status}    ${body}=    Criar Pericia Api
     ...    ${API_URL}    ${token}    ${id}    ${cpf}
     ...    ${CELL_TESTE}    ${EMAIL_TESTE}
-    ...    2026-04-01    15    ${LTS}    ${CID_ORTOPEDIA}    ${FIXTURE}
+    ...    ${DATA_HOJE}    15    ${LTS}    ${CID_ORTOPEDIA}    ${FIXTURE}
     Should Be True    ${status} < 300    API retornou ${status}: ${body}
 
 LTS - 59 Dias - CID M S - Limite Antes Junta Ortopedista
@@ -216,7 +222,7 @@ LTS - 59 Dias - CID M S - Limite Antes Junta Ortopedista
     ${status}    ${body}=    Criar Pericia Api
     ...    ${API_URL}    ${token}    ${id}    ${cpf}
     ...    ${CELL_TESTE}    ${EMAIL_TESTE}
-    ...    2026-04-01    59    ${LTS}    ${CID_ORTOPEDIA}    ${FIXTURE}
+    ...    ${DATA_HOJE}    59    ${LTS}    ${CID_ORTOPEDIA}    ${FIXTURE}
     Should Be True    ${status} < 300    API retornou ${status}: ${body}
 
 LTS - 61 Dias - CID M S - Junta Medica Ortopedista e Clinico Geral
@@ -227,7 +233,7 @@ LTS - 61 Dias - CID M S - Junta Medica Ortopedista e Clinico Geral
     ${status}    ${body}=    Criar Pericia Api
     ...    ${API_URL}    ${token}    ${id}    ${cpf}
     ...    ${CELL_TESTE}    ${EMAIL_TESTE}
-    ...    2026-04-01    61    ${LTS}    ${CID_ORTOPEDIA}    ${FIXTURE}
+    ...    ${DATA_HOJE}    61    ${LTS}    ${CID_ORTOPEDIA}    ${FIXTURE}
     Should Be True    ${status} < 300    API retornou ${status}: ${body}
 
 # ══════════════════════════════════════════════════════════
@@ -242,7 +248,7 @@ LTS INSS - 1 Dia - Clinico Geral
     ${status}    ${body}=    Criar Pericia Api
     ...    ${API_URL}    ${token}    ${id}    ${cpf}
     ...    ${CELL_TESTE}    ${EMAIL_TESTE}
-    ...    2026-04-01    1    ${LTS_INSS}    ${CID_GERAL}    ${FIXTURE}
+    ...    ${DATA_HOJE}    1    ${LTS_INSS}    ${CID_GERAL}    ${FIXTURE}
     Should Be True    ${status} < 300    API retornou ${status}: ${body}
 
 # ══════════════════════════════════════════════════════════
@@ -259,7 +265,7 @@ LTF - 1 Dia - Medico Trabalho
     ${status}    ${body}=    Criar Pericia Api
     ...    ${API_URL}    ${token}    ${id}    ${cpf}
     ...    ${CELL_TESTE}    ${EMAIL_TESTE}
-    ...    2026-04-01    1    ${LTF}    ${CID_GERAL}    ${FIXTURE}
+    ...    ${DATA_HOJE}    1    ${LTF}    ${CID_GERAL}    ${FIXTURE}
     Should Be True    ${status} < 300    API retornou ${status}: ${body}
 
 LTF - 3 Dias - Limite Medico Trabalho
@@ -270,7 +276,7 @@ LTF - 3 Dias - Limite Medico Trabalho
     ${status}    ${body}=    Criar Pericia Api
     ...    ${API_URL}    ${token}    ${id}    ${cpf}
     ...    ${CELL_TESTE}    ${EMAIL_TESTE}
-    ...    2026-04-01    3    ${LTF}    ${CID_GERAL}    ${FIXTURE}
+    ...    ${DATA_HOJE}    3    ${LTF}    ${CID_GERAL}    ${FIXTURE}
     Should Be True    ${status} < 300    API retornou ${status}: ${body}
 
 LTF - 4 Dias - Inicio Clinico Geral
@@ -281,7 +287,7 @@ LTF - 4 Dias - Inicio Clinico Geral
     ${status}    ${body}=    Criar Pericia Api
     ...    ${API_URL}    ${token}    ${id}    ${cpf}
     ...    ${CELL_TESTE}    ${EMAIL_TESTE}
-    ...    2026-04-01    4    ${LTF}    ${CID_GERAL}    ${FIXTURE}
+    ...    ${DATA_HOJE}    4    ${LTF}    ${CID_GERAL}    ${FIXTURE}
     Should Be True    ${status} < 300    API retornou ${status}: ${body}
 
 LTF - 59 Dias - Limite Antes Junta
@@ -292,7 +298,7 @@ LTF - 59 Dias - Limite Antes Junta
     ${status}    ${body}=    Criar Pericia Api
     ...    ${API_URL}    ${token}    ${id}    ${cpf}
     ...    ${CELL_TESTE}    ${EMAIL_TESTE}
-    ...    2026-04-01    59    ${LTF}    ${CID_GERAL}    ${FIXTURE}
+    ...    ${DATA_HOJE}    59    ${LTF}    ${CID_GERAL}    ${FIXTURE}
     Should Be True    ${status} < 300    API retornou ${status}: ${body}
 
 LTF - 61 Dias - Junta Medica Clinico Geral
@@ -303,7 +309,7 @@ LTF - 61 Dias - Junta Medica Clinico Geral
     ${status}    ${body}=    Criar Pericia Api
     ...    ${API_URL}    ${token}    ${id}    ${cpf}
     ...    ${CELL_TESTE}    ${EMAIL_TESTE}
-    ...    2026-04-01    61    ${LTF}    ${CID_GERAL}    ${FIXTURE}
+    ...    ${DATA_HOJE}    61    ${LTF}    ${CID_GERAL}    ${FIXTURE}
     Should Be True    ${status} < 300    API retornou ${status}: ${body}
 
 # ══════════════════════════════════════════════════════════
@@ -318,7 +324,7 @@ Consulta Medica - 1 Dia - Medico Trabalho
     ${status}    ${body}=    Criar Pericia Api
     ...    ${API_URL}    ${token}    ${id}    ${cpf}
     ...    ${CELL_TESTE}    ${EMAIL_TESTE}
-    ...    2026-04-01    1    ${CONSULTA}    ${CID_GERAL}    ${FIXTURE}
+    ...    ${DATA_HOJE}    1    ${CONSULTA}    ${CID_GERAL}    ${FIXTURE}
     Should Be True    ${status} < 300    API retornou ${status}: ${body}
 
 Exame Admissional - 1 Dia - Clinico Geral
@@ -329,7 +335,7 @@ Exame Admissional - 1 Dia - Clinico Geral
     ${status}    ${body}=    Criar Pericia Api
     ...    ${API_URL}    ${token}    ${id}    ${cpf}
     ...    ${CELL_TESTE}    ${EMAIL_TESTE}
-    ...    2026-04-01    1    ${ADMISSIONAL}    ${CID_GERAL}    ${FIXTURE}
+    ...    ${DATA_HOJE}    1    ${ADMISSIONAL}    ${CID_GERAL}    ${FIXTURE}
     Should Be True    ${status} < 300    API retornou ${status}: ${body}
 
 Licenca Gestacao - 120 Dias - Clinico Geral
@@ -340,7 +346,7 @@ Licenca Gestacao - 120 Dias - Clinico Geral
     ${status}    ${body}=    Criar Pericia Api
     ...    ${API_URL}    ${token}    ${id}    ${cpf}
     ...    ${CELL_TESTE}    ${EMAIL_TESTE}
-    ...    2026-04-01    120    ${GESTACAO}    ${CID_GERAL}    ${FIXTURE}
+    ...    ${DATA_HOJE}    120    ${GESTACAO}    ${CID_GERAL}    ${FIXTURE}
     Should Be True    ${status} < 300    API retornou ${status}: ${body}
 
 Atividade Com Restricao - 1 Dia - Junta Medica Clinico Geral
@@ -351,7 +357,7 @@ Atividade Com Restricao - 1 Dia - Junta Medica Clinico Geral
     ${status}    ${body}=    Criar Pericia Api
     ...    ${API_URL}    ${token}    ${id}    ${cpf}
     ...    ${CELL_TESTE}    ${EMAIL_TESTE}
-    ...    2026-04-01    1    ${RESTRICAO}    ${CID_GERAL}    ${FIXTURE}
+    ...    ${DATA_HOJE}    1    ${RESTRICAO}    ${CID_GERAL}    ${FIXTURE}
     Should Be True    ${status} < 300    API retornou ${status}: ${body}
 
 Acidente de Trabalho - 1 Dia - Medico Trabalho
@@ -362,7 +368,7 @@ Acidente de Trabalho - 1 Dia - Medico Trabalho
     ${status}    ${body}=    Criar Pericia Api
     ...    ${API_URL}    ${token}    ${id}    ${cpf}
     ...    ${CELL_TESTE}    ${EMAIL_TESTE}
-    ...    2026-04-01    1    ${ACIDENTE}    ${CID_GERAL}    ${FIXTURE}
+    ...    ${DATA_HOJE}    1    ${ACIDENTE}    ${CID_GERAL}    ${FIXTURE}
     Should Be True    ${status} < 300    API retornou ${status}: ${body}
 
 Processos Administrativos - 1 Dia - Medico Trabalho
@@ -373,5 +379,5 @@ Processos Administrativos - 1 Dia - Medico Trabalho
     ${status}    ${body}=    Criar Pericia Api
     ...    ${API_URL}    ${token}    ${id}    ${cpf}
     ...    ${CELL_TESTE}    ${EMAIL_TESTE}
-    ...    2026-04-01    1    ${PROCESSOS_ADM}    ${CID_GERAL}    ${FIXTURE}
+    ...    ${DATA_HOJE}    1    ${PROCESSOS_ADM}    ${CID_GERAL}    ${FIXTURE}
     Should Be True    ${status} < 300    API retornou ${status}: ${body}

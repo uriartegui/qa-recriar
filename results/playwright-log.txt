@@ -1,66 +1,41 @@
-{"level":30,"time":"2026-03-30T17:40:31.527Z","pid":21556,"hostname":"TOTALLIFEPC-033","msg":"Listening on 127.0.0.1:55664"}
-{"level":30,"time":"2026-03-30T17:40:31.875Z","pid":21556,"hostname":"TOTALLIFEPC-033","msg":"Start of node method newBrowser"}
-{"level":30,"time":"2026-03-30T17:40:32.109Z","pid":21556,"hostname":"TOTALLIFEPC-033","msg":"Adding browser to stack: chromium, version: 145.0.7632.6"}
-{"level":30,"time":"2026-03-30T17:40:32.109Z","pid":21556,"hostname":"TOTALLIFEPC-033","msg":"Adding 0 contexts to browser"}
-{"level":30,"time":"2026-03-30T17:40:32.109Z","pid":21556,"hostname":"TOTALLIFEPC-033","msg":"End of node method newBrowser"}
-{"level":30,"time":"2026-03-30T17:40:32.116Z","pid":21556,"hostname":"TOTALLIFEPC-033","msg":"Start of node method newPage"}
-{"level":30,"time":"2026-03-30T17:40:32.117Z","pid":21556,"hostname":"TOTALLIFEPC-033","msg":"currentBrowser: {\"name\":\"chromium\",\"browser\":{\"_type\":\"Browser\",\"_guid\":\"browser@509800d1dde7781367b3f8408772819e\"},\"headless\":false,\"_contextStack\":[],\"id\":\"browser=93632b4c-8b20-4272-99db-871a583c8d16\"}"}
-{"level":30,"time":"2026-03-30T17:40:32.130Z","pid":21556,"hostname":"TOTALLIFEPC-033","msg":"Setting default timeout for context context=21f6a723-3598-44c1-8dab-935e75f17a78 to 10000"}
-{"level":30,"time":"2026-03-30T17:40:32.130Z","pid":21556,"hostname":"TOTALLIFEPC-033","msg":"Changed active context: context=21f6a723-3598-44c1-8dab-935e75f17a78"}
-{"level":30,"time":"2026-03-30T17:40:32.281Z","pid":21556,"hostname":"TOTALLIFEPC-033","msg":"Video path: undefined"}
-{"level":30,"time":"2026-03-30T17:40:32.281Z","pid":21556,"hostname":"TOTALLIFEPC-033","msg":"Changed active page"}
-{"level":30,"time":"2026-03-30T17:40:33.005Z","pid":21556,"hostname":"TOTALLIFEPC-033","msg":"End of node method newPage"}
-{"level":30,"time":"2026-03-30T17:40:33.010Z","pid":21556,"hostname":"TOTALLIFEPC-033","msg":"Start of node method fillText"}
-{"level":30,"time":"2026-03-30T17:40:33.010Z","pid":21556,"hostname":"TOTALLIFEPC-033","msg":"Strict mode is enabled, find Locator with input[name=\"username\"] in page."}
-{"level":30,"time":"2026-03-30T17:40:33.044Z","pid":21556,"hostname":"TOTALLIFEPC-033","msg":"End of node method fillText"}
-{"level":30,"time":"2026-03-30T17:40:33.049Z","pid":21556,"hostname":"TOTALLIFEPC-033","msg":"Start of node method fillText"}
-{"level":30,"time":"2026-03-30T17:40:33.050Z","pid":21556,"hostname":"TOTALLIFEPC-033","msg":"Strict mode is enabled, find Locator with input[name=\"password\"] in page."}
-{"level":30,"time":"2026-03-30T17:40:33.062Z","pid":21556,"hostname":"TOTALLIFEPC-033","msg":"End of node method fillText"}
-{"level":30,"time":"2026-03-30T17:40:33.065Z","pid":21556,"hostname":"TOTALLIFEPC-033","msg":"Start of node method click"}
-{"level":30,"time":"2026-03-30T17:40:33.065Z","pid":21556,"hostname":"TOTALLIFEPC-033","msg":"Strict mode is enabled, find Locator with po-button button in page."}
-{"level":30,"time":"2026-03-30T17:40:33.236Z","pid":21556,"hostname":"TOTALLIFEPC-033","msg":"End of node method click"}
-{"level":30,"time":"2026-03-30T17:40:33.239Z","pid":21556,"hostname":"TOTALLIFEPC-033","msg":"Start of node method waitForNavigation"}
-{"level":30,"time":"2026-03-30T17:40:36.458Z","pid":21556,"hostname":"TOTALLIFEPC-033","msg":"End of node method waitForNavigation"}
-{"level":30,"time":"2026-03-30T17:40:36.463Z","pid":21556,"hostname":"TOTALLIFEPC-033","msg":"Start of node method goTo"}
-{"level":30,"time":"2026-03-30T17:40:38.684Z","pid":21556,"hostname":"TOTALLIFEPC-033","msg":"End of node method goTo"}
-{"level":30,"time":"2026-03-30T17:40:38.688Z","pid":21556,"hostname":"TOTALLIFEPC-033","msg":"Start of node method click"}
-{"level":30,"time":"2026-03-30T17:40:38.688Z","pid":21556,"hostname":"TOTALLIFEPC-033","msg":"Strict mode is enabled, find Locator with p-dropdown >> nth=0 in page."}
-{"level":30,"time":"2026-03-30T17:40:38.770Z","pid":21556,"hostname":"TOTALLIFEPC-033","msg":"End of node method click"}
-{"level":30,"time":"2026-03-30T17:40:38.772Z","pid":21556,"hostname":"TOTALLIFEPC-033","msg":"Start of node method fillText"}
-{"level":30,"time":"2026-03-30T17:40:38.772Z","pid":21556,"hostname":"TOTALLIFEPC-033","msg":"Strict mode is enabled, find Locator with input.p-dropdown-filter in page."}
-{"level":30,"time":"2026-03-30T17:40:38.788Z","pid":21556,"hostname":"TOTALLIFEPC-033","msg":"End of node method fillText"}
-{"level":30,"time":"2026-03-30T17:40:38.790Z","pid":21556,"hostname":"TOTALLIFEPC-033","msg":"Start of node method click"}
-{"level":30,"time":"2026-03-30T17:40:38.790Z","pid":21556,"hostname":"TOTALLIFEPC-033","msg":"Strict mode is enabled, find Locator with .p-dropdown-item >> nth=0 in page."}
-{"level":30,"time":"2026-03-30T17:40:48.795Z","pid":21556,"hostname":"TOTALLIFEPC-033","msg":"Error of node method  click"}
-================= Original suppressed error =================
-locator.click: Timeout 10000ms exceeded.
-Call log:
-[2m  - waiting for locator('.p-dropdown-item').first()[22m
-
-    at internalClick (C:\Users\guilherme.uriarte\AppData\Local\Python\pythoncore-3.14-64\Lib\site-packages\Browser\wrapper\index.js:12386:19)
-    at async click (C:\Users\guilherme.uriarte\AppData\Local\Python\pythoncore-3.14-64\Lib\site-packages\Browser\wrapper\index.js:12367:18)
-    at async PlaywrightServer.click (C:\Users\guilherme.uriarte\AppData\Local\Python\pythoncore-3.14-64\Lib\site-packages\Browser\wrapper\index.js:13690:28) {
-  name: 'TimeoutError'
-}
-=============================================================
-{"level":30,"time":"2026-03-30T17:40:48.804Z","pid":21556,"hostname":"TOTALLIFEPC-033","msg":"Start of node method takeScreenshot"}
-{"level":30,"time":"2026-03-30T17:40:48.804Z","pid":21556,"hostname":"TOTALLIFEPC-033","Take screenshot with options: ":{"path":"C:\\dev\\qa\\results\\browser\\screenshot\\fail-screenshot-1.png","fileType":"png","fullPage":false,"timeout":10000,"omitBackground":false}}
-{"level":30,"time":"2026-03-30T17:40:48.904Z","pid":21556,"hostname":"TOTALLIFEPC-033","msg":"End of node method takeScreenshot"}
-{"level":30,"time":"2026-03-30T17:40:48.914Z","pid":21556,"hostname":"TOTALLIFEPC-033","msg":"Start of node method getBrowserCatalog"}
-{"level":30,"time":"2026-03-30T17:40:48.915Z","pid":21556,"hostname":"TOTALLIFEPC-033","msg":"End of node method getBrowserCatalog"}
-{"level":30,"time":"2026-03-30T17:40:48.917Z","pid":21556,"hostname":"TOTALLIFEPC-033","msg":"Start of node method getBrowserCatalog"}
-{"level":30,"time":"2026-03-30T17:40:48.918Z","pid":21556,"hostname":"TOTALLIFEPC-033","msg":"End of node method getBrowserCatalog"}
-{"level":30,"time":"2026-03-30T17:40:48.920Z","pid":21556,"hostname":"TOTALLIFEPC-033","msg":"Start of node method getBrowserCatalog"}
-{"level":30,"time":"2026-03-30T17:40:48.921Z","pid":21556,"hostname":"TOTALLIFEPC-033","msg":"End of node method getBrowserCatalog"}
-{"level":30,"time":"2026-03-30T17:40:48.922Z","pid":21556,"hostname":"TOTALLIFEPC-033","msg":"Start of node method getBrowserCatalog"}
-{"level":30,"time":"2026-03-30T17:40:48.923Z","pid":21556,"hostname":"TOTALLIFEPC-033","msg":"End of node method getBrowserCatalog"}
-{"level":30,"time":"2026-03-30T17:40:48.925Z","pid":21556,"hostname":"TOTALLIFEPC-033","msg":"Changed active context: context=21f6a723-3598-44c1-8dab-935e75f17a78"}
-{"level":30,"time":"2026-03-30T17:40:48.925Z","pid":21556,"hostname":"TOTALLIFEPC-033","msg":"Changing current active page: page=d65e904e-36c8-45ef-8c7a-dc5c6eab506e"}
-{"level":30,"time":"2026-03-30T17:40:48.925Z","pid":21556,"hostname":"TOTALLIFEPC-033","msg":"Changed active page"}
-{"level":30,"time":"2026-03-30T17:40:48.927Z","pid":21556,"hostname":"TOTALLIFEPC-033","msg":"Start of node method closeContext"}
-{"level":30,"time":"2026-03-30T17:40:48.955Z","pid":21556,"hostname":"TOTALLIFEPC-033","msg":"Removed page=e6c6c755-f067-457e-85bc-12552b1eb062 from context=21f6a723-3598-44c1-8dab-935e75f17a78 page stack"}
-{"level":30,"time":"2026-03-30T17:40:48.958Z","pid":21556,"hostname":"TOTALLIFEPC-033","msg":"End of node method closeContext"}
-{"level":30,"time":"2026-03-30T17:40:48.963Z","pid":21556,"hostname":"TOTALLIFEPC-033","msg":"Start of node method getBrowserCatalog"}
-{"level":30,"time":"2026-03-30T17:40:48.963Z","pid":21556,"hostname":"TOTALLIFEPC-033","msg":"End of node method getBrowserCatalog"}
-{"level":30,"time":"2026-03-30T17:40:49.024Z","pid":21556,"hostname":"TOTALLIFEPC-033","msg":"Start of node method closeAllBrowsers"}
-{"level":30,"time":"2026-03-30T17:40:49.182Z","pid":21556,"hostname":"TOTALLIFEPC-033","msg":"End of node method closeAllBrowsers"}
+{"level":30,"time":"2026-04-06T13:04:52.829Z","pid":11076,"hostname":"TOTALLIFEPC-033","msg":"Listening on 127.0.0.1:56931"}
+{"level":30,"time":"2026-04-06T13:04:53.263Z","pid":11076,"hostname":"TOTALLIFEPC-033","msg":"Start of node method newBrowser"}
+{"level":30,"time":"2026-04-06T13:04:53.467Z","pid":11076,"hostname":"TOTALLIFEPC-033","msg":"Adding browser to stack: chromium, version: 145.0.7632.6"}
+{"level":30,"time":"2026-04-06T13:04:53.468Z","pid":11076,"hostname":"TOTALLIFEPC-033","msg":"Adding 0 contexts to browser"}
+{"level":30,"time":"2026-04-06T13:04:53.468Z","pid":11076,"hostname":"TOTALLIFEPC-033","msg":"End of node method newBrowser"}
+{"level":30,"time":"2026-04-06T13:04:53.473Z","pid":11076,"hostname":"TOTALLIFEPC-033","msg":"Start of node method newPage"}
+{"level":30,"time":"2026-04-06T13:04:53.474Z","pid":11076,"hostname":"TOTALLIFEPC-033","msg":"currentBrowser: {\"name\":\"chromium\",\"browser\":{\"_type\":\"Browser\",\"_guid\":\"browser@6ce0299c32b3e757510853157aaa8a36\"},\"headless\":false,\"_contextStack\":[],\"id\":\"browser=6d3e8098-aea6-4b64-a169-f494a5c10a93\"}"}
+{"level":30,"time":"2026-04-06T13:04:53.486Z","pid":11076,"hostname":"TOTALLIFEPC-033","msg":"Setting default timeout for context context=3ba0de95-f3f5-4ed1-a5cd-79688b55f082 to 10000"}
+{"level":30,"time":"2026-04-06T13:04:53.486Z","pid":11076,"hostname":"TOTALLIFEPC-033","msg":"Changed active context: context=3ba0de95-f3f5-4ed1-a5cd-79688b55f082"}
+{"level":30,"time":"2026-04-06T13:04:53.618Z","pid":11076,"hostname":"TOTALLIFEPC-033","msg":"Video path: undefined"}
+{"level":30,"time":"2026-04-06T13:04:53.618Z","pid":11076,"hostname":"TOTALLIFEPC-033","msg":"Changed active page"}
+{"level":30,"time":"2026-04-06T13:04:54.280Z","pid":11076,"hostname":"TOTALLIFEPC-033","msg":"End of node method newPage"}
+{"level":30,"time":"2026-04-06T13:04:54.286Z","pid":11076,"hostname":"TOTALLIFEPC-033","msg":"Start of node method fillText"}
+{"level":30,"time":"2026-04-06T13:04:54.286Z","pid":11076,"hostname":"TOTALLIFEPC-033","msg":"Strict mode is enabled, find Locator with input[name=\"username\"] in page."}
+{"level":30,"time":"2026-04-06T13:04:54.318Z","pid":11076,"hostname":"TOTALLIFEPC-033","msg":"End of node method fillText"}
+{"level":30,"time":"2026-04-06T13:04:54.321Z","pid":11076,"hostname":"TOTALLIFEPC-033","msg":"Start of node method fillText"}
+{"level":30,"time":"2026-04-06T13:04:54.322Z","pid":11076,"hostname":"TOTALLIFEPC-033","msg":"Strict mode is enabled, find Locator with input[name=\"password\"] in page."}
+{"level":30,"time":"2026-04-06T13:04:54.330Z","pid":11076,"hostname":"TOTALLIFEPC-033","msg":"End of node method fillText"}
+{"level":30,"time":"2026-04-06T13:04:54.335Z","pid":11076,"hostname":"TOTALLIFEPC-033","msg":"Start of node method click"}
+{"level":30,"time":"2026-04-06T13:04:54.335Z","pid":11076,"hostname":"TOTALLIFEPC-033","msg":"Strict mode is enabled, find Locator with po-button button in page."}
+{"level":30,"time":"2026-04-06T13:04:54.489Z","pid":11076,"hostname":"TOTALLIFEPC-033","msg":"End of node method click"}
+{"level":30,"time":"2026-04-06T13:04:54.492Z","pid":11076,"hostname":"TOTALLIFEPC-033","msg":"Start of node method waitForNavigation"}
+{"level":30,"time":"2026-04-06T13:04:56.919Z","pid":11076,"hostname":"TOTALLIFEPC-033","msg":"End of node method waitForNavigation"}
+{"level":30,"time":"2026-04-06T13:04:56.927Z","pid":11076,"hostname":"TOTALLIFEPC-033","msg":"Start of node method getBrowserCatalog"}
+{"level":30,"time":"2026-04-06T13:04:57.006Z","pid":11076,"hostname":"TOTALLIFEPC-033","msg":"End of node method getBrowserCatalog"}
+{"level":30,"time":"2026-04-06T13:04:57.036Z","pid":11076,"hostname":"TOTALLIFEPC-033","msg":"Start of node method getBrowserCatalog"}
+{"level":30,"time":"2026-04-06T13:04:57.037Z","pid":11076,"hostname":"TOTALLIFEPC-033","msg":"End of node method getBrowserCatalog"}
+{"level":30,"time":"2026-04-06T13:04:57.043Z","pid":11076,"hostname":"TOTALLIFEPC-033","msg":"Start of node method getBrowserCatalog"}
+{"level":30,"time":"2026-04-06T13:04:57.045Z","pid":11076,"hostname":"TOTALLIFEPC-033","msg":"End of node method getBrowserCatalog"}
+{"level":30,"time":"2026-04-06T13:04:57.046Z","pid":11076,"hostname":"TOTALLIFEPC-033","msg":"Start of node method getBrowserCatalog"}
+{"level":30,"time":"2026-04-06T13:04:57.048Z","pid":11076,"hostname":"TOTALLIFEPC-033","msg":"End of node method getBrowserCatalog"}
+{"level":30,"time":"2026-04-06T13:04:57.050Z","pid":11076,"hostname":"TOTALLIFEPC-033","msg":"Start of node method getBrowserCatalog"}
+{"level":30,"time":"2026-04-06T13:04:57.052Z","pid":11076,"hostname":"TOTALLIFEPC-033","msg":"End of node method getBrowserCatalog"}
+{"level":30,"time":"2026-04-06T13:04:57.054Z","pid":11076,"hostname":"TOTALLIFEPC-033","msg":"Start of node method getBrowserCatalog"}
+{"level":30,"time":"2026-04-06T13:04:57.055Z","pid":11076,"hostname":"TOTALLIFEPC-033","msg":"End of node method getBrowserCatalog"}
+{"level":30,"time":"2026-04-06T13:04:57.056Z","pid":11076,"hostname":"TOTALLIFEPC-033","msg":"Changed active context: context=3ba0de95-f3f5-4ed1-a5cd-79688b55f082"}
+{"level":30,"time":"2026-04-06T13:04:57.056Z","pid":11076,"hostname":"TOTALLIFEPC-033","msg":"Changing current active page: page=bf5c20e3-fa14-4cde-86f2-d858d5c3e862"}
+{"level":30,"time":"2026-04-06T13:04:57.057Z","pid":11076,"hostname":"TOTALLIFEPC-033","msg":"Changed active page"}
+{"level":30,"time":"2026-04-06T13:04:57.059Z","pid":11076,"hostname":"TOTALLIFEPC-033","msg":"Start of node method closeContext"}
+{"level":30,"time":"2026-04-06T13:04:57.070Z","pid":11076,"hostname":"TOTALLIFEPC-033","msg":"Removed page=fade3a63-b8a8-46e7-bc86-7ac279547b77 from context=3ba0de95-f3f5-4ed1-a5cd-79688b55f082 page stack"}
+{"level":30,"time":"2026-04-06T13:04:57.074Z","pid":11076,"hostname":"TOTALLIFEPC-033","msg":"End of node method closeContext"}

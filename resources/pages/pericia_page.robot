@@ -59,3 +59,24 @@ Pericia Cadastrada Com Sucesso
 
 Verificar Erro Generico
     Get Text    .po-toaster-message >> nth=0    contains    erro
+
+Aguardar Modal Pericia Solicitada
+    Wait For Elements State    css=span.po-info-value    visible    timeout=15s
+
+Capturar Profissional Da Pericia
+    ${profissional}=    Get Text    css=span.po-info-value >> nth=0
+    RETURN    ${profissional}
+
+Verificar Profissional
+    [Arguments]    ${esperado}
+    ${profissional}=    Capturar Profissional Da Pericia
+    Should Be Equal    ${profissional}    ${esperado}
+
+Fechar Modal Pericia
+    Click    css=po-modal button[aria-label="Fechar"], po-modal .po-modal-header-close
+
+Obter ID Da Pericia Da URL
+    ${url}=    Get Location
+    ${parts}=    Split String    ${url}    /
+    ${id}=    Get From List    ${parts}    -1
+    RETURN    ${id}

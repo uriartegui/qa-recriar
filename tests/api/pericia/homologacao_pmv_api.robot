@@ -6,7 +6,12 @@ Variables     ../../../resources/variables/homolog.yaml
 *** Keywords ***
 Homologar Regra API
     [Arguments]    ${regra}    ${especialista_esperado}    ${junta}=${FALSE}
+    ${existe}=    Regra Existe Na Massa    ${regra}
+    Skip If    not ${existe}    Regra '${regra}' não está no massa_criada.json — rode criar_massa.robot primeiro
     ${token}=    Autenticar No Mihmo
+
+    Sleep    5s
+
     # Passo 1: Verificar roteamento na fila da clínica
     ${role}    ${is_junta}    ${board_roles}    ${att_id}=    Verificar Especialista Api
     ...    ${API_URL}    ${token}    ${regra}
@@ -28,6 +33,12 @@ Homologar Regra API
     ELSE
         Should Be Equal    ${event_type}    ${especialista_esperado}
         ...    eventType na fila diverge! Esperado: '${especialista_esperado}' | Recebido: '${event_type}'
+    END
+    # Passo 3: Homologar a perícia (apenas casos não-junta)
+    IF    not ${junta}
+        ${status}=    Homologar Pericia    ${API_URL}    ${token}    ${regra}
+        Should Be Equal    ${status}    Accepted
+        ...    Status da homologação diverge! Esperado: 'Accepted' | Recebido: '${status}'
     END
 
 *** Test Cases ***
