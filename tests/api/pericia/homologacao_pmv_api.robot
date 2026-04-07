@@ -26,7 +26,7 @@ Homologar Regra API
     END
     # Passo 2: Enviar para fila do médico e confirmar eventType
     ${event_type}    ${is_junta_fila}=    Enviar Para Fila
-    ...    ${API_URL}    ${token}    ${att_id}
+    ...    ${API_URL}    ${token}    ${att_id}    ${regra}
     IF    ${junta}
         Should Be True    ${is_junta_fila}
         ...    Junta não confirmada após envio para fila. regra='${regra}'

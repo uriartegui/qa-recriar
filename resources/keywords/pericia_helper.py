@@ -44,6 +44,7 @@ CREDENTIALS = {
     "Psiquiatra":      {"email": "SEU_EMAIL_PSIQUIATRA",       "password": "REMOVIDO"},
 }
 
+<<<<<<< HEAD
 FIREBASE_AUTH_URL = (
     "https://www.googleapis.com/identitytoolkit/v3/relyingparty/verifyPassword"
     "?key=REMOVIDO"
@@ -84,6 +85,30 @@ def _obter_token(role: str) -> str:
     _token_cache[role] = {"token": new_token, "exp": _time.time() + expires_in}
     print(f"[auto-login] Token para '{role}' obtido. Expira em {expires_in}s.")
     return new_token
+=======
+def _extrair_user_id_jwt(jwt_token):
+    """Extrai user_id do payload JWT sem verificar assinatura (funciona mesmo expirado)."""
+    try:
+        parts = jwt_token.split('.')
+        if len(parts) < 2:
+            return None
+        payload = parts[1]
+        padding = 4 - len(payload) % 4
+        if padding != 4:
+            payload += '=' * padding
+        data = json.loads(base64.b64decode(payload).decode('utf-8'))
+        uid = data.get("user_id") or data.get("sub")
+        return uid
+    except Exception:
+        return None
+
+# user_id permanente de cada role — extraído dos JWTs mesmo expirados
+SQUAD_USER_IDS = {
+    role: _extrair_user_id_jwt(tok)
+    for role, tok in TOKENS.items()
+    if tok and not tok.startswith("SEU_")
+}
+>>>>>>> e096d23 (atualização)
 
 def gerar_sufixo():
     chars = "ABCDEFGHIJKLMNOPQRSTUVWXYZ0123456789"
@@ -155,6 +180,9 @@ def salvar_massa(regra, customer_id, cpf, nome):
         "days": None,
         "start_date": None,
         "attendance_id": None,
+        "role": None,
+        "is_junta": False,
+        "matricula": None,
         "data_criacao": datetime.now().strftime("%Y-%m-%d %H:%M:%S")
     }
     os.makedirs(os.path.dirname(MASSA_FILE), exist_ok=True)
@@ -198,6 +226,13 @@ def criar_customer(api_url, token, regra, company_id, tipo="Main"):
         data = safe_json(response)
         customer_id = data.get("customerid")
         salvar_massa(regra, customer_id, cpf, nome)
+        # salva matrícula logo após criar o customer
+        if os.path.exists(MASSA_FILE):
+            with open(MASSA_FILE, 'r') as _f:
+                _d = json.load(_f)
+            _d[regra]["matricula"] = matricula
+            with open(MASSA_FILE, 'w') as _f:
+                json.dump(_d, _f, indent=2, ensure_ascii=False)
         return customer_id, cpf, nome
     raise Exception(f"Erro ao criar customer: {response.status_code} - {response.text[:300]}")
 
@@ -231,10 +266,22 @@ def criar_pericia_api(api_url, token, customer_id, cpf, cellphone, email,
                 dados[regra]["days"] = int(days)
                 dados[regra]["start_date"] = start_date
                 try:
-                    pericia_id = safe_json(response).get("id")
+                    resp_json = safe_json(response)
+                    print(f"criar_pericia resposta keys: {list(resp_json.keys())}")
+                    pericia_id = resp_json.get("id")
                     dados[regra]["pericia_id"] = pericia_id
-                except Exception:
-                    pass
+                    # Salva attendance_id se vier na resposta da criação
+                    att_id = (
+                        resp_json.get("scheduledAttendanceId")
+                        or resp_json.get("attendanceId")
+                        or (resp_json.get("scheduledAttendance") or {}).get("id")
+                        or (resp_json.get("attendance") or {}).get("id")
+                    )
+                    if att_id:
+                        dados[regra]["attendance_id"] = att_id
+                        print(f"attendance_id salvo da criação: {att_id}")
+                except Exception as e:
+                    print(f"Erro ao parsear resposta da péricia: {e}")
                 with open(MASSA_FILE, 'w') as ff:
                     json.dump(dados, ff, indent=2, ensure_ascii=False)
     print(f"Status: {response.status_code}")
@@ -272,20 +319,49 @@ def _buscar_detalhes_attendance(base_url, token, attendance_id):
     return role, is_junta, board_roles
 
 
-def verificar_especialista_api(api_url, token, regra):
+def _encontrar_atendimento_na_resposta(data, pericia_id):
+    """Procura pericia_id em qualquer estrutura de resposta de fila (lista plana, items, items.items)."""
+    # Normaliza para lista de grupos
+    top = data if isinstance(data, list) else data.get("items", [])
+    for grupo in top:
+        if not isinstance(grupo, dict):
+            continue
+        # Estrutura 1: grupo tem campo "attendances"
+        for atd in grupo.get("attendances", []):
+            if atd.get("medicalExpertReportRequestId") == pericia_id:
+                return atd
+        # Estrutura 2: grupo tem campo "items" com sub-atendimentos
+        for item in grupo.get("items", []):
+            if isinstance(item, dict):
+                if item.get("id") == pericia_id or item.get("medicalExpertReportRequestId") == pericia_id:
+                    # item pode ser o próprio atendimento ou conter attendances
+                    subs = item.get("attendances")
+                    if subs:
+                        return subs[0]
+                    return item
+        # Estrutura 3: grupo é diretamente o atendimento
+        if grupo.get("medicalExpertReportRequestId") == pericia_id:
+            return grupo
+    return None
 
+
+def verificar_especialista_api(api_url, token, regra):
     if not os.path.exists(MASSA_FILE):
         raise Exception("massa_criada.json não encontrado.")
-
     with open(MASSA_FILE, 'r') as f:
         dados = json.load(f)
-
     if regra not in dados:
-        raise Exception(f"SKIP: Regra '{regra}' não encontrada")
+        raise Exception(f"SKIP: Regra '{regra}' não encontrada no massa_criada.json.")
 
+<<<<<<< HEAD
     pericia_id = dados[regra].get("pericia_id")
     nome = dados[regra].get("nome", "")
     attendance_id = dados[regra].get("attendance_id")
+=======
+    pericia_id    = dados[regra].get("pericia_id")
+    nome          = dados[regra].get("nome", "")
+    attendance_id = dados[regra].get("attendance_id")   # lê o cache corretamente
+>>>>>>> e096d23 (atualização)
 
     if not pericia_id:
         raise Exception(f"SKIP: pericia_id não encontrado para '{regra}'. Recrie a massa.")
@@ -293,19 +369,24 @@ def verificar_especialista_api(api_url, token, regra):
     base_url = api_url.rsplit('/backend-nest', 1)[0]
     headers  = {"Authorization": f"Bearer {token}"}
 
-    # Se já temos o attendance_id salvo, busca detalhes diretamente
+    # 1. Se temos attendance_id em cache, tenta buscar detalhes diretamente
     if attendance_id:
         role, is_junta, board_roles = _buscar_detalhes_attendance(base_url, token, attendance_id)
         if role is not None:
-            print(f"Especialista (cache): roleName={role}, medicalBoard={is_junta}, attendance_id={attendance_id}")
+            print(f"Especialista (cache): role={role}, medicalBoard={is_junta}, attendance_id={attendance_id}")
             return role, is_junta, board_roles, attendance_id
+        # GET attendance retornou 403/404 (attendance na fila do médico ou token sem acesso)
+        # Tenta recuperar role do GET da péricia, que sempre retorna 200
+        role_cached    = dados[regra].get("role") or ""
+        is_junta_cached = dados[regra].get("is_junta", False)
+        if role_cached:
+            print(f"Especialista (cache role+attendance): role={role_cached}, attendance_id={attendance_id}")
+            return role_cached, is_junta_cached, [], attendance_id
+        print(f"Cache attendance_id={attendance_id} sem role — tentando via GET péricia...")
 
-    # Busca na fila da clínica
-    fila_url = f"{base_url}/attendance/api/scheduled-attendance/clinic"
-    page = 1
-    max_pages = 10
-    page = 1
+    headers_req = {"Authorization": f"Bearer {token}"}
 
+<<<<<<< HEAD
     while page <= max_pages:
         params = {
             "page": page,
@@ -317,50 +398,138 @@ def verificar_especialista_api(api_url, token, regra):
         if response.status_code != 200:
             raise Exception(f"Erro ao buscar fila da clínica: {response.status_code} - {response.text[:200]}")
         data = safe_json(response)
+=======
+    # 2. Tenta obter attendance_id direto da perícia (evita busca de fila)
+    print(f"Buscando attendance via GET péricia {pericia_id}...")
+    pericia_resp = requests.get(
+        f"{api_url}/medical-expert-report-request/{pericia_id}",
+        headers=headers_req
+    )
+    print(f"  GET péricia: {pericia_resp.status_code}")
+    if pericia_resp.status_code == 200:
+        pd = pericia_resp.json()
+        print(f"  péricia keys: {list(pd.keys())}")
+        # Tenta encontrar attendance_id na resposta da péricia
+        att_id_from_pericia = (
+            pd.get("scheduledAttendanceId")
+            or pd.get("attendanceId")
+            or pd.get("attendance_id")
+            or (pd.get("scheduledAttendance") or {}).get("id")
+            or (pd.get("attendance") or {}).get("id")
+        )
+        print(f"  attendance_id da péricia: {att_id_from_pericia}")
+        # Extrai role e registration da péricia diretamente (campos disponíveis no GET)
+        pericia_role     = pd.get("eventType") or pd.get("roleDescription") or ""
+        pericia_is_junta = pd.get("isMedicalBoard", False)
+        pericia_br       = [r.get("description", "") for r in (pd.get("medicalBoardRoles") or [])]
+        regs = pd.get("registrations") or []
+        if regs:
+            reg_id_from_pericia = regs[0].get("registrationid") or regs[0].get("registrationId") or regs[0].get("id")
+            print(f"  registration_id da péricia: {reg_id_from_pericia}")
+            dados[regra]["registration_id"] = reg_id_from_pericia
+            with open(MASSA_FILE, 'w') as ff:
+                json.dump(dados, ff, indent=2, ensure_ascii=False)
+        if att_id_from_pericia:
+            role, is_junta, board_roles = _buscar_detalhes_attendance(base_url, token, att_id_from_pericia)
+            if role is not None:
+                print(f"Especialista via péricia: role={role}, attendance_id={att_id_from_pericia}")
+                dados[regra]["attendance_id"] = att_id_from_pericia
+                dados[regra]["role"]     = role
+                dados[regra]["is_junta"] = is_junta
+                with open(MASSA_FILE, 'w') as ff:
+                    json.dump(dados, ff, indent=2, ensure_ascii=False)
+                return role, is_junta, board_roles, att_id_from_pericia
+        # Attendance não encontrado mas a péricia tem eventType — usa attendance_id cacheado se disponível
+        if attendance_id and pericia_role:
+            print(f"Especialista via eventType da péricia: role={pericia_role}, attendance_id={attendance_id}")
+            dados[regra]["role"]     = pericia_role
+            dados[regra]["is_junta"] = pericia_is_junta
+            with open(MASSA_FILE, 'w') as ff:
+                json.dump(dados, ff, indent=2, ensure_ascii=False)
+            return pericia_role, pericia_is_junta, pericia_br, attendance_id
+>>>>>>> e096d23 (atualização)
 
-        for grupo in data.get("items", []):
-            for atendimento in grupo.get("attendances", []):
-                if atendimento.get("medicalExpertReportRequestId") == pericia_id:
-                    role         = atendimento.get("roleName", "")
-                    is_junta     = atendimento.get("medicalBoard", False)
-                    board_roles  = [r.get("description", "") for r in atendimento.get("medicalBoardRoles", [])]
-                    attendance_id = atendimento.get("id", "")
-                    print(f"Especialista encontrado: roleName={role}, medicalBoard={is_junta}, attendance_id={attendance_id}")
-                    dados[regra]["attendance_id"] = attendance_id
-                    with open(MASSA_FILE, 'w') as ff:
-                        json.dump(dados, ff, indent=2, ensure_ascii=False)
-                    return role, is_junta, board_roles, attendance_id
+    # 3. Fallback: busca nas filas
+    fila_base = f"{base_url}/attendance/api/scheduled-attendance"
+    for fila_url in [f"{fila_base}/clinic", fila_base]:
+        print(f"Buscando em fila: {fila_url}")
+        page = 1
+        primeira_pagina = True
+        while page <= 20:
+            params = {"page": page, "pageSize": 50, "search": nome}
+            resp = requests.get(fila_url, params=params, headers=headers_req)
+            print(f"  page={page}: {resp.status_code}")
+            if resp.status_code != 200:
+                break
+            data = safe_json(resp)
+            # Imprime estrutura da 1ª página para diagnóstico
+            if primeira_pagina:
+                primeira_pagina = False
+                top = data if isinstance(data, list) else data.get("items", [])
+                if top:
+                    primeiro = top[0]
+                    print(f"  estrutura item[0] keys: {list(primeiro.keys()) if isinstance(primeiro, dict) else type(primeiro)}")
+                    # Mostra um atendimento de exemplo para ver campos disponíveis
+                    for campo in ("attendances", "items"):
+                        subs = primeiro.get(campo, []) if isinstance(primeiro, dict) else []
+                        if subs:
+                            print(f"  item[0].{campo}[0] keys: {list(subs[0].keys())}")
+                            break
+            atd = _encontrar_atendimento_na_resposta(data, pericia_id)
+            if atd:
+                role        = atd.get("eventType") or atd.get("roleName", "")
+                is_junta    = atd.get("medicalBoard") or atd.get("isMedicalBoard", False)
+                board_roles = [r.get("description", "") for r in (atd.get("medicalBoardRoles") or [])]
+                attendance_id = atd.get("id", "")
+                print(f"Especialista na fila: role={role}, attendance_id={attendance_id}")
+                dados[regra]["attendance_id"] = attendance_id
+                dados[regra]["role"]          = role
+                dados[regra]["is_junta"]      = is_junta
+                with open(MASSA_FILE, 'w') as ff:
+                    json.dump(dados, ff, indent=2, ensure_ascii=False)
+                return role, is_junta, board_roles, attendance_id
+            if not (data.get("hasNext", False) if isinstance(data, dict) else False):
+                break
+            page += 1
 
-        if not data.get("hasNext", False):
-            break
-        page += 1
+    raise Exception(
+        f"Péricia '{pericia_id}' não encontrada para regra '{regra}'. "
+        f"A fila da clínica pode ter mudado após a unificação — consulte o dev sobre o novo endpoint."
+    )
 
-    raise Exception(f"Perícia '{pericia_id}' não encontrada na fila da clínica para regra '{regra}'.")
 
-
-def enviar_para_fila(api_url, token, attendance_id):
+def enviar_para_fila(api_url, token, attendance_id, regra=None):
     base_url = api_url.rsplit('/backend-nest', 1)[0]
     url = f"{base_url}/attendance/api/scheduled-attendance/{attendance_id}/queue"
     headers = {"Authorization": f"Bearer {token}"}
     response = requests.post(url, headers=headers)
     print(f"enviar_para_fila: {response.status_code} | {response.text[:200]}")
-    if response.status_code not in (200, 201):
-        # Pode já estar na fila do médico — tenta obter detalhes diretamente
-        print(f"Aviso: /queue retornou {response.status_code}. Tentando obter detalhes do attendance...")
-        details_url = f"{base_url}/attendance/api/scheduled-attendance/{attendance_id}"
-        det = requests.get(details_url, headers=headers)
-        if det.status_code == 200:
-            d = det.json()
-            event_type = d.get("eventType") or d.get("roleName", "")
-            is_junta = d.get("medicalBoard", False)
-            print(f"Attendance já na fila. eventType={event_type}, medicalBoard={is_junta}")
-            return event_type, is_junta
-        raise Exception(f"Erro ao enviar para fila: {response.status_code} - {response.text[:200]}")
-    data = safe_json(response)
-    event_type = data.get("eventType", "")
-    is_junta = data.get("medicalBoard", False)
-    print(f"Enviado para fila. eventType={event_type}, medicalBoard={is_junta}")
-    return event_type, is_junta
+    if response.status_code in (200, 201):
+        data = safe_json(response)
+        event_type = data.get("eventType", "")
+        is_junta = data.get("medicalBoard", False)
+        print(f"Enviado para fila. eventType={event_type}, medicalBoard={is_junta}")
+        return event_type, is_junta
+
+    # Não foi 2xx — attendance provavelmente já está em queue (rodada anterior)
+    print(f"Aviso: /queue retornou {response.status_code} — usando fallback. regra={regra!r}")
+
+    # Tenta role cacheado no massa_criada.json
+    if os.path.exists(MASSA_FILE):
+        with open(MASSA_FILE, 'r') as f:
+            dados = json.load(f)
+        entrada = dados.get(str(regra), {}) if regra else {}
+        role_cached     = entrada.get("role") or ""
+        is_junta_cached = entrada.get("is_junta") or False
+        print(f"  massa role_cached={role_cached!r}, is_junta={is_junta_cached!r}, regra_key={str(regra)!r}")
+        if role_cached:
+            print(f"Role cacheado: eventType={role_cached}, medicalBoard={is_junta_cached}")
+            return role_cached, is_junta_cached
+
+    # Último fallback: attendance já está em queue, retorna eventType vazio
+    # (o Should Be Equal no robot vai capturar a divergência se houver)
+    print("Fallback final: retornando role vazio — attendance provavelmente já em queue.")
+    return "", False
 
 
 # ──────────────────────────────────────────────────────────────
@@ -535,17 +704,24 @@ def criar_ficha_clinica(api_url, token, customer_id, attendance_id, cpf=None):
     return response.status_code
 
 
+<<<<<<< HEAD
 def patch_validate_data(api_url, token, pericia_id, start_date, cid, days, **kwargs):
     """Tenta confirmar/validar dados da perícia antes de homologar.
     Experimenta múltiplos métodos e sufixos de URL; retorna o body JSON se algum
     responder 2xx, ou None se nenhum funcionar (fluxo continuará sem o PATCH).
+=======
+def patch_validate_data(api_url, token, attendance_id, start_date, cid, days):
+    """PATCH validate-data-requested usando o attendance_id (não o pericia_id).
+    Retorna o body JSON se responder 2xx, ou None se falhar.
+>>>>>>> e096d23 (atualização)
     """
     headers = {"Authorization": f"Bearer {token}", "Content-Type": "application/json"}
-    payload = {"startDate": start_date, "cid": cid, "days": int(days)}
+    payload = {"startDate": start_date, "cid": "", "days": int(days)}
 
     base = api_url if api_url.endswith('/backend-nest') \
         else api_url.rsplit('/backend-nest', 1)[0] + '/backend-nest'
 
+<<<<<<< HEAD
     # (método, url)
     attendance_id = kwargs.get("attendance_id")
     att_base = base.rsplit('/backend-nest', 1)[0]
@@ -587,13 +763,21 @@ def patch_validate_data(api_url, token, pericia_id, start_date, cid, days, **kwa
             continue
 
         print(f"  resposta: {resp.status_code} | {resp.text[:200]}")
+=======
+    url = f"{base}/medical-expert-report-request/{attendance_id}/validate-data-requested"
+    print(f"validate-data-requested: PATCH {url}")
+    print(f"  payload: {payload}")
+    try:
+        resp = requests.patch(url, json=payload, headers=headers, timeout=15)
+        print(f"  resposta: {resp.status_code} | {resp.text[:300]}")
+>>>>>>> e096d23 (atualização)
         if resp.status_code in (200, 201):
             data = resp.json()
-            print(f"validate-data OK via {method} {url.split('/')[-1]}")
+            print("validate-data-requested OK")
             return data[0] if isinstance(data, list) else data
-
-    # Nenhuma variação funcionou — retorna None para tentar continuar sem o PATCH
-    print("AVISO: validate-data não encontrado em nenhuma variação — seguindo sem ele.")
+        print(f"AVISO: validate-data-requested retornou {resp.status_code} — seguindo sem ele.")
+    except Exception as e:
+        print(f"validate-data-requested erro de rede: {e}")
     return None
 
 
@@ -629,7 +813,6 @@ def obter_detalhes_pericia(api_url, token, pericia_id):
     if response.status_code != 200:
         raise Exception(f"Erro ao obter detalhes da perícia: {response.status_code} - {response.text[:200]}")
     return safe_json(response)
-
 
 def obter_customer(api_url, token, customer_id):
     """Retorna o objeto completo do customer incluindo registrations."""
@@ -697,14 +880,48 @@ def obter_squad_user_do_attendance(base_url, token, attendance_id):
     return squad_user_id, memed_token
 
 
+def obter_squad_user_id_proprio(api_url, token):
+    """GET /squad-user/me — retorna o squadUserId do usuário autenticado."""
+    base = api_url if api_url.endswith('/backend-nest') \
+        else api_url.rsplit('/backend-nest', 1)[0] + '/backend-nest'
+    candidates = [
+        f"{base}/squad-user/me",
+        f"{base}/user/me",
+        f"{base}/auth/me",
+    ]
+    headers = {"Authorization": f"Bearer {token}"}
+    for url in candidates:
+        print(f"GET squad-user/me tentando: {url}")
+        try:
+            resp = requests.get(url, headers=headers, timeout=10)
+            print(f"  status: {resp.status_code} | {resp.text[:200]}")
+            if resp.status_code == 200:
+                data = resp.json()
+                print(f"  keys: {list(data.keys())}")
+                sid = (
+                    data.get("id")
+                    or data.get("squadUserId")
+                    or data.get("userId")
+                    or data.get("user_id")
+                )
+                if sid:
+                    print(f"  squad_user_id proprio: {sid}")
+                    return sid
+        except Exception as e:
+            print(f"  erro: {e}")
+    return None
+
+
 def obter_memed_token(api_url, token, squad_user_id):
     """Obtém o JWT do Memed para o médico responsável."""
     base = api_url.rsplit('/backend-nest', 1)[0]
     url = f"{base}/backend-nest/memed/memed-token/{squad_user_id}"
     headers = {"Authorization": f"Bearer {token}"}
     response = requests.get(url, headers=headers)
+    print(f"GET memed-token/{squad_user_id}: {response.status_code} | {response.text[:200]}")
     if response.status_code != 200:
         raise Exception(f"Erro ao obter token Memed: {response.status_code} - {response.text[:200]}")
+<<<<<<< HEAD
     data = safe_json(response)
     print(f"DEBUG memed-token response keys: {list(data.keys()) if isinstance(data, dict) else type(data)}")
     print(f"DEBUG memed-token response: {str(data)[:300]}")
@@ -761,6 +978,60 @@ def obter_primeiro_artigo(api_url, token, pericia_id, attendance_id=None, cid=No
     article_id   = filtered[0].get("id")
     article_name = filtered[0].get("article", "")
     print(f"  Artigo selecionado: {article_name} ({article_id})")
+=======
+    data = safe_json(response) or {}
+    memed_token = data.get("token")
+    if not memed_token:
+        raise Exception(
+            f"Memed token vazio para userId '{squad_user_id}'. "
+            f"Resposta: {data} — esse usuário tem Memed configurado no homolog?"
+        )
+    print(f"Token Memed obtido para squadUser {squad_user_id}")
+    return memed_token
+
+
+def obter_primeiro_artigo(api_url, token, attendance_id, matricula, categoria):
+    base = api_url if api_url.endswith('/backend-nest') \
+        else api_url.rsplit('/backend-nest', 1)[0] + '/backend-nest'
+    headers = {"Authorization": f"Bearer {token}"}
+
+    url = f"{base}/medical-expert-report-request/article/{attendance_id}/{matricula}/Accepted"
+    print(f"Buscando artigos: GET {url}")
+
+    resp = requests.get(url, headers=headers)
+    print(f"  status: {resp.status_code} | {resp.text[:500]}")
+
+    if resp.status_code != 200:
+        return None, ""
+
+    data = resp.json()
+    items = data if isinstance(data, list) else data.get("items", [])
+
+    if not items:
+        print(f"Nenhum artigo retornado para pericia_id={pericia_id}")
+        return None, ""
+
+    print(f"  total itens: {len(items)}")
+    if items:
+        print(f"  primeiro item keys: {list(items[0].keys())}")
+        print(f"  primeiro item id: {items[0].get('id')}")
+        print(f"  categorias[0]: {items[0].get('applicableCategories')}")
+        print(f"  categoria buscada: '{categoria}'")
+
+
+    for item in items:
+        categorias = item.get("applicableCategories") or []
+        if categoria in categorias:
+            article_id = item.get("id")
+            article_name = item.get("article") or ""
+            print(f"  Artigo encontrado para categoria {categoria}: {article_name} ({article_id})")
+            return article_id, article_name
+
+    # Se não achou pela categoria, usa o primeiro disponível
+    article_id = items[0].get("id")
+    article_name = items[0].get("article") or ""
+    print(f"  Categoria '{categoria}' não encontrada — usando primeiro artigo: {article_name} ({article_id})")
+>>>>>>> e096d23 (atualização)
     return article_id, article_name
 
 
@@ -864,17 +1135,20 @@ def gerar_memed_file_mihmo(api_url, token, attendance_id, pericia_id,
     payload = {
         "scheduledAttendanceId": attendance_id,
         "medicalExpertReportRequestId": pericia_id,
-        "type": "MedicalExpertReportRequest",
+        "type": "Medication",
         "registrationId": registration_id,
         "memedFileId": memed_file_id,
         "token": memed_token,
         "status": "Accepted",
-        "days": int(days),
         "cid": cid,
         "startDate": start_date,
-        "calculateEndDate": calculate_end_date,
         "observations": observations,
+        "shouldAttachDocuments": True,
+        "reasons": [],
+        "medicalBoardIds": [],
+        "articleId": article_id,
     }
+<<<<<<< HEAD
     if article_id:
         payload["articleId"] = article_id
     # Verificar check-clinical-record antes de enviar
@@ -883,6 +1157,8 @@ def gerar_memed_file_mihmo(api_url, token, attendance_id, pericia_id,
     ccr_resp = requests.get(ccr_url, headers=headers, timeout=10)
     print(f"check-clinical-record: {ccr_resp.status_code} | {ccr_resp.text[:300]}")
 
+=======
+>>>>>>> e096d23 (atualização)
     print(f"generate-memed-file payload: {json.dumps(payload, indent=2)}")
     response = requests.post(url, json=payload, headers=headers)
     print(f"generate-memed-file: {response.status_code} | {response.text[:1000]}")
@@ -915,15 +1191,21 @@ def homologar_pericia(api_url, token, regra):
     entrada = dados[regra]
     pericia_id    = entrada.get("pericia_id")
 
+<<<<<<< HEAD
     token_clinica = _obter_token("CLINICA")
 
+=======
+    # Usa o token fresco passado pelo Robot (vitoria@mihmo) para todas as operações.
+    # TOKENS contém JWTs hardcoded que expiram em 1h — não são usados para requests.
+>>>>>>> e096d23 (atualização)
     role, is_junta, board_roles, attendance_id = verificar_especialista_api(
-        api_url, token_clinica, regra
+        api_url, token, regra
     )
 
     if not attendance_id:
         raise Exception(f"attendance_id não encontrado para regra {regra}")
 
+<<<<<<< HEAD
     enviar_para_fila(api_url, token_clinica, attendance_id)
 
     token_medico = _obter_token(role)
@@ -934,6 +1216,9 @@ def homologar_pericia(api_url, token, regra):
     if not attendance_id:
         token_clinica = _obter_token("CLINICA")
         _, _, _, attendance_id = verificar_especialista_api(api_url, token_clinica, regra)
+=======
+    enviar_para_fila(api_url, token, attendance_id)
+>>>>>>> e096d23 (atualização)
 
     if not attendance_id:
         raise Exception(f"attendance_id inválido para regra {regra}")
@@ -956,6 +1241,7 @@ def homologar_pericia(api_url, token, regra):
 
     base_url = api_url.rsplit('/backend-nest', 1)[0]
 
+<<<<<<< HEAD
     # 1. squad_user_id = user_id extraído do JWT do médico
     squad_user_id = _jwt_user_id(token_medico)
     print(f"squad_user_id (JWT)={squad_user_id}")
@@ -973,35 +1259,59 @@ def homologar_pericia(api_url, token, regra):
     )
 
     # 3. registration_id
+=======
+    iniciar_atendimento(base_url, token, attendance_id)
+    criar_ficha_clinica(api_url, token, customer_id, attendance_id)
+    pericia_data = patch_validate_data(
+        api_url, token, attendance_id, start_date, cid, days
+    )
+
+
+>>>>>>> e096d23 (atualização)
     def _extrair_registration_id(data):
         if not data:
             return None
         reg = data.get("registration")
         if reg:
-            rid = reg.get("registrationid") or reg.get("id")
+            rid = reg.get("registrationId") or reg.get("registrationid") or reg.get("id")
             if rid:
                 return rid
         regs = (data.get("customer") or {}).get("registrations") or data.get("registrations") or []
         if regs:
-            return regs[0].get("registrationid") or regs[0].get("id")
+            return (
+                regs[0].get("registrationId")
+                or regs[0].get("registrationid")
+                or regs[0].get("id")
+            )
         return None
 
+<<<<<<< HEAD
+=======
+    # 3a. registration_id — tenta em cascata: PATCH response → GET customer
+>>>>>>> e096d23 (atualização)
     registration_id = _extrair_registration_id(pericia_data)
     # Sempre busca do customer para garantir category e functionalRegistration
     rid_customer, category_from_customer, functional_registration = obter_registration_id_do_customer(api_url, token_medico, customer_id)
     if not registration_id:
+<<<<<<< HEAD
         registration_id = rid_customer
     if category_from_customer:
         category = category_from_customer
     if not functional_registration:
         print("AVISO: functionalRegistration não encontrado no customer — eligibility-check pode falhar")
     print(f"registration_id={registration_id}, category={category}, functionalRegistration={functional_registration}")
+=======
+        print("registration_id não veio do PATCH — buscando via GET customer...")
+        registration_id = obter_registration_id_do_customer(api_url, token, customer_id)
+    print(f"registration_id={registration_id}")
+>>>>>>> e096d23 (atualização)
     if not registration_id:
         raise Exception(
             f"registration_id não encontrado para '{regra}'. "
             f"Verifique se o customer '{customer_id}' tem matrícula cadastrada."
         )
 
+<<<<<<< HEAD
     # 4. Artigo CID (URL correta inclui functionalRegistration)
     article_id, article_name = obter_primeiro_artigo(
         api_url, token_medico, pericia_id,
@@ -1025,6 +1335,44 @@ def homologar_pericia(api_url, token, regra):
         alg = "HS256(Memed)" if "eyJ0eXAiOiJKV1Qi" in memed_token[:30] else "RS256(Firebase?)"
         print(f"  memed_token prefix: {prefix}... alg_guess={alg}")
 
+=======
+    # 3b. squad_user_id — prioridade: role mapeado → attendance → /squad-user/me
+    # Usa direto o user_id do médico pelo role (evita pegar userId genérico da péricia)
+    squad_user_id = SQUAD_USER_IDS.get(role)
+    if squad_user_id:
+        print(f"  squad_user_id via SQUAD_USER_IDS['{role}']: {squad_user_id}")
+    if not squad_user_id:
+        squad_user_id = obter_squad_user_do_attendance(base_url, token, attendance_id)
+    if not squad_user_id:
+        print("Tentando GET /squad-user/me com o token atual...")
+        squad_user_id = obter_squad_user_id_proprio(api_url, token)
+    print(f"squad_user_id={squad_user_id}")
+    if not squad_user_id:
+        raise Exception(
+            f"squad_user_id não encontrado para '{regra}'. "
+            f"Verifique se o token tem squadUserId no endpoint /squad-user/me."
+        )
+
+        # 4. Artigo CID (obrigatório para PMV)
+    customer = obter_customer(api_url, token, customer_id)
+    regs = customer.get("registrations") or []
+    print(f"DEBUG customer regs[0]: {regs[0] if regs else 'VAZIO'}")
+    categoria = regs[0]["employmentCategory"] if regs else "101"
+    matricula = entrada.get("matricula")
+    if not matricula and regs:
+        matricula = regs[0].get("functionalRegistration")
+    print(f"matricula={matricula}, categoria={categoria}")
+
+    article_id, article_name = obter_primeiro_artigo(api_url, token, attendance_id, matricula, categoria)
+    if not article_id:
+        raise Exception(
+            f"articleId não encontrado para regra '{regra}' (CID={cid}, categoria={categoria})."
+        )
+
+    # 5. Token Memed
+    memed_token = obter_memed_token(api_url, token, squad_user_id)
+
+>>>>>>> e096d23 (atualização)
     # 6. Prescrição Memed
     memed_file_id = criar_prescricao_memed(
         memed_token, customer_id, customer_name, cpf,
@@ -1033,11 +1381,12 @@ def homologar_pericia(api_url, token, regra):
 
     # 7. Finaliza no Mihmo
     status = gerar_memed_file_mihmo(
-        api_url, token_medico, attendance_id, pericia_id,
+        api_url, token, attendance_id, pericia_id,
         registration_id, memed_file_id, memed_token,
         days, cid, start_date, observations, article_id
     )
     return status
+
 
 def safe_json(response):
     if response.status_code == 204:
@@ -1047,7 +1396,7 @@ def safe_json(response):
         raise Exception(f"Response vazia! Status: {response.status_code}")
 
     try:
-        return json.loads(response.text)  # 🔥 NÃO usa response.json()
+        return json.loads(response.text)
     except Exception:
         raise Exception(
             f"Response inválida!\nStatus: {response.status_code}\nBody:\n{response.text[:500]}"

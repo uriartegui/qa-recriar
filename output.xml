@@ -1,90 +1,88 @@
 <?xml version="1.0" encoding="UTF-8"?>
-<robot generator="Robot 7.4.2 (Python 3.12.10 on win32)" generated="2026-04-07T00:02:10.458252" rpa="false" schemaversion="5">
-<suite id="s1" name="Homologacao Pmv Api" source="C:\dev\qa-recriar\tests\api\pericia\homologacao_pmv_api.robot">
+<robot generator="Robot 7.0 (Python 3.14.3 on win32)" generated="2026-04-07T14:04:45.737560" rpa="false" schemaversion="5">
+<suite id="s1" name="Homologacao Pmv Api" source="c:\dev\qa\tests\api\pericia\homologacao_pmv_api.robot">
 <test id="s1-t1" name="LTS - 14 Dias - CID Geral - Deve ir para Clinico Geral" line="62">
 <kw name="Homologar Regra API">
 <kw name="Regra Existe Na Massa" owner="pericia_helper">
-<msg time="2026-04-07T00:02:10.674528" level="INFO">${existe} = True</msg>
+<msg time="2026-04-07T14:04:45.881414" level="INFO">${existe} = True</msg>
 <var>${existe}</var>
 <arg>${regra}</arg>
-<status status="PASS" start="2026-04-07T00:02:10.674528" elapsed="0.000000"/>
+<status status="PASS" start="2026-04-07T14:04:45.881054" elapsed="0.000393"/>
 </kw>
 <kw name="Skip If" owner="BuiltIn">
 <arg>not ${existe}</arg>
 <arg>Regra '${regra}' não está no massa_criada.json — rode criar_massa.robot primeiro</arg>
 <doc>Skips the rest of the current test if the ``condition`` is True.</doc>
-<status status="PASS" start="2026-04-07T00:02:10.674528" elapsed="0.001504"/>
+<status status="PASS" start="2026-04-07T14:04:45.881563" elapsed="0.000235"/>
 </kw>
 <kw name="Autenticar No Mihmo" owner="mihmo_auth">
 <kw name="Create Dictionary" owner="BuiltIn">
-<msg time="2026-04-07T00:02:10.676032" level="INFO">${body} = {'email': 'adm.castela@mihmo.com.br', 'password': 'REMOVIDO', 'returnSecureToken': True}</msg>
+<msg time="2026-04-07T14:04:45.882440" level="INFO">${body} = {'email': 'vitoria@mihmo.com.br', 'password': 'REMOVIDO', 'returnSecureToken': True}</msg>
 <var>${body}</var>
 <arg>email=${EMAIL_VALIDO}</arg>
 <arg>password=${SENHA_VALIDA}</arg>
 <arg>returnSecureToken=${TRUE}</arg>
 <doc>Creates and returns a dictionary based on the given ``items``.</doc>
-<status status="PASS" start="2026-04-07T00:02:10.676032" elapsed="0.000000"/>
+<status status="PASS" start="2026-04-07T14:04:45.882151" elapsed="0.000316"/>
 </kw>
 <kw name="POST" owner="RequestsLibrary">
-<msg time="2026-04-07T00:02:11.375956" level="INFO">POST Request : url=https://www.googleapis.com/identitytoolkit/v3/relyingparty/verifyPassword?key=REMOVIDO 
+<msg time="2026-04-07T14:04:46.573970" level="INFO">POST Request : url=https://www.googleapis.com/identitytoolkit/v3/relyingparty/verifyPassword?key=REMOVIDO 
  path_url=/identitytoolkit/v3/relyingparty/verifyPassword?key=REMOVIDO 
- headers={'User-Agent': 'python-requests/2.31.0', 'Accept-Encoding': 'gzip, deflate', 'Accept': '*/*', 'Connection': 'keep-alive', 'Content-Length': '87', 'Content-Type': 'application/json'} 
- body=b'{"email": "adm.castela@mihmo.com.br", "password": "REMOVIDO", "returnSecureToken": true}' 
+ headers={'User-Agent': 'python-requests/2.31.0', 'Accept-Encoding': 'gzip, deflate, zstd', 'Accept': '*/*', 'Connection': 'keep-alive', 'Content-Length': '84', 'Content-Type': 'application/json'} 
+ body=b'{"email": "vitoria@mihmo.com.br", "password": "REMOVIDO", "returnSecureToken": true}' 
  </msg>
-<msg time="2026-04-07T00:02:11.375956" level="INFO">POST Response : url=https://www.googleapis.com/identitytoolkit/v3/relyingparty/verifyPassword?key=REMOVIDO 
+<msg time="2026-04-07T14:04:46.574087" level="INFO">POST Response : url=https://www.googleapis.com/identitytoolkit/v3/relyingparty/verifyPassword?key=REMOVIDO 
  status=200, reason=OK 
- headers={'Expires': 'Mon, 01 Jan 1990 00:00:00 GMT', 'Pragma': 'no-cache', 'Cache-Control': 'no-cache, no-store, max-age=0, must-revalidate', 'Date': 'Tue, 07 Apr 2026 03:00:36 GMT', 'Content-Type': 'application/json; charset=UTF-8', 'Vary': 'Origin, X-Origin, Referer', 'Content-Encoding': 'gzip', 'Server': 'ESF', 'X-XSS-Protection': '0', 'X-Frame-Options': 'SAMEORIGIN', 'X-Content-Type-Options': 'nosniff', 'Alt-Svc': 'h3=":443"; ma=2592000,h3-29=":443"; ma=2592000', 'Transfer-Encoding': 'chunked'} 
+ headers={'Date': 'Tue, 07 Apr 2026 17:04:56 GMT', 'Pragma': 'no-cache', 'Expires': 'Mon, 01 Jan 1990 00:00:00 GMT', 'Cache-Control': 'no-cache, no-store, max-age=0, must-revalidate', 'Content-Type': 'application/json; charset=UTF-8', 'Vary': 'Origin, X-Origin, Referer', 'Content-Encoding': 'gzip', 'Server': 'ESF', 'X-XSS-Protection': '0', 'X-Frame-Options': 'SAMEORIGIN', 'X-Content-Type-Options': 'nosniff', 'Alt-Svc': 'h3=":443"; ma=2592000,h3-29=":443"; ma=2592000', 'Transfer-Encoding': 'chunked'} 
  body={
   "kind": "identitytoolkit#VerifyPasswordResponse",
-  "localId": "82fcf9fc-2737-431d-ac08-06db189f0868",
-  "email": "adm.castela@mihmo.com.br",
-  "displayName": "adm.castela",
-  "idToken": "eyJhbGciOiJSUzI1NiIsImtpZCI6IjVlODJhZmI0ZWY2OWI3NjM4MzA2OWFjNmI1N2U3ZTY1MjAzYmZlOTYiLCJ0eXAiOiJKV1QifQ.eyJuYW1lIjoiYWRtLmNhc3RlbGEiLCJpc3MiOiJodHRwczovL3NlY3VyZXRva2VuLmdvb2dsZS5jb20vbG9raS1kZXYtNDQ0OGUiLCJhdWQiOiJsb2tpLWRldi00NDQ4ZSIsImF1dGhfdGltZSI6MTc3NTUzMDgzNiwidXNlcl9pZCI6IjgyZmNmOWZjLTI3MzctNDMxZC1hYzA4LTA2ZGIxODlmMDg2OCIsInN1YiI6IjgyZmNmOWZjLTI3MzctNDMxZC1hYzA4LTA2ZGIxODlmMDg2OCIsImlhdCI6MTc3NTUzMDgzNiwiZXhwIjoxNzc1NTM0NDM2LCJlbWFpbCI6ImFkbS5jYXN0ZWxhQG1paG1vLmNvbS5iciIsImVtYWlsX3ZlcmlmaWVkIjpmYWxzZSwicGhvbmVfbnVtYmVyIjoiKzU1MTE4OTg4NzQzNjYiLCJmaXJlYmFzZSI6eyJpZGVudGl0aWVzIjp7ImVtYWlsIjpbImFkbS5jYXN0ZWxhQG1paG1vLmNvbS5iciJdLCJwaG9uZSI6WyIrNTUxMTg5ODg3NDM2NiJdfSwic2lnbl9pbl9wcm92aWRlciI6InBhc3N3b3JkIn19.f7nOkAt6I0VyCSCaDobCF0oKuPdnzo7mpsigCEfKwTjIGlC59KNQyjzpdANgNrzNZ1Wp9FNWQ7iDx9-G-8d5nGsk1O5WKcPPhff4DTTL1e7IUDYdnYTxBGRXBZWeJ_dSsae9UmWqDw_YifcCIvTTQaZrNJOOWs5qMcDNFLMG2hHDIVz8ufbf_ZfsaJ8pLsoC_gcYQWVFkN9gqT0yBf1f3ruuoPO5bBalUFLHWKVNb3r-SQyILcfACf7a-xdwRyOvWIyzEo5nX3G7uSiDls0F__mL78PX5RC0rJEYirGNehJ-H6pQq9XCAEARB0MgpMMF1E2NnFOp4bv9DztBTz9I1w",
+  "localId": "673aafd3-2240-4bfa-88ff-995e456e5fc9",
+  "email": "vitoria@mihmo.com.br",
+  "displayName": "Clinica PMV - Prefeitura Vitoria",
+  "idToken": "eyJhbGciOiJSUzI1NiIsImtpZCI6IjVlODJhZmI0ZWY2OWI3NjM4MzA2OWFjNmI1N2U3ZTY1MjAzYmZlOTYiLCJ0eXAiOiJKV1QifQ.eyJuYW1lIjoiQ2xpbmljYSBQTVYgLSBQcmVmZWl0dXJhIFZpdG9yaWEiLCJpc3MiOiJodHRwczovL3NlY3VyZXRva2VuLmdvb2dsZS5jb20vbG9raS1kZXYtNDQ0OGUiLCJhdWQiOiJsb2tpLWRldi00NDQ4ZSIsImF1dGhfdGltZSI6MTc3NTU4MTQ5NiwidXNlcl9pZCI6IjY3M2FhZmQzLTIyNDAtNGJmYS04OGZmLTk5NWU0NTZlNWZjOSIsInN1YiI6IjY3M2FhZmQzLTIyNDAtNGJmYS04OGZmLTk5NWU0NTZlNWZjOSIsImlhdCI6MTc3NTU4MTQ5NiwiZXhwIjoxNzc1NTg1MDk2LCJlbWFpbCI6InZpdG9yaWFAbWlobW8uY29tLmJyIiwiZW1haWxfdmVyaWZpZWQiOmZhbHNlLCJwaG9uZV9udW1iZXIiOiIrNTU3MTkyMDE5MjAxOSIsImZpcmViYXNlIjp7ImlkZW50aXRpZXMiOnsiZW1haWwiOlsidml0b3JpYUBtaWhtby5jb20uYnIiXSwicGhvbmUiOlsiKzU1NzE5MjAxOTIwMTkiXX0sInNpZ25faW5fcHJvdmlkZXIiOiJwYXNzd29yZCJ9fQ.LufLD3-heunAdu5CxayHLHGj95wG-qlTOGpROEvuCXZpR8WpsA9xNT6H9wp73ZheI2Oz8BTAVzM8YFDPHFx1JbyhNkCScCfIjKXC8meEgTu8A6TybKh6iFoXumlrj2t8rHN_PB4YvwhkhZNR9_Rgu6xpJ_yKr-wFIysEg8ICBTJR1z2s33kJXwglx5U1bhCaFQmckHcGxl07mhjjpv0IBm72duWe84jy2eg7GQRf6I2Tlo8aD5P1WA60XOhu-Rmyo9VS2AICHYaLjB9fwMkz8VQT8kB-sSGV7UJtyHALIUaW9pPf77Ku3dLnbfWEodORbi5PttyUw6FpuywAKY7kww",
   "registered": true,
-  "refreshToken": "AMf-vBzLllS7j1znIueSfMepw3I_7FB2QFEYw6mjRUfzyadcOfqzW_e6lClYGrJXz3bqzN5Z18OxGKlP1tjsyZxL7AJuoegLi9POcZncx3d1bkCFOrXcA9Qk92oB5a-bmoXQTpIbebwisSF9gfgBZs9AhffbT5vy-2G7GxKMgrXx9y43RV6JFcFWgsi2bXd3cXYL3Ut5Fxy5nXkIhHjCQ26-5KFpc40Umi24N1xEHuA8YXAV13Sg5t8",
+  "refreshToken": "AMf-vBwoDhmFV4S2SeaLRHkgOf6H4462Vnn5ENCZOSeyjLug7YYsvwRt5OS_5MwhuP5_4nxz8Tg4cRGqdVbw62JhgI8y4MRMe8lStmWDgTgUXrzUCNkvuhJLFnMgLkYjHVT2JVQ5M82R48Z5QNlDGZR7T66No4tnOY5AXJIKEWPDA3ZCCeB5XbPXX2IT_0B_w4K0NU3Iv3FuskmlBonVYhGiTodH15-JLjlhZDIwxz3tgCbRndeDzpadG4NWD8S82e6DHDE1ccrrLgdYdcqJ_ZnqzJcvxgqKBQ",
   "expiresIn": "3600"
 }
  
  </msg>
-<msg time="2026-04-07T00:02:11.375956" level="INFO">${response} = &lt;Response [200]&gt;</msg>
+<msg time="2026-04-07T14:04:46.574217" level="INFO">${response} = &lt;Response [200]&gt;</msg>
 <var>${response}</var>
 <arg>${FIREBASE_URL}</arg>
 <arg>params=key=${FIREBASE_KEY}</arg>
 <arg>json=${body}</arg>
 <arg>expected_status=200</arg>
 <doc>Sends a POST request.</doc>
-<status status="PASS" start="2026-04-07T00:02:10.676032" elapsed="0.699924"/>
+<status status="PASS" start="2026-04-07T14:04:45.882558" elapsed="0.691685"/>
 </kw>
 <kw name="Get From Dictionary" owner="Collections">
-<msg time="2026-04-07T00:02:11.377038" level="INFO">${token} = eyJhbGciOiJSUzI1NiIsImtpZCI6IjVlODJhZmI0ZWY2OWI3NjM4MzA2OWFjNmI1N2U3ZTY1MjAzYmZlOTYiLCJ0eXAiOiJKV1QifQ.eyJuYW1lIjoiYWRtLmNhc3RlbGEiLCJpc3MiOiJodHRwczovL3NlY3VyZXRva2VuLmdvb2dsZS5jb20vbG9raS1kZXYtNDQ0O...</msg>
+<msg time="2026-04-07T14:04:46.574922" level="INFO">${token} = eyJhbGciOiJSUzI1NiIsImtpZCI6IjVlODJhZmI0ZWY2OWI3NjM4MzA2OWFjNmI1N2U3ZTY1MjAzYmZlOTYiLCJ0eXAiOiJKV1QifQ.eyJuYW1lIjoiQ2xpbmljYSBQTVYgLSBQcmVmZWl0dXJhIFZpdG9yaWEiLCJpc3MiOiJodHRwczovL3NlY3VyZXRva2VuLmdvb...</msg>
 <var>${token}</var>
 <arg>${response.json()}</arg>
 <arg>idToken</arg>
 <doc>Returns a value from the given ``dictionary`` based on the given ``key``.</doc>
-<status status="PASS" start="2026-04-07T00:02:11.375956" elapsed="0.001082"/>
+<status status="PASS" start="2026-04-07T14:04:46.574394" elapsed="0.000553"/>
 </kw>
 <return>
 <value>${token}</value>
-<status status="PASS" start="2026-04-07T00:02:11.377038" elapsed="0.000000"/>
+<status status="PASS" start="2026-04-07T14:04:46.575006" elapsed="0.000047"/>
 </return>
-<msg time="2026-04-07T00:02:11.377038" level="INFO">${token} = eyJhbGciOiJSUzI1NiIsImtpZCI6IjVlODJhZmI0ZWY2OWI3NjM4MzA2OWFjNmI1N2U3ZTY1MjAzYmZlOTYiLCJ0eXAiOiJKV1QifQ.eyJuYW1lIjoiYWRtLmNhc3RlbGEiLCJpc3MiOiJodHRwczovL3NlY3VyZXRva2VuLmdvb2dsZS5jb20vbG9raS1kZXYtNDQ0O...</msg>
+<msg time="2026-04-07T14:04:46.575185" level="INFO">${token} = eyJhbGciOiJSUzI1NiIsImtpZCI6IjVlODJhZmI0ZWY2OWI3NjM4MzA2OWFjNmI1N2U3ZTY1MjAzYmZlOTYiLCJ0eXAiOiJKV1QifQ.eyJuYW1lIjoiQ2xpbmljYSBQTVYgLSBQcmVmZWl0dXJhIFZpdG9yaWEiLCJpc3MiOiJodHRwczovL3NlY3VyZXRva2VuLmdvb...</msg>
 <var>${token}</var>
-<status status="PASS" start="2026-04-07T00:02:10.676032" elapsed="0.701006"/>
+<status status="PASS" start="2026-04-07T14:04:45.881955" elapsed="0.693258"/>
 </kw>
 <kw name="Sleep" owner="BuiltIn">
-<msg time="2026-04-07T00:02:16.377238" level="INFO">Slept 5 seconds.</msg>
+<msg time="2026-04-07T14:04:51.575647" level="INFO">Slept 5 seconds.</msg>
 <arg>5s</arg>
 <doc>Pauses the test executed for the given time.</doc>
-<status status="PASS" start="2026-04-07T00:02:11.377038" elapsed="5.000200"/>
+<status status="PASS" start="2026-04-07T14:04:46.575316" elapsed="5.000462"/>
 </kw>
 <kw name="Verificar Especialista Api" owner="pericia_helper">
-<msg time="2026-04-07T00:02:17.868908" level="FAIL">Erro ao buscar fila da clínica: 503 - &lt;html&gt;
-&lt;head&gt;&lt;title&gt;503 Service Temporarily Unavailable&lt;/title&gt;&lt;/head&gt;
-&lt;body&gt;
-&lt;center&gt;&lt;h1&gt;503 Service Temporarily Unavailable&lt;/h1&gt;&lt;/center&gt;
-&lt;/body&gt;
-&lt;/html&gt;
-</msg>
+<msg time="2026-04-07T14:04:52.509285" level="INFO">Especialista (cache): role=Clínico Geral, medicalBoard=False, attendance_id=605632de-34a8-4eb0-b6ac-922e55d305a1</msg>
+<msg time="2026-04-07T14:04:52.509457" level="INFO">${role} = Clínico Geral</msg>
+<msg time="2026-04-07T14:04:52.509516" level="INFO">${is_junta} = False</msg>
+<msg time="2026-04-07T14:04:52.509571" level="INFO">${board_roles} = []</msg>
+<msg time="2026-04-07T14:04:52.509620" level="INFO">${att_id} = 605632de-34a8-4eb0-b6ac-922e55d305a1</msg>
 <var>${role}</var>
 <var>${is_junta}</var>
 <var>${board_roles}</var>
@@ -92,13 +90,7 @@
 <arg>${API_URL}</arg>
 <arg>${token}</arg>
 <arg>${regra}</arg>
-<status status="FAIL" start="2026-04-07T00:02:16.377238" elapsed="1.492671">Erro ao buscar fila da clínica: 503 - &lt;html&gt;
-&lt;head&gt;&lt;title&gt;503 Service Temporarily Unavailable&lt;/title&gt;&lt;/head&gt;
-&lt;body&gt;
-&lt;center&gt;&lt;h1&gt;503 Service Temporarily Unavailable&lt;/h1&gt;&lt;/center&gt;
-&lt;/body&gt;
-&lt;/html&gt;
-</status>
+<status status="PASS" start="2026-04-07T14:04:51.575988" elapsed="0.933670"/>
 </kw>
 <if>
 <branch type="IF" condition="${junta}">
@@ -106,16 +98,16 @@
 <arg>${is_junta}</arg>
 <arg>Esperado Junta Médica mas isMedicalBoard=False para regra '${regra}'</arg>
 <doc>Fails if the given condition is not true.</doc>
-<status status="NOT RUN" start="2026-04-07T00:02:17.869909" elapsed="0.000000"/>
+<status status="NOT RUN" start="2026-04-07T14:04:52.509982" elapsed="0.000024"/>
 </kw>
 <kw name="Should Contain" owner="BuiltIn">
 <arg>${board_roles}</arg>
 <arg>${especialista_esperado}</arg>
 <arg>Especialista '${especialista_esperado}' não encontrado na junta. Encontrado: ${board_roles}</arg>
 <doc>Fails if ``container`` does not contain ``item`` one or more times.</doc>
-<status status="NOT RUN" start="2026-04-07T00:02:17.870906" elapsed="0.000000"/>
+<status status="NOT RUN" start="2026-04-07T14:04:52.510114" elapsed="0.000019"/>
 </kw>
-<status status="NOT RUN" start="2026-04-07T00:02:17.869909" elapsed="0.000997"/>
+<status status="NOT RUN" start="2026-04-07T14:04:52.509794" elapsed="0.000383"/>
 </branch>
 <branch type="ELSE">
 <kw name="Should Be Equal" owner="BuiltIn">
@@ -123,19 +115,24 @@
 <arg>${especialista_esperado}</arg>
 <arg>Especialista errado! Esperado: '${especialista_esperado}' | Recebido: '${role}'</arg>
 <doc>Fails if the given objects are unequal.</doc>
-<status status="NOT RUN" start="2026-04-07T00:02:17.870906" elapsed="0.000000"/>
+<status status="PASS" start="2026-04-07T14:04:52.510322" elapsed="0.000327"/>
 </kw>
-<status status="NOT RUN" start="2026-04-07T00:02:17.870906" elapsed="0.000000"/>
+<status status="PASS" start="2026-04-07T14:04:52.510215" elapsed="0.000519"/>
 </branch>
-<status status="NOT RUN" start="2026-04-07T00:02:17.869909" elapsed="0.000997"/>
+<status status="PASS" start="2026-04-07T14:04:52.509761" elapsed="0.001007"/>
 </if>
 <kw name="Enviar Para Fila" owner="pericia_helper">
+<msg time="2026-04-07T14:04:53.761667" level="INFO">enviar_para_fila: 201 | {"eventUri":"https://www.google.com/calendar/event?eid=Y3JmOWg2NWdyZ2E1ZjlyMzViaWZ1cWE1bXMgcG1mLmNsaW5pY29nZXJhbDFAbQ","name":"Pericia Licença para Tratamento de Saúde (LTS)","attendanceUrl":null,"rea
+Enviado para fila. eventType=Clínico Geral, medicalBoard=False</msg>
+<msg time="2026-04-07T14:04:53.761918" level="INFO">${event_type} = Clínico Geral</msg>
+<msg time="2026-04-07T14:04:53.762013" level="INFO">${is_junta_fila} = False</msg>
 <var>${event_type}</var>
 <var>${is_junta_fila}</var>
 <arg>${API_URL}</arg>
 <arg>${token}</arg>
 <arg>${att_id}</arg>
-<status status="NOT RUN" start="2026-04-07T00:02:17.870906" elapsed="0.000000"/>
+<arg>${regra}</arg>
+<status status="PASS" start="2026-04-07T14:04:52.510876" elapsed="1.251184"/>
 </kw>
 <if>
 <branch type="IF" condition="${junta}">
@@ -143,9 +140,9 @@
 <arg>${is_junta_fila}</arg>
 <arg>Junta não confirmada após envio para fila. regra='${regra}'</arg>
 <doc>Fails if the given condition is not true.</doc>
-<status status="NOT RUN" start="2026-04-07T00:02:17.871909" elapsed="0.000000"/>
+<status status="NOT RUN" start="2026-04-07T14:04:53.762570" elapsed="0.000041"/>
 </kw>
-<status status="NOT RUN" start="2026-04-07T00:02:17.870906" elapsed="0.001003"/>
+<status status="NOT RUN" start="2026-04-07T14:04:53.762259" elapsed="0.000431"/>
 </branch>
 <branch type="ELSE">
 <kw name="Should Be Equal" owner="BuiltIn">
@@ -153,15 +150,36 @@
 <arg>${especialista_esperado}</arg>
 <arg>eventType na fila diverge! Esperado: '${especialista_esperado}' | Recebido: '${event_type}'</arg>
 <doc>Fails if the given objects are unequal.</doc>
-<status status="NOT RUN" start="2026-04-07T00:02:17.871909" elapsed="0.000000"/>
+<status status="PASS" start="2026-04-07T14:04:53.762927" elapsed="0.000533"/>
 </kw>
-<status status="NOT RUN" start="2026-04-07T00:02:17.871909" elapsed="0.000000"/>
+<status status="PASS" start="2026-04-07T14:04:53.762746" elapsed="0.000808"/>
 </branch>
-<status status="NOT RUN" start="2026-04-07T00:02:17.870906" elapsed="0.001003"/>
+<status status="PASS" start="2026-04-07T14:04:53.762220" elapsed="0.001387"/>
 </if>
 <if>
 <branch type="IF" condition="not ${junta}">
 <kw name="Homologar Pericia" owner="pericia_helper">
+<msg time="2026-04-07T14:05:01.608405" level="INFO">Especialista (cache): role=Clínico Geral, medicalBoard=False, attendance_id=605632de-34a8-4eb0-b6ac-922e55d305a1
+enviar_para_fila: 201 | {"eventUri":"https://www.google.com/calendar/event?eid=Y3JmOWg2NWdyZ2E1ZjlyMzViaWZ1cWE1bXMgcG1mLmNsaW5pY29nZXJhbDFAbQ","name":"Pericia Licença para Tratamento de Saúde (LTS)","attendanceUrl":null,"rea
+Enviado para fila. eventType=Clínico Geral, medicalBoard=False
+iniciar_atendimento [POST start]: 404
+iniciar_atendimento [POST accept]: 404
+iniciar_atendimento [PATCH 605632de-34a8-4eb0-b6ac-922e55d305a1]: 200
+Atendimento iniciado via PATCH ['scheduled-attendance', '605632de-34a8-4eb0-b6ac-922e55d305a1']
+Ficha clínica: 201 | {"id":"bbc8695c-8e8a-4661-b823-8f2050776d60","typeId":"bcfc80cf-12ea-4cb5-8ac2-195895418db1","typeName":"Ficha de HOMOLOG","version":1,"date":"2026-04-07T14:05:08.288Z","link":"https://mihmosaude.lime
+validate-data-requested: PATCH https://homolog.mihmo.com.br/backend-nest/medical-expert-report-request/605632de-34a8-4eb0-b6ac-922e55d305a1/validate-data-requested
+  payload: {'startDate': '2026-04-07', 'cid': '', 'days': 14}
+  resposta: 200 | [{"id":"b6d4fdee-ccff-475d-bcde-f4711852cfd2","number":40638,"type":"HealthCareLicense","start_date":"2026-04-07T00:00:00.000Z","days":14,"medic_crm":"1515","medic_uf":"AC","cid":"","dependent_name":null,"dependent_cpf":null,"request_description":null,"customer":{"customerid":"27d6547e-e539-4cee-b23
+validate-data-requested OK
+registration_id=3b5aaf4d-a65a-4811-a3c5-d92488e03504
+  squad_user_id via SQUAD_USER_IDS['Clínico Geral']: 8c1caaf5-c94e-4b8d-aac7-72260aec4ed7
+squad_user_id=8c1caaf5-c94e-4b8d-aac7-72260aec4ed7
+GET customer: 200
+DEBUG customer regs[0]: {'jobTitle': 'Analista', 'department': 'Saude', 'location': 'Filial Norte', 'cnpjLocation': '45134601337600', 'registrationId': '3b5aaf4d-a65a-4811-a3c5-d92488e03504', 'employmentCategory': '101', 'admissionDate': '2026-03-07', 'functionalRegistration': '19807'}
+matricula=19807, categoria=101
+Buscando artigos: GET https://homolog.mihmo.com.br/backend-nest/medical-expert-report-request/article/605632de-34a8-4eb0-b6ac-922e55d305a1/19807/Accepted
+  status: 500 | {"statusCode":500,"message":"Internal server error"}</msg>
+<msg time="2026-04-07T14:05:01.608598" level="FAIL">articleId não encontrado para regra 'LTS_14DIAS_GERAL' (CID=J00, categoria=101).</msg>
 <var>${status}</var>
 <arg>${API_URL}</arg>
 <arg>${token}</arg>
@@ -175,43 +193,31 @@
 6. Cria prescrição no Memed
 7. Salva homologação no Mihmo (generate-memed-file)
 Retorna o status final ("Accepted").</doc>
-<status status="NOT RUN" start="2026-04-07T00:02:17.871909" elapsed="0.000000"/>
+<status status="FAIL" start="2026-04-07T14:04:53.764151" elapsed="7.845981">articleId não encontrado para regra 'LTS_14DIAS_GERAL' (CID=J00, categoria=101).</status>
 </kw>
 <kw name="Should Be Equal" owner="BuiltIn">
 <arg>${status}</arg>
 <arg>Accepted</arg>
 <arg>Status da homologação diverge! Esperado: 'Accepted' | Recebido: '${status}'</arg>
 <doc>Fails if the given objects are unequal.</doc>
-<status status="NOT RUN" start="2026-04-07T00:02:17.871909" elapsed="0.000000"/>
+<status status="NOT RUN" start="2026-04-07T14:05:01.610330" elapsed="0.000023"/>
 </kw>
-<status status="NOT RUN" start="2026-04-07T00:02:17.871909" elapsed="0.000000"/>
+<status status="FAIL" start="2026-04-07T14:04:53.763729" elapsed="7.846684">articleId não encontrado para regra 'LTS_14DIAS_GERAL' (CID=J00, categoria=101).</status>
 </branch>
-<status status="NOT RUN" start="2026-04-07T00:02:17.871909" elapsed="0.000000"/>
+<status status="FAIL" start="2026-04-07T14:04:53.763701" elapsed="7.846750">articleId não encontrado para regra 'LTS_14DIAS_GERAL' (CID=J00, categoria=101).</status>
 </if>
 <arg>LTS_14DIAS_GERAL</arg>
 <arg>Clínico Geral</arg>
-<status status="FAIL" start="2026-04-07T00:02:10.674528" elapsed="7.197381">Erro ao buscar fila da clínica: 503 - &lt;html&gt;
-&lt;head&gt;&lt;title&gt;503 Service Temporarily Unavailable&lt;/title&gt;&lt;/head&gt;
-&lt;body&gt;
-&lt;center&gt;&lt;h1&gt;503 Service Temporarily Unavailable&lt;/h1&gt;&lt;/center&gt;
-&lt;/body&gt;
-&lt;/html&gt;
-</status>
+<status status="FAIL" start="2026-04-07T14:04:45.880433" elapsed="15.730128">articleId não encontrado para regra 'LTS_14DIAS_GERAL' (CID=J00, categoria=101).</status>
 </kw>
 <tag>api</tag>
 <tag>homolog</tag>
 <tag>lts</tag>
 <tag>lts_geral</tag>
 <tag>pmv</tag>
-<status status="FAIL" start="2026-04-07T00:02:10.673528" elapsed="7.199383">Erro ao buscar fila da clínica: 503 - &lt;html&gt;
-&lt;head&gt;&lt;title&gt;503 Service Temporarily Unavailable&lt;/title&gt;&lt;/head&gt;
-&lt;body&gt;
-&lt;center&gt;&lt;h1&gt;503 Service Temporarily Unavailable&lt;/h1&gt;&lt;/center&gt;
-&lt;/body&gt;
-&lt;/html&gt;
-</status>
+<status status="FAIL" start="2026-04-07T14:04:45.879730" elapsed="15.731402">articleId não encontrado para regra 'LTS_14DIAS_GERAL' (CID=J00, categoria=101).</status>
 </test>
-<status status="FAIL" start="2026-04-07T00:02:10.459253" elapsed="7.413658"/>
+<status status="FAIL" start="2026-04-07T14:04:45.739048" elapsed="15.873351"/>
 </suite>
 <statistics>
 <total>
@@ -225,7 +231,7 @@ Retorna o status final ("Accepted").</doc>
 <stat pass="0" fail="1" skip="0">pmv</stat>
 </tag>
 <suite>
-<stat name="Homologacao Pmv Api" id="s1" pass="0" fail="1" skip="0">Homologacao Pmv Api</stat>
+<stat pass="0" fail="1" skip="0" id="s1" name="Homologacao Pmv Api">Homologacao Pmv Api</stat>
 </suite>
 </statistics>
 <errors>

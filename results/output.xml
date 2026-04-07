@@ -1,91 +1,91 @@
 <?xml version="1.0" encoding="UTF-8"?>
-<robot generator="Robot 7.0 (Python 3.14.3 on win32)" generated="2026-04-06T16:08:06.330407" rpa="false" schemaversion="5">
+<robot generator="Robot 7.0 (Python 3.14.3 on win32)" generated="2026-04-07T13:53:07.128579" rpa="false" schemaversion="5">
 <suite id="s1" name="Qa" source="c:\dev\qa">
 <suite id="s1-s1" name="Tests" source="c:\dev\qa\tests">
 <suite id="s1-s1-s1" name="Setup" source="c:\dev\qa\tests\setup">
 <kw name="Limpar Massa" owner="pericia_helper" type="SETUP">
-<msg time="2026-04-06T16:08:06.456807" level="INFO">massa_criada.json limpo para nova execução.</msg>
-<status status="PASS" start="2026-04-06T16:08:06.456405" elapsed="0.000593"/>
+<msg time="2026-04-07T13:53:07.278550" level="INFO">massa_criada.json limpo para nova execução.</msg>
+<status status="PASS" start="2026-04-07T13:53:07.277904" elapsed="0.000849"/>
 </kw>
 <suite id="s1-s1-s1-s1" name="Criar Massa" source="c:\dev\qa\tests\setup\criar_massa.robot">
 <kw name="Inicializar Data" type="SETUP">
 <kw name="Gerar Data Hoje" owner="pericia_helper">
-<msg time="2026-04-06T16:08:06.494200" level="INFO">${data} = 2026-04-06</msg>
+<msg time="2026-04-07T13:53:07.311316" level="INFO">${data} = 2026-04-07</msg>
 <var>${data}</var>
-<status status="PASS" start="2026-04-06T16:08:06.493931" elapsed="0.000426"/>
+<status status="PASS" start="2026-04-07T13:53:07.310993" elapsed="0.000608"/>
 </kw>
 <kw name="Set Suite Variable" owner="BuiltIn">
-<msg time="2026-04-06T16:08:06.495542" level="INFO">${DATA_HOJE} = 2026-04-06</msg>
+<msg time="2026-04-07T13:53:07.312234" level="INFO">${DATA_HOJE} = 2026-04-07</msg>
 <arg>${DATA_HOJE}</arg>
 <arg>${data}</arg>
 <doc>Makes a variable available everywhere within the scope of the current suite.</doc>
-<status status="PASS" start="2026-04-06T16:08:06.494987" elapsed="0.000760"/>
+<status status="PASS" start="2026-04-07T13:53:07.311804" elapsed="0.000649"/>
 </kw>
-<status status="PASS" start="2026-04-06T16:08:06.493475" elapsed="0.002418"/>
+<status status="PASS" start="2026-04-07T13:53:07.310198" elapsed="0.002405"/>
 </kw>
 <test id="s1-s1-s1-s1-t1" name="LTS - 14 Dias - CID Geral - Limite Faixa 4-14" line="73">
 <kw name="Autenticar No Mihmo" owner="mihmo_auth">
 <kw name="Create Dictionary" owner="BuiltIn">
-<msg time="2026-04-06T16:08:06.499742" level="INFO">${body} = {'email': 'adm.castela@mihmo.com.br', 'password': 'REMOVIDO', 'returnSecureToken': True}</msg>
+<msg time="2026-04-07T13:53:07.317916" level="INFO">${body} = {'email': 'vitoria@mihmo.com.br', 'password': 'REMOVIDO', 'returnSecureToken': True}</msg>
 <var>${body}</var>
 <arg>email=${EMAIL_VALIDO}</arg>
 <arg>password=${SENHA_VALIDA}</arg>
 <arg>returnSecureToken=${TRUE}</arg>
 <doc>Creates and returns a dictionary based on the given ``items``.</doc>
-<status status="PASS" start="2026-04-06T16:08:06.499275" elapsed="0.000611"/>
+<status status="PASS" start="2026-04-07T13:53:07.317447" elapsed="0.000603"/>
 </kw>
 <kw name="POST" owner="RequestsLibrary">
-<msg time="2026-04-06T16:08:07.226157" level="INFO">POST Request : url=https://www.googleapis.com/identitytoolkit/v3/relyingparty/verifyPassword?key=REMOVIDO 
+<msg time="2026-04-07T13:53:08.000772" level="INFO">POST Request : url=https://www.googleapis.com/identitytoolkit/v3/relyingparty/verifyPassword?key=REMOVIDO 
  path_url=/identitytoolkit/v3/relyingparty/verifyPassword?key=REMOVIDO 
- headers={'User-Agent': 'python-requests/2.31.0', 'Accept-Encoding': 'gzip, deflate, zstd', 'Accept': '*/*', 'Connection': 'keep-alive', 'Content-Length': '87', 'Content-Type': 'application/json'} 
- body=b'{"email": "adm.castela@mihmo.com.br", "password": "REMOVIDO", "returnSecureToken": true}' 
+ headers={'User-Agent': 'python-requests/2.31.0', 'Accept-Encoding': 'gzip, deflate, zstd', 'Accept': '*/*', 'Connection': 'keep-alive', 'Content-Length': '84', 'Content-Type': 'application/json'} 
+ body=b'{"email": "vitoria@mihmo.com.br", "password": "REMOVIDO", "returnSecureToken": true}' 
  </msg>
-<msg time="2026-04-06T16:08:07.226417" level="INFO">POST Response : url=https://www.googleapis.com/identitytoolkit/v3/relyingparty/verifyPassword?key=REMOVIDO 
+<msg time="2026-04-07T13:53:08.001021" level="INFO">POST Response : url=https://www.googleapis.com/identitytoolkit/v3/relyingparty/verifyPassword?key=REMOVIDO 
  status=200, reason=OK 
- headers={'Pragma': 'no-cache', 'Date': 'Mon, 06 Apr 2026 19:08:16 GMT', 'Cache-Control': 'no-cache, no-store, max-age=0, must-revalidate', 'Expires': 'Mon, 01 Jan 1990 00:00:00 GMT', 'Content-Type': 'application/json; charset=UTF-8', 'Vary': 'Origin, X-Origin, Referer', 'Content-Encoding': 'gzip', 'Server': 'ESF', 'X-XSS-Protection': '0', 'X-Frame-Options': 'SAMEORIGIN', 'X-Content-Type-Options': 'nosniff', 'Alt-Svc': 'h3=":443"; ma=2592000,h3-29=":443"; ma=2592000', 'Transfer-Encoding': 'chunked'} 
+ headers={'Expires': 'Mon, 01 Jan 1990 00:00:00 GMT', 'Cache-Control': 'no-cache, no-store, max-age=0, must-revalidate', 'Date': 'Tue, 07 Apr 2026 16:53:18 GMT', 'Pragma': 'no-cache', 'Content-Type': 'application/json; charset=UTF-8', 'Vary': 'Origin, X-Origin, Referer', 'Content-Encoding': 'gzip', 'Server': 'ESF', 'X-XSS-Protection': '0', 'X-Frame-Options': 'SAMEORIGIN', 'X-Content-Type-Options': 'nosniff', 'Alt-Svc': 'h3=":443"; ma=2592000,h3-29=":443"; ma=2592000', 'Transfer-Encoding': 'chunked'} 
  body={
   "kind": "identitytoolkit#VerifyPasswordResponse",
-  "localId": "82fcf9fc-2737-431d-ac08-06db189f0868",
-  "email": "adm.castela@mihmo.com.br",
-  "displayName": "adm.castela",
-  "idToken": "eyJhbGciOiJSUzI1NiIsImtpZCI6IjVlODJhZmI0ZWY2OWI3NjM4MzA2OWFjNmI1N2U3ZTY1MjAzYmZlOTYiLCJ0eXAiOiJKV1QifQ.eyJuYW1lIjoiYWRtLmNhc3RlbGEiLCJpc3MiOiJodHRwczovL3NlY3VyZXRva2VuLmdvb2dsZS5jb20vbG9raS1kZXYtNDQ0OGUiLCJhdWQiOiJsb2tpLWRldi00NDQ4ZSIsImF1dGhfdGltZSI6MTc3NTUwMjQ5NiwidXNlcl9pZCI6IjgyZmNmOWZjLTI3MzctNDMxZC1hYzA4LTA2ZGIxODlmMDg2OCIsInN1YiI6IjgyZmNmOWZjLTI3MzctNDMxZC1hYzA4LTA2ZGIxODlmMDg2OCIsImlhdCI6MTc3NTUwMjQ5NiwiZXhwIjoxNzc1NTA2MDk2LCJlbWFpbCI6ImFkbS5jYXN0ZWxhQG1paG1vLmNvbS5iciIsImVtYWlsX3ZlcmlmaWVkIjpmYWxzZSwicGhvbmVfbnVtYmVyIjoiKzU1MTE4OTg4NzQzNjYiLCJmaXJlYmFzZSI6eyJpZGVudGl0aWVzIjp7ImVtYWlsIjpbImFkbS5jYXN0ZWxhQG1paG1vLmNvbS5iciJdLCJwaG9uZSI6WyIrNTUxMTg5ODg3NDM2NiJdfSwic2lnbl9pbl9wcm92aWRlciI6InBhc3N3b3JkIn19.p2lSWs5Hmv2GkoC8j6WLX9XAm7-n7XmLR3ZCysIilGAvRnIcXo5489QdS30sXnvdEG6m7NgtvEUI_f6wWFjzn_KM1muVX2TqsRynvkPBSDkYQnS0e4bErYnXoZoi3aQNVczlh6SjK_steXcD4oT4bJtt9H6grDrWX8e_sW-xiXT9qobDM9YVTEjGXVUVLNjqtXenyyPgk7KZPxvRx6PMlln5SamlxNb4d2frCwVLdBP-KQc646fGL3sL17-gBU-zhQFkkr6k1k0uZ0-y1cr7XA6LwyyoiqzJgrnFfSjF99_CJ7Ou-UEk01xTFd7wxxo_OLnKDmXWPpqcEWjYsxRAhg",
+  "localId": "673aafd3-2240-4bfa-88ff-995e456e5fc9",
+  "email": "vitoria@mihmo.com.br",
+  "displayName": "Clinica PMV - Prefeitura Vitoria",
+  "idToken": "eyJhbGciOiJSUzI1NiIsImtpZCI6IjVlODJhZmI0ZWY2OWI3NjM4MzA2OWFjNmI1N2U3ZTY1MjAzYmZlOTYiLCJ0eXAiOiJKV1QifQ.eyJuYW1lIjoiQ2xpbmljYSBQTVYgLSBQcmVmZWl0dXJhIFZpdG9yaWEiLCJpc3MiOiJodHRwczovL3NlY3VyZXRva2VuLmdvb2dsZS5jb20vbG9raS1kZXYtNDQ0OGUiLCJhdWQiOiJsb2tpLWRldi00NDQ4ZSIsImF1dGhfdGltZSI6MTc3NTU4MDc5OCwidXNlcl9pZCI6IjY3M2FhZmQzLTIyNDAtNGJmYS04OGZmLTk5NWU0NTZlNWZjOSIsInN1YiI6IjY3M2FhZmQzLTIyNDAtNGJmYS04OGZmLTk5NWU0NTZlNWZjOSIsImlhdCI6MTc3NTU4MDc5OCwiZXhwIjoxNzc1NTg0Mzk4LCJlbWFpbCI6InZpdG9yaWFAbWlobW8uY29tLmJyIiwiZW1haWxfdmVyaWZpZWQiOmZhbHNlLCJwaG9uZV9udW1iZXIiOiIrNTU3MTkyMDE5MjAxOSIsImZpcmViYXNlIjp7ImlkZW50aXRpZXMiOnsiZW1haWwiOlsidml0b3JpYUBtaWhtby5jb20uYnIiXSwicGhvbmUiOlsiKzU1NzE5MjAxOTIwMTkiXX0sInNpZ25faW5fcHJvdmlkZXIiOiJwYXNzd29yZCJ9fQ.Xd0higUONWKRrrTBnWyVtOWex3D3wr6KB0YF3m6fnQk4GYUC1M1En5oBn3Oet5ccilTYx0cIrBboXcUH7KJ6cSUdyzrOlFx3Mv6ZvI3BfBwy1i8_d7WIEnOtE9FNb5y1ZDBZumDr9FMOLdRW8096ioDLQ5FHCT-wOeWPCGY1RMor8Yq57hBhoPXs_V8VF2hxltDFQl_L2bRS3CY1EAvi2poPWetF0OhwYcP1xnwYbjv_LqrzMpXCR13_0a2J-XKlRn0x1CwDBVPf0eNlPYKl_GoICZAURYCembhfvnp8jN7LoxXveP-RKTVY9v7Fusx8mYbtY4Wx09Xwm8UmLfDxnw",
   "registered": true,
-  "refreshToken": "AMf-vBxRKdoAtjSGPuxSxaJG0oeFUHZ3NjLggAROWrXCWso4xyT0MEA6AoisMilVBGRbTmm9W4XKTQuibz8Z_zX8F-6WS2SIDOhZdWlPCIPuJXR8WNd9aBxaFzJHxMRlmvLqoMoTNfKNgMLLH-HqibmzXvOq7vckrEg-o5D7ofyjFvLjAftsHbLzGeWTXmGsjePxGNwOZB7hvV2yxrWZUBgdYnXCZhSgXc2S1WtKsj3cuW5DsyB3BPM",
+  "refreshToken": "AMf-vBxp3i-j7aWPEQNOrm0aMz6zbSWoUJWC65LOdsUfe2OaEjbZXGEKkwe5y2ZLW32c4HDO4zw6_9AsFtX8M7QWjS7sGbyD_smZxumTS3g9oikg9sSGeThn4TV90LuXgTDhYWzkYKNQvjZOW6CHX1RDp_VH2QAspXrJA_pTODuYwn6NjdNcMxubHpuARx3kBX0lyRChyrOA2gD14x1BGle_VYVuDzzS1WtigsVwlVsmH-nBKf84g0oABP4XE9eUr3Hf28-8haOf_oVcs4nanRtaygkfkMp6GQ",
   "expiresIn": "3600"
 }
  
  </msg>
-<msg time="2026-04-06T16:08:07.226625" level="INFO">${response} = &lt;Response [200]&gt;</msg>
+<msg time="2026-04-07T13:53:08.001228" level="INFO">${response} = &lt;Response [200]&gt;</msg>
 <var>${response}</var>
 <arg>${FIREBASE_URL}</arg>
 <arg>params=key=${FIREBASE_KEY}</arg>
 <arg>json=${body}</arg>
 <arg>expected_status=200</arg>
 <doc>Sends a POST request.</doc>
-<status status="PASS" start="2026-04-06T16:08:06.500055" elapsed="0.726668"/>
+<status status="PASS" start="2026-04-07T13:53:07.318216" elapsed="0.683111"/>
 </kw>
 <kw name="Get From Dictionary" owner="Collections">
-<msg time="2026-04-06T16:08:07.227499" level="INFO">${token} = eyJhbGciOiJSUzI1NiIsImtpZCI6IjVlODJhZmI0ZWY2OWI3NjM4MzA2OWFjNmI1N2U3ZTY1MjAzYmZlOTYiLCJ0eXAiOiJKV1QifQ.eyJuYW1lIjoiYWRtLmNhc3RlbGEiLCJpc3MiOiJodHRwczovL3NlY3VyZXRva2VuLmdvb2dsZS5jb20vbG9raS1kZXYtNDQ0O...</msg>
+<msg time="2026-04-07T13:53:08.002053" level="INFO">${token} = eyJhbGciOiJSUzI1NiIsImtpZCI6IjVlODJhZmI0ZWY2OWI3NjM4MzA2OWFjNmI1N2U3ZTY1MjAzYmZlOTYiLCJ0eXAiOiJKV1QifQ.eyJuYW1lIjoiQ2xpbmljYSBQTVYgLSBQcmVmZWl0dXJhIFZpdG9yaWEiLCJpc3MiOiJodHRwczovL3NlY3VyZXRva2VuLmdvb...</msg>
 <var>${token}</var>
 <arg>${response.json()}</arg>
 <arg>idToken</arg>
 <doc>Returns a value from the given ``dictionary`` based on the given ``key``.</doc>
-<status status="PASS" start="2026-04-06T16:08:07.226921" elapsed="0.000937"/>
+<status status="PASS" start="2026-04-07T13:53:08.001519" elapsed="0.000645"/>
 </kw>
 <return>
 <value>${token}</value>
-<status status="PASS" start="2026-04-06T16:08:07.227993" elapsed="0.000230"/>
+<status status="PASS" start="2026-04-07T13:53:08.002275" elapsed="0.000387"/>
 </return>
-<msg time="2026-04-06T16:08:07.228422" level="INFO">${token} = eyJhbGciOiJSUzI1NiIsImtpZCI6IjVlODJhZmI0ZWY2OWI3NjM4MzA2OWFjNmI1N2U3ZTY1MjAzYmZlOTYiLCJ0eXAiOiJKV1QifQ.eyJuYW1lIjoiYWRtLmNhc3RlbGEiLCJpc3MiOiJodHRwczovL3NlY3VyZXRva2VuLmdvb2dsZS5jb20vbG9raS1kZXYtNDQ0O...</msg>
+<msg time="2026-04-07T13:53:08.002840" level="INFO">${token} = eyJhbGciOiJSUzI1NiIsImtpZCI6IjVlODJhZmI0ZWY2OWI3NjM4MzA2OWFjNmI1N2U3ZTY1MjAzYmZlOTYiLCJ0eXAiOiJKV1QifQ.eyJuYW1lIjoiQ2xpbmljYSBQTVYgLSBQcmVmZWl0dXJhIFZpdG9yaWEiLCJpc3MiOiJodHRwczovL3NlY3VyZXRva2VuLmdvb...</msg>
 <var>${token}</var>
-<status status="PASS" start="2026-04-06T16:08:06.498872" elapsed="0.729677"/>
+<status status="PASS" start="2026-04-07T13:53:07.317052" elapsed="0.685897"/>
 </kw>
 <kw name="Criar Customer" owner="pericia_helper">
-<msg time="2026-04-06T16:08:08.136937" level="INFO">Criar customer [TESTE_LTS_14DIAS_GERAL_20260406_VA5Z] status: 201
-Massa salva: LTS_14DIAS_GERAL → TESTE_LTS_14DIAS_GERAL_20260406_VA5Z</msg>
-<msg time="2026-04-06T16:08:08.137373" level="INFO">${id} = bdc40e9e-c27a-4b37-ac9d-bd0fcc311d14</msg>
-<msg time="2026-04-06T16:08:08.137570" level="INFO">${cpf} = 80330778838</msg>
-<msg time="2026-04-06T16:08:08.137847" level="INFO">${nome} = TESTE_LTS_14DIAS_GERAL_20260406_VA5Z</msg>
+<msg time="2026-04-07T13:53:08.891009" level="INFO">Criar customer [TESTE_LTS_14DIAS_GERAL_20260407_1Y8D] status: 201
+Massa salva: LTS_14DIAS_GERAL → TESTE_LTS_14DIAS_GERAL_20260407_1Y8D</msg>
+<msg time="2026-04-07T13:53:08.891307" level="INFO">${id} = 1237cfa7-a3fe-4fd1-9598-8211e87681a6</msg>
+<msg time="2026-04-07T13:53:08.891509" level="INFO">${cpf} = 33678231209</msg>
+<msg time="2026-04-07T13:53:08.891680" level="INFO">${nome} = TESTE_LTS_14DIAS_GERAL_20260407_1Y8D</msg>
 <var>${id}</var>
 <var>${cpf}</var>
 <var>${nome}</var>
@@ -93,12 +93,13 @@ Massa salva: LTS_14DIAS_GERAL → TESTE_LTS_14DIAS_GERAL_20260406_VA5Z</msg>
 <arg>${token}</arg>
 <arg>LTS_14DIAS_GERAL</arg>
 <arg>${COMPANY_PMV}</arg>
-<status status="PASS" start="2026-04-06T16:08:07.229084" elapsed="0.909040"/>
+<status status="PASS" start="2026-04-07T13:53:08.003560" elapsed="0.888212"/>
 </kw>
 <kw name="Criar Pericia Api" owner="pericia_helper">
-<msg time="2026-04-06T16:08:15.512531" level="INFO">Status: 201</msg>
-<msg time="2026-04-06T16:08:15.513289" level="INFO">${status} = 201</msg>
-<msg time="2026-04-06T16:08:15.514316" level="INFO">${body} = {"files":[{"id":"5d961a47-e98a-48a8-8d3e-1f72550acf2d","link":"https://guidance-mages-results.s3.amazonaws.com/medical-expert-report-request/files/f2416c2b-0fd4-4417-9b4d-0255c910a655.png","extension"...</msg>
+<msg time="2026-04-07T13:53:15.485916" level="INFO">criar_pericia resposta keys: ['files', 'type', 'customerId', 'startDate', 'days', 'medicCrm', 'medicUf', 'cid', 'dependentName', 'dependentCpf', 'requestDescription', 'resourceReason', 'id', 'number', 'customerName', 'customerCpf', 'companyName', 'submitDate', 'status', 'attendances', 'reportLink', 'acceptedCid', 'acceptedStartDate', 'acceptedDays', 'analysisDate', 'observations', 'rejectionReasons', 'discrepancyAnnotation', 'notatedBy', 'annotationDate', 'changeReason', 'changeDate', 'hasAppeal', 'shouldAttachDocuments', 'name', 'documentAnalysis', 'reportLinkList', 'medicalBoardSignatures', 'squadUserName', 'eventType', 'isMedicalBoard', 'medicalBoardRoles', 'auditedDate', 'companyId', 'serviceName', 'requestConclusion', 'squadUserRoleDescription', 'roleDescription', 'registrations', 'medicalExpertType']
+Status: 201</msg>
+<msg time="2026-04-07T13:53:15.486371" level="INFO">${status} = 201</msg>
+<msg time="2026-04-07T13:53:15.486588" level="INFO">${body} = {"files":[{"id":"a9af1c4e-379c-4025-88f2-4051e43f5ee1","link":"https://guidance-mages-results.s3.amazonaws.com/medical-expert-report-request/files/569d6b97-1e15-4f2e-b9c1-895593366b54.png","extension"...</msg>
 <var>${status}</var>
 <var>${body}</var>
 <arg>${API_URL}</arg>
@@ -112,28 +113,28 @@ Massa salva: LTS_14DIAS_GERAL → TESTE_LTS_14DIAS_GERAL_20260406_VA5Z</msg>
 <arg>${LTS}</arg>
 <arg>${CID_GERAL}</arg>
 <arg>${FIXTURE}</arg>
-<status status="PASS" start="2026-04-06T16:08:08.138637" elapsed="7.375883"/>
+<status status="PASS" start="2026-04-07T13:53:08.892311" elapsed="6.594423"/>
 </kw>
 <kw name="Should Be True" owner="BuiltIn">
 <arg>${status} &lt; 300</arg>
 <arg>API retornou ${status}: ${body}</arg>
 <doc>Fails if the given condition is not true.</doc>
-<status status="PASS" start="2026-04-06T16:08:15.515131" elapsed="0.000510"/>
+<status status="PASS" start="2026-04-07T13:53:15.487752" elapsed="0.000768"/>
 </kw>
 <tag>borda</tag>
 <tag>lts</tag>
 <tag>lts_geral</tag>
 <tag>pmv</tag>
 <tag>setup</tag>
-<status status="PASS" start="2026-04-06T16:08:06.496004" elapsed="9.019995"/>
+<status status="PASS" start="2026-04-07T13:53:07.312718" elapsed="8.176341"/>
 </test>
-<status status="PASS" start="2026-04-06T16:08:06.457504" elapsed="9.062315"/>
+<status status="PASS" start="2026-04-07T13:53:07.278893" elapsed="8.215482"/>
 </suite>
-<status status="PASS" start="2026-04-06T16:08:06.369036" elapsed="9.153635"/>
+<status status="PASS" start="2026-04-07T13:53:07.192676" elapsed="8.307995"/>
 </suite>
-<status status="PASS" start="2026-04-06T16:08:06.365489" elapsed="9.159612"/>
+<status status="PASS" start="2026-04-07T13:53:07.163044" elapsed="8.340249"/>
 </suite>
-<status status="PASS" start="2026-04-06T16:08:06.336261" elapsed="9.191313"/>
+<status status="PASS" start="2026-04-07T13:53:07.136051" elapsed="8.372694"/>
 </suite>
 <statistics>
 <total>
