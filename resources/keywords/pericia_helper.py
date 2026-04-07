@@ -4,19 +4,86 @@ import random
 import time
 import uuid as _uuid
 import os
+import base64
 from datetime import datetime, timedelta
+
+
+PMV_ARTICLES_LTS = [
+    {"id": "6a1ee0cf-49b5-4c37-ac48-03b6a87fecc6", "article": "Licença para Tratamento de Saúde - ARTIGO 92", "applicableCategories": ["301"], "medicalBoard": False},
+    {"id": "262c9513-dba2-4dcf-826b-b13a80874dc1", "article": "Licença Tratamento de Saúde - ARTIGO 91", "applicableCategories": ["301"], "medicalBoard": False},
+    {"id": "8df9d57e-b94e-4177-8cc1-b5c8b6280697", "article": "Acidente de Trabalho - ARTIGO 97", "applicableCategories": ["301"], "medicalBoard": False},
+    {"id": "e5ff7f0c-9585-4bb5-84e2-8048fb7f111f", "article": "Auxílio Doença Administrativo", "applicableCategories": ["301","101","306","410","302","771"], "medicalBoard": False},
+    {"id": "232cce2b-1f07-4447-bf21-364556770d37", "article": "Auxílio Doença Administrativo - ACIDENTE DE TRABALHO", "applicableCategories": ["301","101","306","410","302","771"], "medicalBoard": False},
+    {"id": "7e4757a6-f056-4396-96f5-529f66a5700f", "article": "T89-REGISTRO DE ACIDENTE DE TRABALHO - SEM AFASTAMENTO", "applicableCategories": ["410","301","101","306","302","771"], "medicalBoard": False},
+    {"id": "9b1ed97e-f4ea-41dc-a74b-6bba81dbd677", "article": "Junta Médica - ARTIGO 91", "applicableCategories": ["301"], "medicalBoard": True},
+    {"id": "dae57233-a18d-4c4b-b87c-36bb353ac70c", "article": "Junta Médica - ARTIGO 92", "applicableCategories": ["301"], "medicalBoard": True},
+    {"id": "942bae7e-0869-41d8-97b6-3650ec502b11", "article": "Junta Médica - ACIDENTE TRABALHO", "applicableCategories": ["301"], "medicalBoard": True},
+]
+
+
+def _jwt_user_id(token):
+    """Extrai user_id do payload JWT sem verificar assinatura."""
+    try:
+        payload_b64 = token.split('.')[1]
+        padding = 4 - len(payload_b64) % 4
+        payload = json.loads(base64.b64decode(payload_b64 + '=' * padding))
+        return payload.get("user_id") or payload.get("sub")
+    except Exception:
+        return None
 
 MASSA_FILE = os.path.join(os.path.dirname(__file__), '..', '..', 'results', 'massa_criada.json')
 FICHA_HOMOLOG_TYPE_ID = "bcfc80cf-12ea-4cb5-8ac2-195895418db1"
 _customer_regra = {}
 
-TOKENS = {
-    "CLINICA": "eyJhbGciOiJSUzI1NiIsImtpZCI6IjVlODJhZmI0ZWY2OWI3NjM4MzA2OWFjNmI1N2U3ZTY1MjAzYmZlOTYiLCJ0eXAiOiJKV1QifQ.eyJuYW1lIjoiQ2xpbmljYSBQTVYgLSBUT1RBTExJRkUiLCJpc3MiOiJodHRwczovL3NlY3VyZXRva2VuLmdvb2dsZS5jb20vbG9raS1kZXYtNDQ0OGUiLCJhdWQiOiJsb2tpLWRldi00NDQ4ZSIsImF1dGhfdGltZSI6MTc3NTUwNTk5MiwidXNlcl9pZCI6IjNhMjRkMzE3LTBmNzEtNDY1Yi05MzNkLTU0ZjI3MzRkYTlkZiIsInN1YiI6IjNhMjRkMzE3LTBmNzEtNDY1Yi05MzNkLTU0ZjI3MzRkYTlkZiIsImlhdCI6MTc3NTUwNTk5MiwiZXhwIjoxNzc1NTA5NTkyLCJlbWFpbCI6Imdlc3Rvcm1paG1vQG1paG1vLmNvbS5iciIsImVtYWlsX3ZlcmlmaWVkIjpmYWxzZSwicGhvbmVfbnVtYmVyIjoiKzU1NDMyMTMyMTMyMTMiLCJmaXJlYmFzZSI6eyJpZGVudGl0aWVzIjp7ImVtYWlsIjpbImdlc3Rvcm1paG1vQG1paG1vLmNvbS5iciJdLCJwaG9uZSI6WyIrNTU0MzIxMzIxMzIxMyJdfSwic2lnbl9pbl9wcm92aWRlciI6InBhc3N3b3JkIn19.ov5SJTIZ2YW04nI2XJGT4I0zWcuUX15WPUzjnq476NkG8Gp-cMClsVqFdNXL3X3VnY2cVzYA99ImZ4tnrH2wLUBlse-BWIC1OBI6K7iRcW050wefIsU_E6B89vAcHYwdv7yO4Vo2N6zlmfQFgqsZZvXB-kmf2ruFgb2kccJRei7tWs3Oy2jzOGexyh9OTrQPGjIbf91h2lcdQ-LrOteWTx2zE4JQ6ZT0KuaGxmdVWx96YQ54UP5we0ehwUxo7Aecm9qyFVEkpXUiqSlMCHWSTFY70-BsIKEyIXh3m8XvMPg61CtLGuv4XgjEI8OgGk-4ME_kyqeBu5XHXhQsYVwPOw",
-    "Clínico Geral": "eyJhbGciOiJSUzI1NiIsImtpZCI6IjVlODJhZmI0ZWY2OWI3NjM4MzA2OWFjNmI1N2U3ZTY1MjAzYmZlOTYiLCJ0eXAiOiJKV1QifQ.eyJuYW1lIjoiQ2zDrW5pY28gR2VyYWwxIiwiaXNzIjoiaHR0cHM6Ly9zZWN1cmV0b2tlbi5nb29nbGUuY29tL2xva2ktZGV2LTQ0NDhlIiwiYXVkIjoibG9raS1kZXYtNDQ0OGUiLCJhdXRoX3RpbWUiOjE3NzU1MDU5NTEsInVzZXJfaWQiOiI4YzFjYWFmNS1jOTRlLTRiOGQtYWFjNy03MjI2MGFlYzRlZDciLCJzdWIiOiI4YzFjYWFmNS1jOTRlLTRiOGQtYWFjNy03MjI2MGFlYzRlZDciLCJpYXQiOjE3NzU1MDU5NTEsImV4cCI6MTc3NTUwOTU1MSwiZW1haWwiOiJjbGluaWNvZ2VyYWwxQG1paG1vLmNvbS5iciIsImVtYWlsX3ZlcmlmaWVkIjpmYWxzZSwicGhvbmVfbnVtYmVyIjoiKzU1NDg5MDg2MjU0MjQiLCJmaXJlYmFzZSI6eyJpZGVudGl0aWVzIjp7ImVtYWlsIjpbImNsaW5pY29nZXJhbDFAbWlobW8uY29tLmJyIl0sInBob25lIjpbIis1NTQ4OTA4NjI1NDI0Il19LCJzaWduX2luX3Byb3ZpZGVyIjoicGFzc3dvcmQifX0.xiBvaIqLwrvWzQN20Aw2HV-Wbfh7pQv0KAiBrgnwJj9QmP_zt3dGZH5wLvt27bHFLFUTKU1FdRXJD9KeEzycZ8LPouQ-ewKHgnN3AVKH6eRmqC8VbISGnkP9Qw_uFfBkP1APsaIFwocE-46zhcXhm2r8FiPaE9drhzFGlvOwpi7_AeVPF3MM49UC9w1rQC-l-ktc9KpRjCfHUp0NImQU_A3wWPkQzgqWKY6TKwieeJfSyNNt1JHlY0CYHgMAtDtY-aRCdir3Mw60yQTvAkfVDgKSUSfqrocdhpxKMJJufH9XZuIsHz96XLWPc9b7UyXHq_UpqLZCp1MqxfG9GCkXKA",
-    "Médico Trabalho": "SEU_TOKEN_MEDICO_TRABALHO",
-    "Ortopedista": "SEU_TOKEN_ORTOPEDISTA",
-    "Psiquiatra": "SEU_TOKEN_PSIQUIATRA"
+# Credenciais para auto-login Firebase (não precisam de atualização manual)
+CREDENTIALS = {
+    "CLINICA":         {"email": "gestormihmo@mihmo.com.br",   "password": "REMOVIDO"},
+    "Clínico Geral":   {"email": "clinicogeral1@mihmo.com.br", "password": "REMOVIDO"},
+    "Médico Trabalho": {"email": "SEU_EMAIL_MEDICO_TRABALHO",  "password": "REMOVIDO"},
+    "Ortopedista":     {"email": "SEU_EMAIL_ORTOPEDISTA",      "password": "REMOVIDO"},
+    "Psiquiatra":      {"email": "SEU_EMAIL_PSIQUIATRA",       "password": "REMOVIDO"},
 }
+
+FIREBASE_AUTH_URL = (
+    "https://www.googleapis.com/identitytoolkit/v3/relyingparty/verifyPassword"
+    "?key=REMOVIDO"
+)
+
+# Cache em memória: role → {"token": "...", "exp": timestamp}
+_token_cache: dict = {}
+
+
+def _obter_token(role: str) -> str:
+    """Retorna token Firebase válido para o role, fazendo login automático se expirado."""
+    import time as _time
+
+    cached = _token_cache.get(role, {})
+    token = cached.get("token")
+    exp = cached.get("exp", 0)
+
+    # Renova se faltarem menos de 5 minutos para expirar
+    if token and _time.time() < exp - 300:
+        return token
+
+    creds = CREDENTIALS.get(role)
+    if not creds:
+        raise Exception(f"Credenciais não configuradas para role '{role}'. Adicione em CREDENTIALS.")
+    if creds["email"].startswith("SEU_"):
+        raise Exception(f"Credenciais não configuradas para role '{role}'. Preencha o e-mail em CREDENTIALS.")
+
+    print(f"[auto-login] Obtendo token para '{role}' ({creds['email']})...")
+    payload = {"email": creds["email"], "password": creds["password"], "returnSecureToken": True}
+    resp = requests.post(FIREBASE_AUTH_URL, json=payload, timeout=10)
+    if resp.status_code != 200:
+        raise Exception(f"Falha no login Firebase para '{role}': {resp.status_code} - {resp.text[:200]}")
+
+    data = resp.json()
+    new_token = data["idToken"]
+    expires_in = int(data.get("expiresIn", 3600))
+
+    _token_cache[role] = {"token": new_token, "exp": _time.time() + expires_in}
+    print(f"[auto-login] Token para '{role}' obtido. Expira em {expires_in}s.")
+    return new_token
 
 def gerar_sufixo():
     chars = "ABCDEFGHIJKLMNOPQRSTUVWXYZ0123456789"
@@ -121,7 +188,7 @@ def criar_customer(api_url, token, regra, company_id, tipo="Main"):
             "jobTitle": gerar_cargo(),
             "location": gerar_unidade(),
             "cnpjLocation": gerar_cnpj(),
-            "employmentCategory": "101",
+            "employmentCategory": "301",
             "functionalRegistration": matricula
         }]
     }
@@ -218,7 +285,7 @@ def verificar_especialista_api(api_url, token, regra):
 
     pericia_id = dados[regra].get("pericia_id")
     nome = dados[regra].get("nome", "")
-    attendance_id = None
+    attendance_id = dados[regra].get("attendance_id")
 
     if not pericia_id:
         raise Exception(f"SKIP: pericia_id não encontrado para '{regra}'. Recrie a massa.")
@@ -244,7 +311,6 @@ def verificar_especialista_api(api_url, token, regra):
             "page": page,
             "pageSize": 50,
             "search": nome,
-            "status": "active",
             "type": "faceToFace"
         }
         response = requests.get(fila_url, params=params, headers=headers)
@@ -301,39 +367,143 @@ def enviar_para_fila(api_url, token, attendance_id):
 # HOMOLOGAÇÃO
 # ──────────────────────────────────────────────────────────────
 
-def iniciar_atendimento(base_url, token, attendance_id):
-    """Inicia o atendimento (doctor starts/opens the attendance from their queue).
-    Tenta POST /start, depois POST /accept, e por último PATCH com status InProgress.
-    Não lança exceção — apenas loga o resultado.
-    """
+def iniciar_atendimento(base_url, token, attendance_id, squad_user_id):
+    """Inicia o atendimento via PATCH /squaduser (atribui médico e bloqueia)."""
+    url = f"{base_url}/attendance/api/scheduled-attendance/{attendance_id}/squaduser"
     headers = {"Authorization": f"Bearer {token}", "Content-Type": "application/json"}
-    candidates = [
-        ("POST",  f"{base_url}/attendance/api/scheduled-attendance/{attendance_id}/start"),
-        ("POST",  f"{base_url}/attendance/api/scheduled-attendance/{attendance_id}/accept"),
-        ("PATCH", f"{base_url}/attendance/api/scheduled-attendance/{attendance_id}"),
-    ]
-    patch_payload = {"status": "InProgress"}
-
-    for method, url in candidates:
-        try:
-            if method == "POST":
-                resp = requests.post(url, headers=headers, timeout=10)
-            else:
-                resp = requests.patch(url, json=patch_payload, headers=headers, timeout=10)
-
-            print(f"iniciar_atendimento [{method} {url.split('/')[-1]}]: {resp.status_code}")
-            if resp.status_code in (200, 201, 204):
-                print(f"Atendimento iniciado via {method} {url.split('/')[-2:]}")
-                return resp.status_code
-        except Exception as exc:
-            print(f"iniciar_atendimento erro: {exc}")
-
-    print("iniciar_atendimento: nenhum endpoint respondeu 2xx — continuando mesmo assim.")
+    payload = {"squadUserId": squad_user_id, "lock": True}
+    resp = requests.patch(url, json=payload, headers=headers, timeout=10)
+    print(f"iniciar_atendimento [PATCH squaduser]: {resp.status_code}")
+    if resp.status_code in (200, 201, 204):
+        print(f"Atendimento iniciado via PATCH /squaduser")
+        return resp.status_code
+    print(f"iniciar_atendimento: aviso {resp.status_code} - {resp.text[:200]}")
     return None
 
 
-def criar_ficha_clinica(api_url, token, customer_id, attendance_id):
-    """Cria a Ficha de HOMOLOG (registro clínico obrigatório antes de homologar)."""
+LIMESURVEY_URL = "https://mihmosaude.limesurvey.net"
+LIMESURVEY_USER = "admin"
+LIMESURVEY_PASS = "REMOVIDO"  # ajuste se necessário
+
+
+def _limesurvey_submit(survey_id, cpf, responses=None):
+    """Submete uma resposta ao LimeSurvey simulando o participante no navegador."""
+    import re as _re
+
+    session = requests.Session()
+    survey_url = f"{LIMESURVEY_URL}/{survey_id}"
+    params = {"lang": "pt", "CPF": cpf}
+
+    # 1. GET para obter o formulário e os tokens de sessão
+    print(f"LimeSurvey GET survey {survey_id}...")
+    get_resp = session.get(survey_url, params=params, timeout=20)
+    print(f"  GET status: {get_resp.status_code}")
+    if get_resp.status_code != 200:
+        print(f"  AVISO: não conseguiu carregar survey: {get_resp.status_code}")
+        return None
+
+    html = get_resp.text
+
+    # Extrair campos hidden do formulário (YII_CSRF_TOKEN, sid, token, etc.)
+    hidden_fields = {}
+    for match in _re.finditer(r'<input[^>]+type=["\']hidden["\'][^>]*>', html, _re.IGNORECASE):
+        tag = match.group(0)
+        name_m = _re.search(r'name=["\']([^"\']+)["\']', tag)
+        value_m = _re.search(r'value=["\']([^"\']*)["\']', tag)
+        if name_m:
+            hidden_fields[name_m.group(1)] = value_m.group(1) if value_m else ""
+
+    print(f"  hidden fields encontrados: {list(hidden_fields.keys())}")
+
+    def _extract_hidden(h):
+        fields = {}
+        for m in _re.finditer(r'<input[^>]+type=["\']hidden["\'][^>]*>', h, _re.IGNORECASE):
+            tag = m.group(0)
+            name_m = _re.search(r'name=["\']([^"\']+)["\']', tag)
+            value_m = _re.search(r'value=["\']([^"\']*)["\']', tag)
+            if name_m:
+                fields[name_m.group(1)] = value_m.group(1) if value_m else ""
+        return fields
+
+    def _extract_questions(h):
+        fields = {}
+        for m in _re.finditer(
+            r'name=["\'](' + str(survey_id) + r'X\d+X\d+[^"\']*)["\']',
+            h, _re.IGNORECASE
+        ):
+            fname = m.group(1)
+            if fname not in fields:
+                fields[fname] = "A"
+        return fields
+
+    def _is_done(h):
+        low = h.lower()
+        return any(w in low for w in ["obrigado", "thank", "enviado", "survey complete", "finaliz",
+                                       "salva com sucesso", "fechar esta guia"])
+
+    # 2. Se a página inicial não tem perguntas, fazer POST com move=start
+    questions = _extract_questions(html)
+    if not questions:
+        print("  Página inicial detectada — enviando move=start...")
+        start_data = dict(hidden_fields)
+        start_data["move"] = "start"
+        start_data["sid"] = str(survey_id)
+        start_data["lang"] = "pt"
+        start_resp = session.post(survey_url, data=start_data, timeout=20, allow_redirects=True)
+        print(f"  start POST: {start_resp.status_code} | len={len(start_resp.text)}")
+        html = start_resp.text
+        hidden_fields = _extract_hidden(html)
+        questions = _extract_questions(html)
+
+    print(f"  perguntas encontradas: {list(questions.keys())}")
+
+    # 3. Iterar páginas até submeter tudo (máx 10 páginas)
+    current_html = html
+    for step in range(10):
+        hidden = _extract_hidden(current_html)
+        qs = _extract_questions(current_html)
+
+        if _is_done(current_html):
+            print(f"  LimeSurvey: submissão concluída (step {step})")
+            return True
+
+        if not qs and step > 0:
+            print(f"  Sem perguntas na página {step} — possível conclusão ou erro")
+            print(f"  HTML: {current_html[:300]}")
+            break
+
+        post_data = {}
+        post_data.update(hidden)
+        post_data.update({k: "A" for k in qs})
+        post_data["move"] = "movenext"
+        post_data["sid"] = str(survey_id)
+        post_data["lang"] = "pt"
+
+        print(f"  step {step}: POST com {len(qs)} perguntas, move=movenext")
+        resp = session.post(survey_url, data=post_data, timeout=20, allow_redirects=True)
+        print(f"  step {step} resposta: {resp.status_code} | len={len(resp.text)}")
+        current_html = resp.text
+
+        if _is_done(current_html):
+            print(f"  LimeSurvey: submissão concluída (step {step})")
+            # Notificar Mihmo da integração (o mesmo fetch que o frontend faz)
+            _re_survey = _re.search(r"clinical-record/survey/(\d+)", current_html)
+            if _re_survey:
+                notify_url = f"https://homolog.mihmo.com.br/backend-nest/clinical-record/survey/{_re_survey.group(1)}"
+                print(f"  Notificando Mihmo: GET {notify_url}")
+                try:
+                    notify_resp = requests.get(notify_url, timeout=10)
+                    print(f"  Notificação Mihmo: {notify_resp.status_code} | {notify_resp.text[:200]}")
+                except Exception as e:
+                    print(f"  Notificação Mihmo erro: {e}")
+            return True
+
+    print(f"  LimeSurvey: não confirmado após tentativas")
+    return None
+
+
+def criar_ficha_clinica(api_url, token, customer_id, attendance_id, cpf=None):
+    """Cria a Ficha de HOMOLOG e submete o LimeSurvey automaticamente."""
     url = f"{api_url}/clinical-record"
     headers = {"Authorization": f"Bearer {token}", "Content-Type": "application/json"}
     payload = {
@@ -342,13 +512,30 @@ def criar_ficha_clinica(api_url, token, customer_id, attendance_id):
         "scheduledAttendanceId": attendance_id
     }
     response = requests.post(url, json=payload, headers=headers)
-    print(f"Ficha clínica: {response.status_code} | {response.text[:200]}")
+    print(f"Ficha clínica: {response.status_code} | {response.text[:300]}")
     if response.status_code not in (200, 201):
         print(f"Aviso: Ficha clínica retornou {response.status_code} — pode já existir.")
+        return response.status_code
+
+    # Extrair surveyId e link do LimeSurvey
+    ficha_data = safe_json(response)
+    if ficha_data:
+        survey_link = ficha_data.get("link", "")
+        print(f"  survey_link: {survey_link}")
+        # Tentar submeter via RemoteControl2
+        survey_id_str = survey_link.split("/")[-1].split("?")[0] if survey_link else None
+        if survey_id_str and survey_id_str.isdigit():
+            survey_id = int(survey_id_str)
+            print(f"  Tentando submeter LimeSurvey survey {survey_id} para CPF {cpf}...")
+            result = _limesurvey_submit(survey_id, cpf)
+            print(f"  LimeSurvey submit result: {result}")
+            # Aguardar integração
+            time.sleep(3)
+
     return response.status_code
 
 
-def patch_validate_data(api_url, token, pericia_id, start_date, cid, days):
+def patch_validate_data(api_url, token, pericia_id, start_date, cid, days, **kwargs):
     """Tenta confirmar/validar dados da perícia antes de homologar.
     Experimenta múltiplos métodos e sufixos de URL; retorna o body JSON se algum
     responder 2xx, ou None se nenhum funcionar (fluxo continuará sem o PATCH).
@@ -359,8 +546,19 @@ def patch_validate_data(api_url, token, pericia_id, start_date, cid, days):
     base = api_url if api_url.endswith('/backend-nest') \
         else api_url.rsplit('/backend-nest', 1)[0] + '/backend-nest'
 
-    # (método, sufixo do caminho)
-    candidates = [
+    # (método, url)
+    attendance_id = kwargs.get("attendance_id")
+    att_base = base.rsplit('/backend-nest', 1)[0]
+    candidates = []
+    if attendance_id:
+        candidates += [
+            # Correto: usa attendance_id no path do attendance service
+            ("PATCH", f"{att_base}/attendance/api/scheduled-attendance/{attendance_id}/validate-data-requested"),
+            ("POST",  f"{att_base}/attendance/api/scheduled-attendance/{attendance_id}/validate-data-requested"),
+            ("PATCH", f"{att_base}/attendance/api/scheduled-attendance/{attendance_id}/validate-data"),
+        ]
+    candidates += [
+        # Fallbacks com pericia_id
         ("PATCH", f"{base}/medical-expert-report-request/{pericia_id}/validate-data-requested"),
         ("PATCH", f"{base}/medical-expert-report-request/{pericia_id}/validate-data"),
         ("POST",  f"{base}/medical-expert-report-request/{pericia_id}/validate-data-requested"),
@@ -368,6 +566,11 @@ def patch_validate_data(api_url, token, pericia_id, start_date, cid, days):
         ("PUT",   f"{base}/medical-expert-report-request/{pericia_id}/validate-data-requested"),
         ("PATCH", f"{base}/medical-expert-report-request/{pericia_id}"),
     ]
+    if attendance_id:
+        candidates += [
+            ("PATCH", f"{base}/medical-expert-report-request/{attendance_id}/validate-data-requested"),
+            ("PATCH", f"{base}/medical-expert-report-request/{attendance_id}/validate-data"),
+        ]
 
     for method, url in candidates:
         print(f"validate-data tentando: {method} {url}")
@@ -394,6 +597,30 @@ def patch_validate_data(api_url, token, pericia_id, start_date, cid, days):
     return None
 
 
+def eligibility_check(api_url, token, pericia_id, accepted_days, accepted_start_date,
+                      conclusion_id, functional_registration):
+    """GET eligibility-check — valida os dados e habilita o generate-memed-file."""
+    base = api_url if api_url.endswith('/backend-nest') \
+        else api_url.rsplit('/backend-nest', 1)[0] + '/backend-nest'
+    url = f"{base}/medical-expert-report-request/{pericia_id}/eligibility-check"
+    headers = {"Authorization": f"Bearer {token}"}
+    params = {
+        "acceptedDays": accepted_days,
+        "acceptedStartDate": accepted_start_date,
+        "conclusionId": conclusion_id,
+        "functionalRegistration": functional_registration,
+    }
+    print(f"eligibility-check: GET {url}")
+    print(f"  params: {params}")
+    resp = requests.get(url, params=params, headers=headers, timeout=15)
+    print(f"  resposta: {resp.status_code} | {resp.text[:300]}")
+    if resp.status_code == 200:
+        print("eligibility-check OK — DataValideted deve ser True agora.")
+        return resp.json()
+    print(f"AVISO: eligibility-check retornou {resp.status_code} — seguindo sem ele.")
+    return None
+
+
 def obter_detalhes_pericia(api_url, token, pericia_id):
     """Retorna detalhes da perícia incluindo registrationId e squadUserId."""
     url = f"{api_url}/medical-expert-report-request/{pericia_id}"
@@ -416,38 +643,58 @@ def obter_customer(api_url, token, customer_id):
 
 
 def obter_registration_id_do_customer(api_url, token, customer_id):
-    """Busca o registrationId do customer diretamente."""
+    """Busca o registrationId, employmentCategory e functionalRegistration do customer."""
     data = obter_customer(api_url, token, customer_id)
     regs = data.get("registrations") or []
     print(f"  customer registrations: {regs}")
     if regs:
+        print(f"  customer regs[0] keys: {list(regs[0].keys())}")
         rid = regs[0].get("registrationid") or regs[0].get("registrationId") or regs[0].get("id")
-        print(f"  registration_id encontrado: {rid}")
-        return rid
-    return None
+        cat = regs[0].get("employmentCategory") or regs[0].get("employment_category") or regs[0].get("employmentcategory")
+        func_reg = (regs[0].get("functionalRegistration")
+                    or regs[0].get("functional_registration")
+                    or regs[0].get("functionalregistration"))
+        print(f"  registration_id: {rid}, category: {cat}, functionalRegistration: {func_reg}")
+        return rid, cat, func_reg
+    return None, None, None
 
 
 def obter_squad_user_do_attendance(base_url, token, attendance_id):
-    """Busca o squadUserId no endpoint do attendance."""
+    """Busca o squadUserId e memed_token no endpoint do attendance."""
     url = f"{base_url}/attendance/api/scheduled-attendance/{attendance_id}"
     headers = {"Authorization": f"Bearer {token}"}
     response = requests.get(url, headers=headers)
     print(f"GET attendance: {response.status_code}")
     if response.status_code != 200:
-        return None
+        return None, None
     data = safe_json(response)
     print(f"  attendance keys: {list(data.keys())}")
-    # Tenta todas as variações de campo
+    memed_token = data.get("token")
+    if memed_token:
+        print(f"  memed_token via attendance['token']: presente")
+    # Debug: campos críticos de estado
+    print(f"  canHomologate: {data.get('canHomologate')}")
+    print(f"  canPrescription: {data.get('canPrescription')}")
+    print(f"  canCid: {data.get('canCid')}")
+    print(f"  medicalExpertReportRequestStatus: {data.get('medicalExpertReportRequestStatus')}")
+    print(f"  medicalExpertReportRequestDataValideted: {data.get('medicalExpertReportRequestDataValideted')}")
+    print(f"  stepper: {data.get('stepper')}")
+    print(f"  clinicalRecord: {data.get('clinicalRecord')}")
+    print(f"  medicalExpertReportRequestConclusion: {data.get('medicalExpertReportRequestConclusion')}")
+    squad_user_id = None
     for campo in ("squadUserId", "squadUser", "squad_user", "userId", "user_id",
                   "doctorId", "doctor_id", "medicId", "medic_id"):
         val = data.get(campo)
         if val:
             print(f"  squad_user_id via '{campo}': {val}")
             if isinstance(val, dict):
-                return val.get("id") or val.get("squadUserId")
-            return val
-    print(f"  AVISO: squad_user_id não encontrado. Campos disponíveis: {list(data.keys())}")
-    return None
+                squad_user_id = val.get("id") or val.get("squadUserId")
+            else:
+                squad_user_id = val
+            break
+    if not squad_user_id:
+        print(f"  AVISO: squad_user_id não encontrado. Campos disponíveis: {list(data.keys())}")
+    return squad_user_id, memed_token
 
 
 def obter_memed_token(api_url, token, squad_user_id):
@@ -458,54 +705,63 @@ def obter_memed_token(api_url, token, squad_user_id):
     response = requests.get(url, headers=headers)
     if response.status_code != 200:
         raise Exception(f"Erro ao obter token Memed: {response.status_code} - {response.text[:200]}")
-    memed_token = safe_json(response).get("token")
-    print(f"Token Memed obtido para squadUser {squad_user_id}")
+    data = safe_json(response)
+    print(f"DEBUG memed-token response keys: {list(data.keys()) if isinstance(data, dict) else type(data)}")
+    print(f"DEBUG memed-token response: {str(data)[:300]}")
+    memed_token = data.get("token") if isinstance(data, dict) else None
+    print(f"Token Memed obtido para squadUser {squad_user_id}: {'ok' if memed_token else 'NULO'}")
     return memed_token
 
 
-def obter_primeiro_artigo(api_url, token, pericia_id, cid=None):
-    """Retorna (article_id, article_name) do primeiro artigo aplicável.
-    Tenta vários endpoints possíveis; retorna (None, '') se nenhum funcionar.
-    """
+def obter_primeiro_artigo(api_url, token, pericia_id, attendance_id=None, cid=None, category=None, is_junta=False, functional_registration=None):
+    """Retorna (article_id, article_name) do primeiro artigo aplicável para a perícia."""
     base = api_url if api_url.endswith('/backend-nest') \
         else api_url.rsplit('/backend-nest', 1)[0] + '/backend-nest'
     headers = {"Authorization": f"Bearer {token}"}
-
-    candidates = [
-        f"{base}/medical-expert-report-request/{pericia_id}/Accepted",
-        f"{base}/medical-expert-report-request/{pericia_id}/articles",
-        f"{base}/medical-expert-report-request/{pericia_id}/article",
-        f"{base}/article?medicalExpertReportRequestId={pericia_id}&status=Accepted",
-        f"{base}/article?status=Accepted",
-        f"{base}/article",
+    # URL correta inclui functionalRegistration: /article/{pericia_id}/{funcReg}/Accepted
+    candidates_urls = []
+    if functional_registration:
+        candidates_urls += [
+            f"{base}/medical-expert-report-request/article/{pericia_id}/{functional_registration}/Accepted",
+            f"{base}/medical-expert-report-request/article/{pericia_id}/{functional_registration}",
+        ]
+    candidates_urls += [
+        f"{base}/medical-expert-report-request/article/{pericia_id}/Accepted",
+        f"{base}/medical-expert-report-request/article/{pericia_id}",
     ]
-    if cid:
-        candidates.insert(4, f"{base}/article?cid={cid}&status=Accepted")
-
-    for url in candidates:
+    if attendance_id:
+        candidates_urls += [
+            f"{base}/medical-expert-report-request/article/{attendance_id}/Accepted",
+            f"{base}/medical-expert-report-request/article/{attendance_id}",
+        ]
+    items = []
+    for url in candidates_urls:
         print(f"Buscando artigos: GET {url}")
         resp = requests.get(url, headers=headers)
-        print(f"  status: {resp.status_code} | {resp.text[:120]}")
+        print(f"  status: {resp.status_code}")
         if resp.status_code == 200:
             try:
                 data = resp.json()
+                items = data if isinstance(data, list) else (data.get("items") or data.get("data") or [])
+                if items:
+                    break
             except Exception:
                 continue
-            # Pode vir como lista ou como dict com campo items/data
-            if isinstance(data, list):
-                items = data
-            elif isinstance(data, dict):
-                items = data.get("items") or data.get("data") or data.get("articles") or []
-            else:
-                items = []
-            if items:
-                article_id   = items[0].get("id")
-                article_name = items[0].get("article") or items[0].get("name") or items[0].get("description") or ""
-                print(f"  Artigo encontrado: {article_name} ({article_id})")
-                return article_id, article_name
-
-    print("AVISO: nenhum artigo encontrado — prosseguindo com articleId=None.")
-    return None, ""
+    if not items:
+        print("AVISO: API não retornou artigos — usando fallback PMV_ARTICLES_LTS.")
+        items = PMV_ARTICLES_LTS
+    # Filtra por medicalBoard e categoria se disponível
+    filtered = [a for a in items if a.get("medicalBoard", False) == is_junta]
+    if category:
+        by_cat = [a for a in filtered if category in (a.get("applicableCategories") or [])]
+        if by_cat:
+            filtered = by_cat
+    if not filtered:
+        filtered = items
+    article_id   = filtered[0].get("id")
+    article_name = filtered[0].get("article", "")
+    print(f"  Artigo selecionado: {article_name} ({article_id})")
+    return article_id, article_name
 
 
 def criar_prescricao_memed(memed_token, customer_id, customer_name, cpf,
@@ -585,7 +841,13 @@ def criar_prescricao_memed(memed_token, customer_id, customer_name, cpf,
     if response.status_code not in (200, 201):
         raise Exception(f"Erro Memed prescricoes: {response.status_code} - {response.text[:300]}")
     memed_file_id = safe_json(response).get("data", {}).get("id")
-    print(f"Prescrição Memed criada: memedFileId={memed_file_id}")
+    print(f"Prescrição Memed criada: memedFileId={memed_file_id} (tipo: {type(memed_file_id).__name__})")
+    # Mihmo espera inteiro — converte se vier como string
+    try:
+        memed_file_id = int(memed_file_id)
+    except (TypeError, ValueError):
+        pass
+    print(f"  memedFileId convertido: {memed_file_id} (tipo: {type(memed_file_id).__name__})")
     return memed_file_id
 
 def gerar_memed_file_mihmo(api_url, token, attendance_id, pericia_id,
@@ -615,11 +877,17 @@ def gerar_memed_file_mihmo(api_url, token, attendance_id, pericia_id,
     }
     if article_id:
         payload["articleId"] = article_id
+    # Verificar check-clinical-record antes de enviar
+    att_base2 = base.rsplit('/backend-nest', 1)[0]
+    ccr_url = f"{att_base2}/attendance/api/scheduled-attendance/check-clinical-record/{attendance_id}"
+    ccr_resp = requests.get(ccr_url, headers=headers, timeout=10)
+    print(f"check-clinical-record: {ccr_resp.status_code} | {ccr_resp.text[:300]}")
+
     print(f"generate-memed-file payload: {json.dumps(payload, indent=2)}")
     response = requests.post(url, json=payload, headers=headers)
-    print(f"generate-memed-file: {response.status_code} | {response.text[:300]}")
+    print(f"generate-memed-file: {response.status_code} | {response.text[:1000]}")
     if response.status_code not in (200, 201):
-        raise Exception(f"Erro generate-memed-file: {response.status_code} - {response.text[:300]}")
+        raise Exception(f"Erro generate-memed-file: {response.status_code} - {response.text}")
     status = safe_json(response).get("status", "")
     print(f"Homologação concluída. Status: {status}")
     return status
@@ -647,7 +915,7 @@ def homologar_pericia(api_url, token, regra):
     entrada = dados[regra]
     pericia_id    = entrada.get("pericia_id")
 
-    token_clinica = TOKENS["CLINICA"]
+    token_clinica = _obter_token("CLINICA")
 
     role, is_junta, board_roles, attendance_id = verificar_especialista_api(
         api_url, token_clinica, regra
@@ -658,12 +926,13 @@ def homologar_pericia(api_url, token, regra):
 
     enviar_para_fila(api_url, token_clinica, attendance_id)
 
-    token_medico = TOKENS.get(role)
+    token_medico = _obter_token(role)
 
     if not token_medico:
         raise Exception(f"Token não encontrado para role '{role}'")
 
     if not attendance_id:
+        token_clinica = _obter_token("CLINICA")
         _, _, _, attendance_id = verificar_especialista_api(api_url, token_clinica, regra)
 
     if not attendance_id:
@@ -674,6 +943,7 @@ def homologar_pericia(api_url, token, regra):
     customer_id   = entrada.get("customer_id")
     customer_name = entrada.get("nome")
     cpf           = entrada.get("cpf")
+    category      = entrada.get("employmentCategory")
     start_date    = entrada.get("start_date") or gerar_data_hoje()
     observations  = "Teste automatizado"
 
@@ -686,12 +956,23 @@ def homologar_pericia(api_url, token, regra):
 
     base_url = api_url.rsplit('/backend-nest', 1)[0]
 
-    iniciar_atendimento(base_url, token_medico, attendance_id)
-    criar_ficha_clinica(api_url, token_medico, customer_id, attendance_id)
+    # 1. squad_user_id = user_id extraído do JWT do médico
+    squad_user_id = _jwt_user_id(token_medico)
+    print(f"squad_user_id (JWT)={squad_user_id}")
+    if not squad_user_id:
+        raise Exception(f"Não foi possível extrair user_id do token do médico para '{regra}'.")
+
+    # 2. Iniciar atendimento via PATCH /squaduser com lock
+    iniciar_atendimento(base_url, token_medico, attendance_id, squad_user_id)
+    # Re-fetch após iniciar para pegar token Memed se disponível
+    _, memed_token_attendance = obter_squad_user_do_attendance(base_url, token_medico, attendance_id)
+    criar_ficha_clinica(api_url, token_medico, customer_id, attendance_id, cpf=cpf)
     pericia_data = patch_validate_data(
-        api_url, token_medico, pericia_id, start_date, cid, days
+        api_url, token_medico, pericia_id, start_date, cid, days,
+        attendance_id=attendance_id
     )
 
+    # 3. registration_id
     def _extrair_registration_id(data):
         if not data:
             return None
@@ -705,61 +986,52 @@ def homologar_pericia(api_url, token, regra):
             return regs[0].get("registrationid") or regs[0].get("id")
         return None
 
-    # 3a. registration_id — tenta em cascata: PATCH response → GET péricia → GET customer
     registration_id = _extrair_registration_id(pericia_data)
+    # Sempre busca do customer para garantir category e functionalRegistration
+    rid_customer, category_from_customer, functional_registration = obter_registration_id_do_customer(api_url, token_medico, customer_id)
     if not registration_id:
-        details = obter_detalhes_pericia(api_url, token_medico, pericia_id)
-        registration_id = obter_registration_id_do_customer(api_url, token_medico, customer_id)
-    if not registration_id:
-        print("registration_id não veio do GET péricia — buscando via GET customer...")
-        registration_id = obter_registration_id_do_customer(api_url, token_medico, customer_id)
-    print(f"registration_id={registration_id}")
+        registration_id = rid_customer
+    if category_from_customer:
+        category = category_from_customer
+    if not functional_registration:
+        print("AVISO: functionalRegistration não encontrado no customer — eligibility-check pode falhar")
+    print(f"registration_id={registration_id}, category={category}, functionalRegistration={functional_registration}")
     if not registration_id:
         raise Exception(
             f"registration_id não encontrado para '{regra}'. "
             f"Verifique se o customer '{customer_id}' tem matrícula cadastrada."
         )
 
-    # 3b. squad_user_id — attendance endpoint (com debug completo)
-    squad_user_id = obter_squad_user_do_attendance(base_url, token_medico, attendance_id)
-    if not squad_user_id and pericia_data:
-        for campo in ("squad_user", "squadUser", "userId"):
-            sq = pericia_data.get(campo)
-            if sq:
-                squad_user_id = sq.get("id") if isinstance(sq, dict) else sq
-                break
-    if not squad_user_id:
-        try:
-            det2 = obter_detalhes_pericia(api_url, token_medico, pericia_id)
-            print(f"  GET péricia (2ª vez) keys: {list(det2.keys())}")
-            for campo in ("squad_user", "squadUser", "userId", "squadUserId"):
-                sq2 = det2.get(campo)
-                if sq2:
-                    squad_user_id = sq2.get("id") if isinstance(sq2, dict) else sq2
-                    print(f"  squad_user_id via péricia['{campo}']: {squad_user_id}")
-                    break
-        except Exception:
-            pass
-    print(f"squad_user_id={squad_user_id}")
-    if not squad_user_id:
-        raise Exception(
-            f"squad_user_id não encontrado para '{regra}'. "
-            f"Verifique se o attendance '{attendance_id}' tem médico atribuído."
-        )
+    # 4. Artigo CID (URL correta inclui functionalRegistration)
+    article_id, article_name = obter_primeiro_artigo(
+        api_url, token_medico, pericia_id,
+        attendance_id=attendance_id, cid=cid, category=category,
+        is_junta=is_junta, functional_registration=functional_registration
+    )
 
-    # 4. Artigo CID
-    article_id, article_name = obter_primeiro_artigo(api_url, token_medico, pericia_id, cid=cid)
+    # 4.5 eligibility-check — valida dados e habilita DataValideted no backend
+    eligibility_check(
+        api_url, token_medico, pericia_id,
+        accepted_days=days,
+        accepted_start_date=start_date,
+        conclusion_id=article_id,
+        functional_registration=functional_registration
+    )
 
-    # 4. Token Memed
-    memed_token = obter_memed_token(api_url, token_medico, squad_user_id)
+    # 5. Token Memed
+    memed_token = memed_token_attendance or obter_memed_token(api_url, token_medico, squad_user_id)
+    if memed_token:
+        prefix = memed_token[:30]
+        alg = "HS256(Memed)" if "eyJ0eXAiOiJKV1Qi" in memed_token[:30] else "RS256(Firebase?)"
+        print(f"  memed_token prefix: {prefix}... alg_guess={alg}")
 
-    # 5. Prescrição Memed
+    # 6. Prescrição Memed
     memed_file_id = criar_prescricao_memed(
         memed_token, customer_id, customer_name, cpf,
         cid, days, start_date, observations
     )
 
-    # 6. Finaliza no Mihmo
+    # 7. Finaliza no Mihmo
     status = gerar_memed_file_mihmo(
         api_url, token_medico, attendance_id, pericia_id,
         registration_id, memed_file_id, memed_token,

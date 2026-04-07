@@ -4,3 +4,10 @@ BROWSER: chromium
 HEADLESS: false
 EMAIL_VALIDO: adm.castela@mihmo.com.br
 SENHA_VALIDA: REMOVIDO
+
+# Credenciais dos médicos/clínica para auto-login
+FIREBASE_API_KEY: REMOVIDO
+CREDENTIALS_CLINICA_EMAIL: gestormihmo@mihmo.com.br
+CREDENTIALS_CLINICA_SENHA: REMOVIDO
+CREDENTIALS_CLINICO_GERAL_EMAIL: clinicogeral1@mihmo.com.br
+CREDENTIALS_CLINICO_GERAL_SENHA: REMOVIDO

@@ -5,7 +5,7 @@
 <meta http-equiv="Pragma" content="no-cache">
 <meta http-equiv="Expires" content="-1">
 <meta http-equiv="X-UA-Compatible" content="IE=edge">
-<meta content="Robot Framework 7.0 (Python 3.14.3 on win32)" name="Generator">
+<meta content="Robot Framework 7.4.2 (Python 3.12.10 on win32)" name="Generator">
 <link rel="icon" type="image/x-icon" href="data:image/x-icon;base64,AAABAAEAEBAAAAEAIABoBAAAFgAAACgAAAAQAAAAIAAAAAEAIAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAKcAAAD/AAAA/wAAAP8AAAD/AAAA/wAAAP8AAAD/AAAA/wAAAP8AAAD/AAAAqAAAAAAAAAAAAAAAAAAAALIAAAD/AAAA4AAAANwAAADcAAAA3AAAANwAAADcAAAA3AAAANwAAADcAAAA4AAAAP8AAACxAAAAAAAAAKYAAAD/AAAAuwAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAC/AAAA/wAAAKkAAAD6AAAAzAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAN8AAAD/AAAA+gAAAMMAAAAAAAAAAgAAAGsAAABrAAAAawAAAGsAAABrAAAAawAAAGsAAABrAAAADAAAAAAAAADaAAAA/wAAAPoAAADDAAAAAAAAAIsAAAD/AAAA/wAAAP8AAAD/AAAA/wAAAP8AAAD/AAAA/wAAANEAAAAAAAAA2gAAAP8AAAD6AAAAwwAAAAAAAAAAAAAAMgAAADIAAAAyAAAAMgAAADIAAAAyAAAAMgAAADIAAAAFAAAAAAAAANoAAAD/AAAA+gAAAMMAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAADaAAAA/wAAAPoAAADDAAAAAAAAADwAAAB8AAAAAAAAAGAAAABcAAAAAAAAAH8AAABKAAAAAAAAAAAAAAAAAAAA2gAAAP8AAAD6AAAAwwAAAAAAAADCAAAA/wAAACkAAADqAAAA4QAAAAAAAAD7AAAA/wAAALAAAAAGAAAAAAAAANoAAAD/AAAA+gAAAMMAAAAAAAAAIwAAAP4AAAD/AAAA/wAAAGAAAAAAAAAAAAAAAMkAAAD/AAAAigAAAAAAAADaAAAA/wAAAPoAAADDAAAAAAAAAAAAAAAIAAAAcAAAABkAAAAAAAAAAAAAAAAAAAAAAAAAEgAAAAAAAAAAAAAA2gAAAP8AAAD7AAAAywAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAN4AAAD/AAAAqwAAAP8AAACvAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAALIAAAD/AAAAsgAAAAAAAAC5AAAA/wAAAMoAAADAAAAAwAAAAMAAAADAAAAAwAAAAMAAAADAAAAAwAAAAMkAAAD/AAAAvAAAAAAAAAAAAAAAAAAAAKwAAAD/AAAA/wAAAP8AAAD/AAAA/wAAAP8AAAD/AAAA/wAAAP8AAAD/AAAArQAAAAAAAAAAwAMAAIABAAAf+AAAP/wAAD/8AAAgBAAAP/wAAD/8AAA//AAAJIwAADHEAAA//AAAP/wAAB/4AACAAQAAwAMAAA==">
 <style media="all">
 :root {
@@ -116,15 +116,16 @@ select {
 #header {
     width: 65em;
     height: 3em;
-    margin: 20px 0 6px 0;
+    margin: 1em 0 0 0;
 }
 h1 {
     float: left;
-    margin: 0 0 0.5em 0;
+    margin: 0 0 1em 0;
     width: 75%;
 }
 h2 {
     clear: left;
+    margin: 1.5em 0 0.5em 0;
 }
 #generated {
     float: right;
@@ -168,7 +169,13 @@ h2 {
     background-color: var(--primary-color);
     border-radius: 3px;
 }
-.label.debug, .label.trace, .label.error, .label.keyword {
+/* https://stackoverflow.com/questions/75238633 */
+@supports (-moz-appearance: none) {
+    .label {
+        padding-top: 4px;
+    }
+}
+.label.debug, .label.trace, .label.error {
     letter-spacing: 0;
 }
 .label.pass, .label.fail, .label.error, .label.skip, .label.warn {
@@ -355,19 +362,6 @@ th.stats-col-graph:hover {
 [data-theme="light"] .dark-mode-icon {
     display: block;
 }
-@keyframes highlight {
-    0% {
-        background: var(--primary-color)
-    }
-    100% {
-        background: var(--target-color);
-    }
-}
-:target {
-    background: var(--target-color);
-    transition: background 0.3s;
-    animation: highlight 4s;
-}
 </style>
 <style media="all">
 /* Icons are from Open Iconic <https://useiconic.com/open/>.
@@ -384,36 +378,43 @@ th.stats-col-graph:hover {
     --elapsed-color: #999;
 }
 /* Containers */
-.suite, .test, #errors {
+.suite, .test, #errors, #errors .messages {
     border-color: #ccc; /* Fallback value */
     border-color: var(--secondary-color);
     border-width: 1px;
     border-style: solid;
-    padding: 0.3em 0.2em;
-    margin: 0.2em 0;
+    padding: 5px;
+    margin-top: 5px;
 }
 .test {
     border-style: dashed;
 }
-#errors, .messages {
+.messages {
     width: 100%;
     border-spacing: 0;
+    padding: 0 5px;
 }
 .children {
     display: none;
-    margin-left: 1.4em;
+    margin-left: 18px;
+    margin-top: 2px;
 }
-.suite, .test, .keyword {
-    margin-left: -0.2em;
+#errors .children {
+    margin-left: 22px;
 }
-#s1, .suite > .children > .keyword {
-    margin-left: 0;
+.suite, .test {
+    margin-left: -5px;
+}
+#s1, #errors {
+    margin: 0;
 }
 /* Suite, test and kw headers */
 .element-header {
+    display: flex;
+    align-items: center;
+    padding: 2px;
     border: 1px solid transparent;
     border-radius: 2px;
-    position: relative;
 }
 .element-header:hover {
     cursor: pointer;
@@ -423,17 +424,15 @@ th.stats-col-graph:hover {
     border-color: var(--secondary-color);
 }
 .element-header-toggle {
-    position: absolute;
-    left: 3px;
-    top: 5px;
+    margin: 0 4px 0 2px;
+    height: 11px;
+    width: 11px;
+    min-width: 11px;
+    background-size: 6px 6px;
     background-repeat: no-repeat;
     background-position: center;
-    background-image: url(data:image/png;base64,iVBORw0KGgoAAAANSUhEUgAAAAYAAAAGCAQAAABKxSfDAAAAAmJLR0QA/4ePzL8AAAAJcEhZcwAACxMAAAsTAQCanBgAAAAHdElNRQfeCR0JChSkZz20AAAAGklEQVQI12NgQAKMDKzInP8IDhOqMk4G7AAANQwBE427PYUAAAAASUVORK5CYII=);
     background-image: url(data:image/svg+xml;base64,PHN2ZyB4bWxucz0iaHR0cDovL3d3dy53My5vcmcvMjAwMC9zdmciIHdpZHRoPSI4IiBoZWlnaHQ9IjgiIHZpZXdCb3g9IjAgMCA4IDgiPgogIDxwYXRoIGQ9Ik0wIDB2Mmg4di0yaC04eiIgdHJhbnNmb3JtPSJ0cmFuc2xhdGUoMCAzKSIgLz4KPC9zdmc+), none;
     filter: var(--icon-filter);
-    height: 10px;
-    width: 10px;
-    background-size: 6px 6px;
     border-color: #ccc; /* Fallback value */
     border-color: var(--icon-highlight);
     border-width: 1px;
@@ -441,67 +440,59 @@ th.stats-col-graph:hover {
     border-radius: 2px;
 }
 .closed > .element-header-toggle {
-    background-image: url(data:image/png;base64,iVBORw0KGgoAAAANSUhEUgAAAAYAAAAGCAQAAABKxSfDAAAAAmJLR0QA/4ePzL8AAAAJcEhZcwAACxMAAAsTAQCanBgAAAAHdElNRQfeCR0JCDHdVYtxAAAAM0lEQVQI103MMQqAMBQFwVHyITaB3P+W1sKzSBC3mW6hRFw0pUB5DvF1bu9FN0RM3X/wAk98CUnvFTakAAAAAElFTkSuQmCC);
     background-image: url(data:image/svg+xml;base64,PHN2ZyB4bWxucz0iaHR0cDovL3d3dy53My5vcmcvMjAwMC9zdmciIHdpZHRoPSI4IiBoZWlnaHQ9IjgiIHZpZXdCb3g9IjAgMCA4IDgiPgogIDxwYXRoIGQ9Ik0zIDB2M2gtM3YyaDN2M2gydi0zaDN2LTJoLTN2LTNoLTJ6IiAvPgo8L3N2Zz4=), none;
 }
 .element-header:hover > .element-header-toggle {
     background-color: #ccc; /* Fallback value */
     background-color: var(--icon-highlight);
 }
-.element-header-right:hover ~ .element-header-toggle {
+.element-header-menu:hover ~ .element-header-toggle {
     background-color: transparent;
 }
-.element-header-left {
-    padding: 3px 80px 3px 20px;
-}
-.element-header-right {
-    position: absolute;
-    right: 0;
-    top: 0;
-    padding: 3px;
+.element-header-menu {
+    margin: 0 2px 0 4px;
     cursor: default;
 }
-.element-header .label {
-    margin-right: 0.5em;
+.name, .arg, .assign {
+    margin-left: 7px;
+    white-space: pre-wrap;
 }
 .name {
     font-weight: bold;
-    white-space: pre-wrap;
-}
-.arg, .assign {
-    white-space: pre-wrap;
 }
 .elapsed {
-    float: right;
+    margin-left: auto;
+    padding-left: 0.5em;
     color: #666; /* Fallback value */
     color: var(--elapsed-color);
-    padding-left: 1em;
+    font-size: 0.9em;
+}
+/* https://stackoverflow.com/questions/75238633 */
+@supports (-moz-appearance: none) {
+    .name, .arg, .assign, .elapsed {
+        padding-top: 3px;
+    }
 }
 .link {
-    background-image: url(data:image/png;base64,iVBORw0KGgoAAAANSUhEUgAAAAgAAAAICAYAAADED76LAAAABHNCSVQICAgIfAhkiAAAAAlwSFlzAAALEwAACxMBAJqcGAAAAHlJREFUGJVtzrEJwmAQBtCn6ASuIKTIBhY2gmghBiJYB1udwk10B8FJbKMBcQFbtbkfJHrVwfu+4/idJR64Y9H7E3higj5O3S8Y44ApLnjhnXCNGhV2yNGggDJwiC02gavUbpDFvscRo4QdXOMKDHBufz3HLYKzNn4AbSkV3fncGQYAAAAASUVORK5CYII=);
     background-image: url(data:image/svg+xml;base64,PHN2ZyB4bWxucz0iaHR0cDovL3d3dy53My5vcmcvMjAwMC9zdmciIHdpZHRoPSI4IiBoZWlnaHQ9IjgiIHZpZXdCb3g9IjAgMCA4IDgiPgogIDxwYXRoIGQ9Ik01Ljg4LjAzYy0uMTguMDEtLjM2LjAzLS41My4wOS0uMjcuMS0uNTMuMjUtLjc1LjQ3YS41LjUgMCAxIDAgLjY5LjY5Yy4xMS0uMTEuMjQtLjE3LjM4LS4yMi4zNS0uMTIuNzgtLjA3IDEuMDYuMjIuMzkuMzkuMzkgMS4wNCAwIDEuNDRsLTEuNSAxLjVjLS40NC40NC0uOC40OC0xLjA2LjQ3LS4yNi0uMDEtLjQxLS4xMy0uNDEtLjEzYS41LjUgMCAxIDAtLjUuODhzLjM0LjIyLjg0LjI1Yy41LjAzIDEuMi0uMTYgMS44MS0uNzhsMS41LTEuNWMuNzgtLjc4Ljc4LTIuMDQgMC0yLjgxLS4yOC0uMjgtLjYxLS40NS0uOTctLjUzLS4xOC0uMDQtLjM4LS4wNC0uNTYtLjAzem0tMiAyLjMxYy0uNS0uMDItMS4xOS4xNS0xLjc4Ljc1bC0xLjUgMS41Yy0uNzguNzgtLjc4IDIuMDQgMCAyLjgxLjU2LjU2IDEuMzYuNzIgMi4wNi40Ny4yNy0uMS41My0uMjUuNzUtLjQ3YS41LjUgMCAxIDAtLjY5LS42OWMtLjExLjExLS4yNC4xNy0uMzguMjItLjM1LjEyLS43OC4wNy0xLjA2LS4yMi0uMzktLjM5LS4zOS0xLjA0IDAtMS40NGwxLjUtMS41Yy40LS40Ljc1LS40NSAxLjAzLS40NC4yOC4wMS40Ny4wOS40Ny4wOWEuNS41IDAgMSAwIC40NC0uODhzLS4zNC0uMi0uODQtLjIyeiIKICAvPgo8L3N2Zz4=), none;
-    filter: var(--icon-filter);
 }
 .expand {
-    background-image: url(data:image/png;base64,iVBORw0KGgoAAAANSUhEUgAAAAgAAAAICAYAAADED76LAAAABHNCSVQICAgIfAhkiAAAAAlwSFlzAAALEwAACxMBAJqcGAAAADtJREFUGJVjYCACKDAwMByA0ljFDjAwMPxnYGB4ABVQgLL/Q+VQBB6gseGmIivCkERXhFUSWRFOSawAAEl7E3uv1iMcAAAAAElFTkSuQmCC);
     background-image: url(data:image/svg+xml;base64,PHN2ZyB4bWxucz0iaHR0cDovL3d3dy53My5vcmcvMjAwMC9zdmciIHdpZHRoPSI4IiBoZWlnaHQ9IjgiIHZpZXdCb3g9IjAgMCA4IDgiPgogIDxwYXRoIGQ9Ik0xLjUgMGwtMS41IDEuNSA0IDQgNC00LTEuNS0xLjUtMi41IDIuNS0yLjUtMi41eiIgdHJhbnNmb3JtPSJ0cmFuc2xhdGUoMCAxKSIgLz4KPC9zdmc+), none;
-    filter: var(--icon-filter);
 }
 .collapse {
-    background-image: url(data:image/png;base64,iVBORw0KGgoAAAANSUhEUgAAAAgAAAAICAYAAADED76LAAAABHNCSVQICAgIfAhkiAAAAAlwSFlzAAALEwAACxMBAJqcGAAAAC5JREFUGJVjYCARNEAxTsn/UIyhCFkSQxG6ThQ+C5IpjWhG1yNb4YDFTdjEMAEACi8Q++9Y9TAAAAAASUVORK5CYII=);
     background-image: url(data:image/svg+xml;base64,PHN2ZyB4bWxucz0iaHR0cDovL3d3dy53My5vcmcvMjAwMC9zdmciIHdpZHRoPSI4IiBoZWlnaHQ9IjgiIHZpZXdCb3g9IjAgMCA4IDgiPgogIDxwYXRoIGQ9Ik00IDBsLTQgNCAxLjUgMS41IDIuNS0yLjUgMi41IDIuNSAxLjUtMS41LTQtNHoiIHRyYW5zZm9ybT0idHJhbnNsYXRlKDAgMSkiIC8+Cjwvc3ZnPg==), none;
-    filter: var(--icon-filter);
 }
 .expand, .collapse, .link {
     float: left;
     display: block;
     visibility: hidden;
-    margin: 0 4px;
+    margin: 0 3px;
     height: 14px;
     width: 14px;
     background-size: 8px 8px;
     background-repeat: no-repeat;
     background-position: center;
+    filter: var(--icon-filter);
     border-color: #ccc; /* Fallback value */
     border-color: var(--icon-highlight);
     border-width: 1px;
@@ -519,23 +510,18 @@ th.stats-col-graph:hover {
     background-color: var(--icon-highlight);
 }
 /* Messages and errors */
+.message-row {
+    height: 20px;
+}
 .messages .time, .messages .message {
     font-family: monospace;
     font-size: 1.1em;
 }
-#errors .message {
-    font-family: monospace;
-    font-size: 1.2em;
-}
-.message-row {
-    height: 20px;
-}
-.time {
+.messages .time {
     width: 7.5em;
 }
-.error-time {
-    width: 11em;
-    font-size: 0.9em;
+#errors .time {
+    width: 12.5em;
     white-space: nowrap;
 }
 .level {
@@ -555,7 +541,6 @@ th.stats-col-graph:hover {
     background-position: center;
 }
 .message-row:hover .select-message div {
-    background-image: url(data:image/png;base64,iVBORw0KGgoAAAANSUhEUgAAAAwAAAAMCAQAAAD8fJRsAAAAAmJLR0QA/4ePzL8AAAAJcEhZcwAACxMAAAsTAQCanBgAAAAHdElNRQfeCR0MOzhWKZQOAAAASUlEQVQY032PsRHAIAwDX9BkicD+W8UMEqegAQJWKZ/+3sLZJhFGQEZzNaIa4ibh66En867VNaIeoP5WppNuIGoAlOm3g5VC1AdYeQv1BZPRSgAAAABJRU5ErkJggg==);
     background-image: url(data:image/svg+xml;base64,PHN2ZyB4bWxucz0iaHR0cDovL3d3dy53My5vcmcvMjAwMC9zdmciIHdpZHRoPSI4IiBoZWlnaHQ9IjgiIHZpZXdCb3g9IjAgMCA4IDgiPgogIDxwYXRoIGQ9Ik0wIDB2MWg4di0xaC04em0wIDJ2MWg2di0xaC02em0wIDJ2MWg4di0xaC04em0wIDJ2MWg2di0xaC02eiIgLz4KPC9zdmc+), none;
     filter: var(--icon-filter);
     border-color: #ccc; /* Fallback value */
@@ -577,7 +562,6 @@ th.stats-col-graph:hover {
 .debug-message {
     display: table;
 }
-/* Metadata */
 .metadata {
     width: 100%;
     border-spacing: 0.2em;
@@ -596,6 +580,20 @@ th.stats-col-graph:hover {
 /* Custom styles for statistics */
 #total-stats tr:hover, #tag-stats tr:hover {
     cursor: default;
+}
+/* Target highlight */
+@keyframes highlight {
+    0% {
+        background: var(--primary-color)
+    }
+    100% {
+        background: var(--target-color);
+    }
+}
+:target {
+    background: var(--target-color);
+    transition: background 0.3s;
+    animation: highlight 4s;
 }
 </style>
 <style media="print">
@@ -724,10 +722,13 @@ function toggleSuite(suiteId) {
     toggleElement(suiteId, ['keyword', 'suite', 'test']);
 }
 function toggleTest(testId) {
-    toggleElement(testId, ['keyword']);
     var test = window.testdata.findLoaded(testId);
-    if (test.status == "FAIL" || test.status == "SKIP")
+    var autoExpand = test.status == "FAIL" || test.status == "SKIP";
+    var closed = $('#' + testId).children('.element-header').hasClass('closed');
+    if (autoExpand && closed)
         expandFailed(test);
+    else
+        toggleElement(testId, ['keyword']);
 }
 function toggleKeyword(kwId) {
     toggleElement(kwId, ['keyword']);
@@ -738,7 +739,8 @@ function toggleElement(elementId, childrenNames) {
     children.toggle(100, '', function () {
         element.children('.element-header').toggleClass('closed');
     });
-    populateChildren(elementId, children, childrenNames);
+    if (childrenNames)
+        populateChildren(elementId, children, childrenNames);
 }
 function populateChildren(elementId, childElement, childrenNames) {
     if (!childElement.hasClass('populated')) {
@@ -1141,7 +1143,7 @@ window.model = (function () {
         kw.type = data.type;
         kw.template = 'keywordTemplate';
         kw.arguments = data.args;
-        kw.assign = data.assign + (data.assign ? ' =  ' : '');
+        kw.assign = data.assign;
         kw.tags = data.tags;
         kw.timeout = data.timeout;
         kw.populateKeywords = createIterablePopulator('Keyword');
@@ -1252,58 +1254,48 @@ window.stats = (function () {
             });
     }
     function calculatePercents(total, passed, failed, skipped) {
-        if (total == 0) {
+        if (total == 0)
             return [0.0, 0.0, 0.0];
-        }
         var pass = 100.0 * passed / total;
         var skip = 100.0 * skipped / total;
         var fail = 100.0 * failed / total;
         if (pass > 0 && pass < 0.1)
-            pass = 0.1
+            pass = 0.1;
         if (fail > 0 && fail < 0.1)
-            fail = 0.1
+            fail = 0.1;
         if (skip > 0 && skip < 0.1)
-            skip = 0.1
+            skip = 0.1;
         if (pass > 99.95 && pass < 100)
-            pass = 99.9
+            pass = 99.9;
         if (fail > 99.95 && fail < 100)
-            fail = 99.9
+            fail = 99.9;
         if (skip > 99.95 && skip < 100)
-            skip = 99.9
-        return [Math.round(pass*10)/10, Math.round(skip*10)/10, Math.round(fail*10)/10];
+            skip = 99.9;
+        return [round1(pass), round1(skip), round1(fail)];
     }
     function calculateWidths(num1, num2, num3) {
         if (num1 + num2 + num3 === 0)
             return [0.0, 0.0, 0.0];
         // Make small percentages better visible
         if (num1 > 0 && num1 < 1)
-            num1 = 1
+            num1 = 1.0;
         if (num2 > 0 && num2 < 1)
-            num2 = 1
+            num2 = 1.0;
         if (num3 > 0 && num3 < 1)
-            num3 = 1
+            num3 = 1.0;
         // Handle situation where some are rounded up
         while (num1 + num2 + num3 > 100) {
-            if (num1 > num2 && num1 > num3)
-                num1 -= 0.1;
-            else if (num2 > num1 && num2 > num3)
-                num2 -= 0.1;
-            else if (num3 > num1 && num3 > num2)
-                num3 -= 0.1;
-            else if (num1 > num3 && num1 == num2) {
-                num1 -= 0.1;
-                num2 -= 0.1;
-            }
-            else if (num1 > num2 && num1 == num3) {
-                num1 -= 0.1;
-                num3 -= 0.1;
-            }
-            else if (num2 > num1 && num2 == num3) {
-                num2 -= 0.1;
-                num3 -= 0.1;
-            }
+            if (num1 >= num2 && num1 >= num3)
+                num1 = round1(num1 - 0.1);
+            else if (num2 >= num1 && num2 >= num3)
+                num2 = round1(num2 - 0.1);
+            else
+                num3 = round1(num3 - 0.1);
         }
-        return [Math.ceil(num1*10)/10, Math.ceil(num2*10)/10, Math.ceil(num3*10)/10];
+        return [num1, num2, num3];
+    }
+    function round1(num) {
+        return Math.round(num*10) / 10;
     }
     return {
         Statistics: Statistics
@@ -1522,7 +1514,7 @@ window.testdata = function () {
     var STATUSES = ['FAIL', 'PASS', 'SKIP', 'NOT RUN'];
     var KEYWORD_TYPES = ['KEYWORD', 'SETUP', 'TEARDOWN', 'FOR', 'ITERATION', 'IF',
                          'ELSE IF', 'ELSE', 'RETURN', 'VAR', 'TRY', 'EXCEPT', 'FINALLY',
-                         'WHILE', 'CONTINUE', 'BREAK', 'ERROR'];
+                         'WHILE', 'GROUP', 'CONTINUE', 'BREAK', 'ERROR'];
     function addElement(elem) {
         if (!elem.id)
             elem.id = uniqueId();
@@ -1890,7 +1882,7 @@ function addStatistics() {
         '<th class="stats-col-elapsed">Elapsed</th>' +
         '<th class="stats-col-graph">Pass / Fail / Skip</th>';
     var statTable =
-        '<h2>{Test} Statistics</h2>' +
+        '<h2>Statistics</h2>' +
         '<table class="statistics" id="total-stats"><thead><tr>' +
         '<th class="stats-col-name">Total Statistics</th>' + statHeaders +
         '</tr></thead></table>' +
@@ -1900,7 +1892,7 @@ function addStatistics() {
         '<table class="statistics" id="suite-stats"><thead><tr>' +
         '<th class="stats-col-name">Statistics by Suite</th>' + statHeaders +
         '</tr></thead></table>';
-    $(testOrTask(statTable)).appendTo('#statistics-container');
+    $(statTable).appendTo('#statistics-container');
     util.map(['total', 'tag', 'suite'], addStatTable);
     addTooltipsToElapsedTimes();
     enableStatisticsSorter();
@@ -2081,13 +2073,13 @@ storage = function () {
 window.output = {};
 </script>
 <script type="text/javascript">
-window.output["suite"] = [1,2,3,0,[],[0,0,6707],[],[[4,0,0,[5,6,7,8,9],[0,119,6586,10],[[0,11,0,0,0,12,0,0,[0,120,6584],[[0,13,14,0,0,15,16,0,[1,120,0],[[121,2,17]]],[0,18,19,0,20,21,0,0,[1,121,0],[]],[0,22,23,0,0,0,24,0,[1,121,668],[[0,25,19,0,26,27,28,0,[1,121,0],[[122,2,29]]],[0,30,31,0,32,33,34,0,[1,122,666],[[787,2,35],[788,2,36],[788,2,37]]],[0,38,39,0,40,41,24,0,[1,788,1],[[789,2,42]]],[8,0,0,0,0,24,0,0,[1,789,0],[]],[789,2,42]]],[0,43,19,0,44,45,0,0,[1,789,5001],[[5790,2,46]]],[0,47,14,0,0,48,49,0,[0,5791,911],[[6699,5,10]]],[5,50,0,0,0,0,0,0,[3,6701,1],[[0,51,19,0,52,53,0,0,[3,6702,0],[]],[0,54,19,0,55,56,0,0,[3,6702,0],[]]]],[7,0,0,0,0,0,0,0,[3,6702,0],[[0,57,19,0,58,59,0,0,[3,6702,0],[]]]],[0,60,14,0,0,61,62,0,[3,6702,0],[]],[5,50,0,0,0,0,0,0,[3,6703,0],[[0,51,19,0,52,63,0,0,[3,6703,0],[]]]],[7,0,0,0,0,0,0,0,[3,6703,0],[[0,57,19,0,58,64,0,0,[3,6703,0],[]]]],[5,65,0,0,0,0,0,0,[3,6703,0],[[0,66,14,0,67,48,68,0,[3,6703,0],[]],[0,57,19,0,58,69,0,0,[3,6704,0],[]]]]]]]]],[],[1,0,1,0]];
+window.output["suite"] = [1,2,3,0,[],[0,0,7414],[],[[4,0,0,[5,6,7,8,9],[0,215,7199,10],[[0,11,0,0,0,12,0,0,[0,216,7197],[[0,13,14,0,0,15,16,0,[1,216,0],[[216,2,17]]],[0,18,19,0,20,21,0,0,[1,216,2],[]],[0,22,23,0,0,0,24,0,[1,217,701],[[0,25,19,0,26,27,28,0,[1,217,0],[[217,2,29]]],[0,30,31,0,32,33,34,0,[1,217,700],[[917,2,35],[917,2,36],[917,2,37]]],[0,38,39,0,40,41,24,0,[1,917,1],[[918,2,42]]],[8,0,0,0,0,24,0,0,[1,918,0],[]],[918,2,42]]],[0,43,19,0,44,45,0,0,[1,918,5000],[[5918,2,46]]],[0,47,14,0,0,48,49,0,[0,5918,1493],[[7410,5,10]]],[5,50,0,0,0,0,0,0,[3,7411,1],[[0,51,19,0,52,53,0,0,[3,7411,0],[]],[0,54,19,0,55,56,0,0,[3,7412,0],[]]]],[7,0,0,0,0,0,0,0,[3,7412,0],[[0,57,19,0,58,59,0,0,[3,7412,0],[]]]],[0,60,14,0,0,61,62,0,[3,7412,0],[]],[5,50,0,0,0,0,0,0,[3,7412,1],[[0,51,19,0,52,63,0,0,[3,7413,0],[]]]],[7,0,0,0,0,0,0,0,[3,7413,0],[[0,57,19,0,58,64,0,0,[3,7413,0],[]]]],[5,65,0,0,0,0,0,0,[3,7413,0],[[0,66,14,0,67,48,68,0,[3,7413,0],[]],[0,57,19,0,58,69,0,0,[3,7413,0],[]]]]]]]]],[],[1,0,1,0]];
 </script>
 <script type="text/javascript">
 window.output["strings"] = [];
 </script>
 <script type="text/javascript">
-window.output["strings"] = window.output["strings"].concat(["*","*Homologacao Pmv Api","*C:\\dev\\qa\\tests\\api\\pericia\\homologacao_pmv_api.robot","*tests/api/pericia/homologacao_pmv_api.robot","*LTS - 14 Dias - CID Geral - Deve ir para Clinico Geral","*api","*homolog","*lts","*lts_geral","*pmv","*Perícia '096fdf71-17b8-4beb-9114-d634744b4a10' não encontrada na fila da clínica para regra 'LTS_14DIAS_GERAL'.","*Homologar Regra API","*LTS_14DIAS_GERAL    Clínico Geral","*Regra Existe Na Massa","*pericia_helper","*${regra}","*${existe}","*${existe} = True","*Skip If","*BuiltIn","*<p>Skips the rest of the current test if the <code>condition\x3c/code> is True.\x3c/p>","*not ${existe}    Regra '${regra}' não está no massa_criada.json — rode criar_massa.robot primeiro","*Autenticar No Mihmo","*mihmo_auth","*${token}","*Create Dictionary","*<p>Creates and returns a dictionary based on the given <code>items\x3c/code>.\x3c/p>","*email=${EMAIL_VALIDO}    password=${SENHA_VALIDA}    returnSecureToken=${TRUE}","*${body}","*${body} = {'email': 'adm.castela@mihmo.com.br', 'password': 'REMOVIDO', 'returnSecureToken': True}","*POST","*RequestsLibrary","*<p>Sends a POST request.\x3c/p>","*${FIREBASE_URL}    params=key=${FIREBASE_KEY}    json=${body}    expected_status=200","*${response}","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","*${response} = &lt;Response [200]&gt;","*Get From Dictionary","*Collections","*<p>Returns a value from the given <code>dictionary\x3c/code> based on the given <code>key\x3c/code>.\x3c/p>","*${response.json()}    idToken","*${token} = eyJhbGciOiJSUzI1NiIsImtpZCI6IjVlODJhZmI0ZWY2OWI3NjM4MzA2OWFjNmI1N2U3ZTY1MjAzYmZlOTYiLCJ0eXAiOiJKV1QifQ.eyJuYW1lIjoiYWRtLmNhc3RlbGEiLCJpc3MiOiJodHRwczovL3NlY3VyZXRva2VuLmdvb2dsZS5jb20vbG9raS1kZXYtNDQ0O...","*Sleep","*<p>Pauses the test executed for the given time.\x3c/p>","*5s","*Slept 5 seconds.","*Verificar Especialista Api","*${API_URL}    ${token}    ${regra}","*${role}    ${is_junta}    ${board_roles}    ${att_id}","*${junta}","*Should Be True","*<p>Fails if the given condition is not true.\x3c/p>","*${is_junta}    Esperado Junta Médica mas isMedicalBoard=False para regra '${regra}'","*Should Contain","*<p>Fails if <code>container\x3c/code> does not contain <code>item\x3c/code> one or more times.\x3c/p>","eNpTqU7KTyxKiS/Kz0ktrlUAApXq1OKC1OTMxJzM4pLEeBCnKDElHyzniiSjoI5LpbpC3uHF+Qqpecn5eSUgEYW8RIWs0rySRD0FV7igFdAmZLsB32Aztg==","*Should Be Equal","*<p>Fails if the given objects are unequal.\x3c/p>","eNpTqS7Kz0mtVQAClerU4oLU5MzEnMziksR4EKcoMSUfLOeKJKOQWgQSVwQLglhWCuq49Kor1CgEpSanJmVClYFtUwcAz+sqOA==","*Enviar Para Fila","*${API_URL}    ${token}    ${att_id}","*${event_type}    ${is_junta_fila}","*${is_junta_fila}    Junta não confirmada após envio para fila. regra='${regra}'","*${event_type}    ${especialista_esperado}    eventType na fila diverge! Esperado: '${especialista_esperado}' | Recebido: '${event_type}'","*not ${junta}","*Homologar Pericia","*<p>Orquestra o fluxo completo de homologação: 1. Cria Ficha de HOMOLOG 2. PATCH validate-data-requested (desbloqueia artigos e popula registration) 3. Busca registrationId e squadUserId 4. Busca artigo CID aplicável (GET /Accepted) 5. Obtém token Memed 6. Cria prescrição no Memed 7. Salva homologação no Mihmo (generate-memed-file) Retorna o status final (\"Accepted\").\x3c/p>","*${status}","*${status}    Accepted    Status da homologação diverge! Esperado: 'Accepted' | Recebido: '${status}'"]);
+window.output["strings"] = window.output["strings"].concat(["*","*Homologacao Pmv Api","*C:\\dev\\qa-recriar\\tests\\api\\pericia\\homologacao_pmv_api.robot","*tests/api/pericia/homologacao_pmv_api.robot","*LTS - 14 Dias - CID Geral - Deve ir para Clinico Geral","*api","*homolog","*lts","*lts_geral","*pmv","eNqVjzEOwjAMAHde4akbKgix0JkXAA9wEkMjuQkybqU+ilfwMZKgBjGy+aTzWT6KRMAIZnxYFLh6RnAIll/P4C0eYL/ZwRoa1q7XgZubdqsChC5DntUrU4bsnkgmbwnONNyjoHie4RJwwlQ2SUt+WxcKLanSNdHNFSwFJVnEfvvPjY9dxm+mVNufG2196w2w3FpB","*Homologar Regra API","*LTS_14DIAS_GERAL    Clínico Geral","*Regra Existe Na Massa","*pericia_helper","*${regra}","*${existe}","*${existe} = True","*Skip If","*BuiltIn","*<p>Skips the rest of the current test if the <code>condition\x3c/code> is True.\x3c/p>","*not ${existe}    Regra '${regra}' não está no massa_criada.json — rode criar_massa.robot primeiro","*Autenticar No Mihmo","*mihmo_auth","*${token}","*Create Dictionary","*<p>Creates and returns a dictionary based on the given <code>items\x3c/code>.\x3c/p>","*email=${EMAIL_VALIDO}    password=${SENHA_VALIDA}    returnSecureToken=${TRUE}","*${body}","*${body} = {'email': 'adm.castela@mihmo.com.br', 'password': 'REMOVIDO', 'returnSecureToken': True}","*POST","*RequestsLibrary","*<p>Sends a POST request.\x3c/p>","*${FIREBASE_URL}    params=key=${FIREBASE_KEY}    json=${body}    expected_status=200","*${response}","eNq1kd1KAzEUhO99irA3C6W76Y9gKRQt/murxVZQbyTNnu7GZpOYnN2Slr67Gy3oC3j7zTAznDN7nC/IE3xW4JAMSWXlqEA0bkjpZrNJc61zCcwIl3JdUpGBQoEetZZrgbTuUwvSC5UbZtHTGqxY+RlzbqNtdroGPxrfbtncX+RX86IzqF/qCX99W/DZvRiLsjB3/nh6LW4epuSIGIbFexjwvzUFsAysG+3iZwc2GedNVzwksfFYaJXYn1s42kv73bQTt0k85hwMJpeK66zZEMz5Vpg2yWAlGcKvJ0gt2grgXCsFHIVWAa4BTMKkqOGgYdOaTEDlWAR9cPKXL7yBQJkxUnAWQuiHa5L2zf6lzvxoGe8iKJmQ0ZBELCtTzhyCZGelKEodfpUubdQmkTkcKfi+tW4vYAtYWTUHXllY6DWoRkdbwT5uGr4AZFa2gw==","eNqdVllvs8gSff9+Bco85CUkLN7IyLoXY0OwWWyDzfISNU0DbTdLAC8wmv8+TXJz9c0iXelKRi6qTlVXndPu9tZ2XGaPmqosGsS8MpeazLO2rZrXl5fb7faclmVKEKhw8wzL/AXHqGhx27VlSc64fbmKLzUiHS7SCtRt93JFNU66LWiaW1nH/zqjbi7rPXC6Zao6GTe7+lcDBqELtxss4zyr1t3I1PCbZTI/mKYF7aWZCxz3xNQINGUxtzfUnyEQo7qZ//a4ule4Rs3jK/NolsUTw/HMGhQML0kcw3Gvnx9GM93HJ+ZxW4M0BwO0KFkIYIYGrzIYrFIWbV2Sn4NPDLWatqyplYM7C1I0p33kl6Zla3QFBMeg/SyxHL5ppnuhUG7KyFXNCJwwYThx6ECcfHcwrELpYt2u+kwAVUUwBC0ui5cTne5XBmagblA7P7gqOxtSjqDuBqhd4xTTAX3229qjBNWo/rnuqoBlTKkfEtIeV0PMQTXVYPCsHHVw+KzvOOy2LlsEh5WHEPcVUGuQI9auBvcnp45sruy9runWF+DnAX7GFWVT4CQZQDJpWecKB28mzh9eRyPx4VdK4FwYS1RI7ikTWUH6h8CQ7NagaOhYf5oEZpfijOLH36nyURl3899+MMzDGRfxwyvz8JcN+MvxTxvueyM/PA05pISA6J9pMyGBiZRAVpiKU3Yk8jELIDdjuUkc8TMp4WaT2VcSygEmQwqI82cImhYR8O8cZ3k5/ACeo/oLFuOmIqCzKIN/AX/FceyWZ1QMMdSts0iD2MZr59DrvIX1Rs/bKlT0iX46Enu5zsJc50IvEGxPF62TOTJ7mdrqycopXjiIoRvw5knugzwkthtgQ1lzyJeHmpsjv8PJ7pkucwk8nuinEgfevjVyK4PinkTaaoBXUDQHeBm/7W+wL6+GaJFAPHahv78C4Xgx8vgaCXETOuNTJHDXSJNq4PDn0A9aa7njbO0w1MlibzfUaSKhrQxvT2LMcTQ+Cp1hLJWPtSyJNdLS94npQtFyD725THsL33DsWwQS6T+jp12YW7nthSfD1UWzh3Qd8x4qfBb08shwZSHU9Lu9JDnNF2yF1i8sPsD/Z25Oslj5e0+hn90oZ3erh7zlmnQWU6BzkshTq2joM1fPEeUk8C0q0T3baXwFNP5K+b1SP4afch7bwCONL4YE5iQH3vGsn6o88O596Nww1LJrlB+TqKC4/NgNGm36A2+6q5HtpiOr3/XW6VPWHPhrEuRqP/BHNa1C7XihfHK0Zk9rTr/Xonb0v3tbx7TmDWjSZajndXpNZ7+bbjq2l6k4zGpRTDL0KJAiotrQ5wZzSQBUWzhwXSzoPrLESFyf9YKXnpNpYZ/ldqJzx05xFLAsI0Xlys1lGxd9Oc2rBqfKKtnc3JOuEWUsbaxdd+qrWLZSq+6tkPcqSbW83RQv7xKrsbN4XGjNmbfH3gZut1mSjJaua/Boqh+WQVwE7n2h7f1F6KH1e+w0AEmH3PtY3t4DnEBFv7ruDoS1tbZtrxl/mHBpqYapCdnbUj/2s0sSJe9h0oD1rDKaUnlPYbDzjurZktIPl+sWCZ+I9eVSbu1xtADkoBpv3uZoRWLNOrtON2AiK8kUsPf4tu/sq6d3/aocF76oTS8OXpKGU9/fc2M62/rjvcLV61WAa81C2Zp9m1S7D8lX5JW8X3BmWpmmyq8Eq1DtahRdpWXfLtxe0vnb17FRoxTTU6RGw6nV1vSG+fIm9NbL/nuiyGbCXhe9QYgzPfF9oV+Qk5iouon6+1RdCDt1Fdwm+Wl/SPoOxNBOPnrvHU2IQgKtXvu9GH301jjkZ/Zd25At356aLrwbU3l9KVFqYGlrw7CAdzHmo7Oi2rUPZWl3loRyMQZslJf+zq30CEU33DiqlCbpImwkmSoXueNrxwraVLtvzLT271I3EvfHyVqFqpc2WIj8WIR+YIiHdqzeO0rjWc/eTspOmLDjjVrBEXfIsTCy+Pvq7SLPAl8+8qKTjtvvA/rrP4D+yYQ44biHH7//oHfFH23c3D4=","*${response} = &lt;Response [200]&gt;","*Get From Dictionary","*Collections","*<p>Returns a value from the given <code>dictionary\x3c/code> based on the given <code>key\x3c/code>.\x3c/p>","*${response.json()}    idToken","*${token} = eyJhbGciOiJSUzI1NiIsImtpZCI6IjVlODJhZmI0ZWY2OWI3NjM4MzA2OWFjNmI1N2U3ZTY1MjAzYmZlOTYiLCJ0eXAiOiJKV1QifQ.eyJuYW1lIjoiYWRtLmNhc3RlbGEiLCJpc3MiOiJodHRwczovL3NlY3VyZXRva2VuLmdvb2dsZS5jb20vbG9raS1kZXYtNDQ0O...","*Sleep","*<p>Pauses the test executed for the given time.\x3c/p>","*5s","*Slept 5 seconds.","*Verificar Especialista Api","*${API_URL}    ${token}    ${regra}","*${role}    ${is_junta}    ${board_roles}    ${att_id}","*${junta}","*Should Be True","*<p>Fails if the given condition is not true.\x3c/p>","*${is_junta}    Esperado Junta Médica mas isMedicalBoard=False para regra '${regra}'","*Should Contain","*<p>Fails if <code>container\x3c/code> does not contain <code>item\x3c/code> one or more times.\x3c/p>","eNpTqU7KTyxKiS/Kz0ktrlUAApXq1OKC1OTMxJzM4pLEeBCnKDElHyzniiSjoI5LpbpC3uHF+Qqpecn5eSUgEYW8RIWs0rySRD0FV7igFdAmZLsB32Aztg==","*Should Be Equal","*<p>Fails if the given objects are unequal.\x3c/p>","eNpTqS7Kz0mtVQAClerU4oLU5MzEnMziksR4EKcoMSUfLOeKJKOQWgQSVwQLglhWCuq49Kor1CgEpSanJmVClYFtUwcAz+sqOA==","*Enviar Para Fila","*${API_URL}    ${token}    ${att_id}","*${event_type}    ${is_junta_fila}","*${is_junta_fila}    Junta não confirmada após envio para fila. regra='${regra}'","*${event_type}    ${especialista_esperado}    eventType na fila diverge! Esperado: '${especialista_esperado}' | Recebido: '${event_type}'","*not ${junta}","*Homologar Pericia","*<p>Orquestra o fluxo completo de homologação: 1. Cria Ficha de HOMOLOG 2. PATCH validate-data-requested (desbloqueia artigos e popula registration) 3. Busca registrationId e squadUserId 4. Busca artigo CID aplicável (GET /Accepted) 5. Obtém token Memed 6. Cria prescrição no Memed 7. Salva homologação no Mihmo (generate-memed-file) Retorna o status final (\"Accepted\").\x3c/p>","*${status}","*${status}    Accepted    Status da homologação diverge! Esperado: 'Accepted' | Recebido: '${status}'"]);
 </script>
 <script type="text/javascript">
 window.output["stats"] = [[{"elapsed":"00:00:07","fail":1,"label":"All Tests","pass":0,"skip":0}],[{"elapsed":"00:00:07","fail":1,"label":"api","pass":0,"skip":0},{"elapsed":"00:00:07","fail":1,"label":"homolog","pass":0,"skip":0},{"elapsed":"00:00:07","fail":1,"label":"lts","pass":0,"skip":0},{"elapsed":"00:00:07","fail":1,"label":"lts_geral","pass":0,"skip":0},{"elapsed":"00:00:07","fail":1,"label":"pmv","pass":0,"skip":0}],[{"elapsed":"00:00:07","fail":1,"id":"s1","label":"Homologacao Pmv Api","name":"Homologacao Pmv Api","pass":0,"skip":0}]];
@@ -2096,10 +2088,10 @@ window.output["stats"] = [[{"elapsed":"00:00:07","fail":1,"label":"All Tests","p
 window.output["errors"] = [];
 </script>
 <script type="text/javascript">
-window.output["baseMillis"] = 1775506011959;
+window.output["baseMillis"] = 1775530930459;
 </script>
 <script type="text/javascript">
-window.output["generated"] = 6745;
+window.output["generated"] = 7432;
 </script>
 <script type="text/javascript">
 window.output["expand_keywords"] = null;
@@ -2161,8 +2153,9 @@ function addErrors() {
     var errors = window.testdata.errorIterator();
     if (errors.hasNext()) {
         $.tmpl('errorHeaderTemplate').appendTo($('body'));
-        drawErrorsRecursively(errors, $('#errors'));
+        drawErrorsRecursively(errors, $('#errors .messages'));
     }
+    toggleElement('errors');
 }
 
 function drawErrorsRecursively(errors, target) {
@@ -2196,7 +2189,7 @@ function makeElementVisible(id) {
 }
 
 function addExecutionLog(main) {
-    $('body').append($(testOrTask('<h2>{Test} Execution Log</h2>')),
+    $('body').append('<h2>Execution Log</h2>',
                      $.tmpl('suiteTemplate', main));
 }
 </script>
@@ -2214,7 +2207,7 @@ function addExecutionLog(main) {
 
 <script type="text/x-jquery-tmpl" id="tagStatisticsRowTemplate">
   <tr class="row-${$item.index}">
-    <td class="stats-col-name" title="{{html doc}}">
+    <td class="stats-col-name" title="${doc}">
       <div class="stat-name">
         <span>{{html label}}</span>
         {{if info}}(${info}){{/if}}
@@ -2241,20 +2234,31 @@ function addExecutionLog(main) {
 </script>
 
 <script type="text/x-jquery-tmpl" id="errorHeaderTemplate">
-  <h2>{{= testOrTask('{Test}')}} Execution Errors</h2>
-  <table id="errors"></table>
+  <h2>Execution Errors</h2>
+  <div id="errors">
+    <div class="element-header closed" onclick="toggleElement('errors')">
+      <div class="element-header-toggle" title="Toggle visibility"></div>
+      <div class="label error">ERRORS</div>
+      <div class="name">Errors and warnings during execution</div>
+    </div>
+    <div class="children">
+      <table class="messages"></table>
+    </div>
+  </div>
 </script>
 
 <script type="text/x-jquery-tmpl" id="errorTemplate">
   <tr id="${id}" class="message-row">
-    <td class="error-time">
+    <td class="time">
       {{if link}}
       <a onclick="makeElementVisible('${link}')" href="#${link}" title="Link to details">${date} ${time}</a>
       {{else}}
       ${date} ${time}
       {{/if}}
     </td>
-    <td class="${level.toLowerCase()} level"><span class="label ${level.toLowerCase()}">${level}</span></td>
+    <td class="${level.toLowerCase()} level">
+      <span class="label ${level.toLowerCase()}">${level}</span>
+    </td>
     <td class="message">{{html text}}</td>
     <td class="select-message" onclick="javascript:selectMessage('${id}')" title="Select message text">
       <div></div>
@@ -2264,18 +2268,18 @@ function addExecutionLog(main) {
 
 <script type="text/x-jquery-tmpl" id="suiteTemplate">
   <div id="${id}" class="suite">
-    <div class="element-header closed" onclick="toggleSuite('${id}')">
-      <div class="element-header-left" title="SUITE  {{html name}}  [${status}]">
-        <span class="elapsed" title="Elapsed time">${times.elapsedTime}</span>
-        <span class="label ${status.toLowerCase()}">SUITE</span>
-        <span class="name">{{html name}}</span>
-      </div>
-      <div class="element-header-right" onclick="stopPropagation(event)" title="">
+    <div class="element-header closed" onclick="toggleSuite('${id}')"
+         title="SUITE  {{html name}}  [${status}]">
+      <div class="element-header-toggle" title="Toggle visibility"></div>
+      <div class="label ${status.toLowerCase()}">SUITE</div>
+      <div class="name">{{html name}}</div>
+      <div class="elapsed" title="Elapsed time">${times.elapsedTime}</div>
+      <div class="element-header-menu" onclick="stopPropagation(event)" title="">
         <a class="expand" title="Expand all" href="javascript:expandAll('${id}')"></a>
         <a class="collapse" title="Collapse all" href="javascript:collapseAll('${id}')"></a>
-        <a class="link" title="Link to this suite" href="#${id}" onclick="makeElementVisible('${id}')"></a>
+        <a class="link" onclick="makeElementVisible('${id}')"
+           title="Link to this suite" href="#${id}"></a>
       </div>
-      <div class="element-header-toggle" title="Toggle visibility"></div>
     </div>
     <div class="children">
       <table class="metadata">
@@ -2326,18 +2330,18 @@ function addExecutionLog(main) {
 
 <script type="text/x-jquery-tmpl" id="testTemplate">
   <div id="${id}" class="test">
-    <div class="element-header closed" onclick="toggleTest('${id}')">
-      <div class="element-header-left" title="{{= testOrTask('{TEST}')}}  {{html name}}  [${status}]">
-        <span class="elapsed" title="Elapsed time">${times.elapsedTime}</span>
-        <span class="label ${status.toLowerCase()}">{{= testOrTask('{TEST}')}}</span>
-        <span class="name">{{html name}}</span>
-      </div>
-      <div class="element-header-right" onclick="stopPropagation(event)" title="">
+    <div class="element-header closed" onclick="toggleTest('${id}')"
+         title="{{= testOrTask('{TEST}')}}  {{html name}}  [${status}]">
+      <div class="element-header-toggle" title="Toggle visibility"></div>
+      <div class="label ${status.toLowerCase()}">{{= testOrTask('{TEST}')}}</div>
+      <div class="name">{{html name}}</div>
+      <div class="elapsed" title="Elapsed time">${times.elapsedTime}</div>
+      <div class="element-header-menu" onclick="stopPropagation(event)" title="">
         <a class="expand" title="Expand all" href="javascript:expandAll('${id}')"></a>
         <a class="collapse" title="Collapse all" href="javascript:collapseAll('${id}')"></a>
-        <a class="link" title="Link to this {{= testOrTask('{test}')}}" href="#${id}" onclick="makeElementVisible('${id}')"></a>
+        <a class="link" href="#${id}" onclick="makeElementVisible('${id}')"
+           title="Link to this {{= testOrTask('{test}')}}"></a>
       </div>
-      <div class="element-header-toggle" title="Toggle visibility"></div>
     </div>
     <div class="children">
       <table class="metadata">
@@ -2384,21 +2388,20 @@ function addExecutionLog(main) {
 
 <script type="text/x-jquery-tmpl" id="keywordTemplate">
   <div id="${id}" class="keyword">
-    <div class="element-header closed" onclick="toggleKeyword('${id}')">
-      <div class="element-header-left" title="${type}  {{if name}}{{html fullName}}  {{/if}}[${status}]">
-        <span class="elapsed" title="Elapsed time">${times.elapsedTime}</span>
-        <span class="label ${status.toLowerCase()}">${type}</span>
-        <span class="assign">{{html assign}}</span>
-        <span class="name"><span class="parent-name">{{html libname}}{{if libname}} . {{/if}}</span>{{html name}}</span>
-        &nbsp;
-        <span class="arg">{{html arguments}}</span>
-      </div>
-      <div class="element-header-right" onclick="stopPropagation(event)">
+    <div class="element-header closed" onclick="toggleKeyword('${id}')"
+         title="${type}  {{if name}}{{html fullName}}  {{/if}}[${status}]">
+      <div class="element-header-toggle" title="Toggle visibility"></div>
+      <div class="label ${status.toLowerCase()}">${type}</div>
+      {{if assign}}<div class="assign">{{html assign}}&nbsp;=</div>{{/if}}
+      <div class="name">{{if libname}}<span class="parent-name">{{html libname}} . </span>{{/if}}{{html name}}</div>
+      <div class="arg">{{html arguments}}</div>
+      <div class="elapsed" title="Elapsed time">${times.elapsedTime}</div>
+      <div class="element-header-menu" onclick="stopPropagation(event)">
         <a class="expand" title="Expand all" href="javascript:expandAll('${id}')"></a>
         <a class="collapse" title="Collapse all" href="javascript:collapseAll('${id}')"></a>
-        <a class="link" title="Link to this item" href="#${id}" onclick="makeElementVisible('${id}')"></a>
+        <a class="link" onclick="makeElementVisible('${id}')"
+           title="Link to this item" href="#${id}"></a>
       </div>
-      <div class="element-header-toggle" title="Toggle visibility"></div>
     </div>
     <div class="children">
       <table class="metadata keyword-metadata">
