@@ -2,7 +2,6 @@ BASE_URL: https://homolog.mihmo.com.br
 API_URL: https://homolog.mihmo.com.br/backend-nest
 BROWSER: chromium
 HEADLESS: false
-<<<<<<< HEAD
 EMAIL_VALIDO: adm.castela@mihmo.com.br
 SENHA_VALIDA: REMOVIDO
 
@@ -12,7 +11,3 @@ CREDENTIALS_CLINICA_EMAIL: gestormihmo@mihmo.com.br
 CREDENTIALS_CLINICA_SENHA: REMOVIDO
 CREDENTIALS_CLINICO_GERAL_EMAIL: clinicogeral1@mihmo.com.br
 CREDENTIALS_CLINICO_GERAL_SENHA: REMOVIDO
-=======
-EMAIL_VALIDO: vitoria@mihmo.com.br
-SENHA_VALIDA: REMOVIDO
->>>>>>> e096d23 (atualização)
