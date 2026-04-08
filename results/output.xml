@@ -1,92 +1,92 @@
 <?xml version="1.0" encoding="UTF-8"?>
-<robot generator="Robot 7.4.2 (Python 3.12.10 on win32)" generated="2026-04-07T21:27:56.223510" rpa="false" schemaversion="5">
-<suite id="s1" name="Qa-Recriar" source="C:\dev\qa-recriar">
-<suite id="s1-s1" name="Tests" source="C:\dev\qa-recriar\tests">
-<suite id="s1-s1-s1" name="Api" source="C:\dev\qa-recriar\tests\api">
-<suite id="s1-s1-s1-s1" name="Pericia" source="C:\dev\qa-recriar\tests\api\pericia">
-<suite id="s1-s1-s1-s1-s1" name="Homologacao Pmv Api" source="C:\dev\qa-recriar\tests\api\pericia\homologacao_pmv_api.robot">
+<robot generator="Robot 7.0 (Python 3.14.3 on win32)" generated="2026-04-08T16:09:48.278246" rpa="false" schemaversion="5">
+<suite id="s1" name="Qa-Recriar" source="c:\dev\qa-recriar">
+<suite id="s1-s1" name="Tests" source="c:\dev\qa-recriar\tests">
+<suite id="s1-s1-s1" name="Api" source="c:\dev\qa-recriar\tests\api">
+<suite id="s1-s1-s1-s1" name="Pericia" source="c:\dev\qa-recriar\tests\api\pericia">
+<suite id="s1-s1-s1-s1-s1" name="Homologacao Pmv Api" source="c:\dev\qa-recriar\tests\api\pericia\homologacao_pmv_api.robot">
 <test id="s1-s1-s1-s1-s1-t1" name="LTS - 14 Dias - CID Geral - Deve ir para Clinico Geral" line="62">
 <kw name="Homologar Regra API">
 <kw name="Regra Existe Na Massa" owner="pericia_helper">
-<msg time="2026-04-07T21:27:56.441741" level="INFO">${existe} = True</msg>
+<msg time="2026-04-08T16:09:48.438496" level="INFO">${existe} = True</msg>
 <var>${existe}</var>
 <arg>${regra}</arg>
-<status status="PASS" start="2026-04-07T21:27:56.441741" elapsed="0.000000"/>
+<status status="PASS" start="2026-04-08T16:09:48.437971" elapsed="0.000811"/>
 </kw>
 <kw name="Skip If" owner="BuiltIn">
 <arg>not ${existe}</arg>
 <arg>Regra '${regra}' não está no massa_criada.json — rode criar_massa.robot primeiro</arg>
 <doc>Skips the rest of the current test if the ``condition`` is True.</doc>
-<status status="PASS" start="2026-04-07T21:27:56.442743" elapsed="0.000000"/>
+<status status="PASS" start="2026-04-08T16:09:48.438989" elapsed="0.000389"/>
 </kw>
 <kw name="Autenticar No Mihmo" owner="mihmo_auth">
 <kw name="Create Dictionary" owner="BuiltIn">
-<msg time="2026-04-07T21:27:56.443744" level="INFO">${body} = {'email': 'adm.castela@mihmo.com.br', 'password': 'REMOVIDO', 'returnSecureToken': True}</msg>
+<msg time="2026-04-08T16:09:48.440360" level="INFO">${body} = {'email': 'adm.castela@mihmo.com.br', 'password': 'REMOVIDO', 'returnSecureToken': True}</msg>
 <var>${body}</var>
 <arg>email=${EMAIL_VALIDO}</arg>
 <arg>password=${SENHA_VALIDA}</arg>
 <arg>returnSecureToken=${TRUE}</arg>
 <doc>Creates and returns a dictionary based on the given ``items``.</doc>
-<status status="PASS" start="2026-04-07T21:27:56.443744" elapsed="0.000000"/>
+<status status="PASS" start="2026-04-08T16:09:48.439928" elapsed="0.000568"/>
 </kw>
 <kw name="POST" owner="RequestsLibrary">
-<msg time="2026-04-07T21:28:00.852013" level="INFO">POST Request : url=https://www.googleapis.com/identitytoolkit/v3/relyingparty/verifyPassword?key=REMOVIDO 
+<msg time="2026-04-08T16:09:49.121144" level="INFO">POST Request : url=https://www.googleapis.com/identitytoolkit/v3/relyingparty/verifyPassword?key=REMOVIDO 
  path_url=/identitytoolkit/v3/relyingparty/verifyPassword?key=REMOVIDO 
- headers={'User-Agent': 'python-requests/2.31.0', 'Accept-Encoding': 'gzip, deflate', 'Accept': '*/*', 'Connection': 'keep-alive', 'Content-Length': '87', 'Content-Type': 'application/json'} 
+ headers={'User-Agent': 'python-requests/2.31.0', 'Accept-Encoding': 'gzip, deflate, zstd', 'Accept': '*/*', 'Connection': 'keep-alive', 'Content-Length': '87', 'Content-Type': 'application/json'} 
  body=b'{"email": "adm.castela@mihmo.com.br", "password": "REMOVIDO", "returnSecureToken": true}' 
  </msg>
-<msg time="2026-04-07T21:28:00.852013" level="INFO">POST Response : url=https://www.googleapis.com/identitytoolkit/v3/relyingparty/verifyPassword?key=REMOVIDO 
+<msg time="2026-04-08T16:09:49.121398" level="INFO">POST Response : url=https://www.googleapis.com/identitytoolkit/v3/relyingparty/verifyPassword?key=REMOVIDO 
  status=200, reason=OK 
- headers={'Pragma': 'no-cache', 'Cache-Control': 'no-cache, no-store, max-age=0, must-revalidate', 'Date': 'Wed, 08 Apr 2026 00:26:20 GMT', 'Expires': 'Mon, 01 Jan 1990 00:00:00 GMT', 'Content-Type': 'application/json; charset=UTF-8', 'Vary': 'Origin, X-Origin, Referer', 'Content-Encoding': 'gzip', 'Server': 'ESF', 'X-XSS-Protection': '0', 'X-Frame-Options': 'SAMEORIGIN', 'X-Content-Type-Options': 'nosniff', 'Alt-Svc': 'h3=":443"; ma=2592000,h3-29=":443"; ma=2592000', 'Transfer-Encoding': 'chunked'} 
+ headers={'Cache-Control': 'no-cache, no-store, max-age=0, must-revalidate', 'Date': 'Wed, 08 Apr 2026 19:10:00 GMT', 'Expires': 'Mon, 01 Jan 1990 00:00:00 GMT', 'Pragma': 'no-cache', 'Content-Type': 'application/json; charset=UTF-8', 'Vary': 'Origin, X-Origin, Referer', 'Content-Encoding': 'gzip', 'Server': 'ESF', 'X-XSS-Protection': '0', 'X-Frame-Options': 'SAMEORIGIN', 'X-Content-Type-Options': 'nosniff', 'Alt-Svc': 'h3=":443"; ma=2592000,h3-29=":443"; ma=2592000', 'Transfer-Encoding': 'chunked'} 
  body={
   "kind": "identitytoolkit#VerifyPasswordResponse",
   "localId": "82fcf9fc-2737-431d-ac08-06db189f0868",
   "email": "adm.castela@mihmo.com.br",
   "displayName": "adm.castela",
-  "idToken": "eyJhbGciOiJSUzI1NiIsImtpZCI6IjVlODJhZmI0ZWY2OWI3NjM4MzA2OWFjNmI1N2U3ZTY1MjAzYmZlOTYiLCJ0eXAiOiJKV1QifQ.eyJuYW1lIjoiYWRtLmNhc3RlbGEiLCJpc3MiOiJodHRwczovL3NlY3VyZXRva2VuLmdvb2dsZS5jb20vbG9raS1kZXYtNDQ0OGUiLCJhdWQiOiJsb2tpLWRldi00NDQ4ZSIsImF1dGhfdGltZSI6MTc3NTYwNzk4MCwidXNlcl9pZCI6IjgyZmNmOWZjLTI3MzctNDMxZC1hYzA4LTA2ZGIxODlmMDg2OCIsInN1YiI6IjgyZmNmOWZjLTI3MzctNDMxZC1hYzA4LTA2ZGIxODlmMDg2OCIsImlhdCI6MTc3NTYwNzk4MCwiZXhwIjoxNzc1NjExNTgwLCJlbWFpbCI6ImFkbS5jYXN0ZWxhQG1paG1vLmNvbS5iciIsImVtYWlsX3ZlcmlmaWVkIjpmYWxzZSwicGhvbmVfbnVtYmVyIjoiKzU1MTE4OTg4NzQzNjYiLCJmaXJlYmFzZSI6eyJpZGVudGl0aWVzIjp7ImVtYWlsIjpbImFkbS5jYXN0ZWxhQG1paG1vLmNvbS5iciJdLCJwaG9uZSI6WyIrNTUxMTg5ODg3NDM2NiJdfSwic2lnbl9pbl9wcm92aWRlciI6InBhc3N3b3JkIn19.ss7VOhtg3CSY6JzKwwU5ZE07STI30PFLfK9F0kLusW-xsQafTCJViUyP6tLRR8hdk6YNGiNsxfbuOoSu8IT_y0WQctmrCbzljFg6VyroNi_3vkK3mwUTFRQrssNMQntdSUwJ1vNOTWMBJgoZu_xW54UU4Ph-lsFNQEAOOx9qhwNBaHkYiLqS0wUN6c7EZDTRGgB13jh2NigBWjMwIVXBLbXm74VG7Ajupr-YdSiKAnbwPEUQK9Lly2yF9D8WvvzYR0-TqCrlM_eNENfaTkMRkxchzvIJbCE9KdgqKxIQE2RBL6mCqWH3RXBvOVnZti06ERI7ugaipEtBiYcqJ5EfnQ",
+  "idToken": "eyJhbGciOiJSUzI1NiIsImtpZCI6IjVlODJhZmI0ZWY2OWI3NjM4MzA2OWFjNmI1N2U3ZTY1MjAzYmZlOTYiLCJ0eXAiOiJKV1QifQ.eyJuYW1lIjoiYWRtLmNhc3RlbGEiLCJpc3MiOiJodHRwczovL3NlY3VyZXRva2VuLmdvb2dsZS5jb20vbG9raS1kZXYtNDQ0OGUiLCJhdWQiOiJsb2tpLWRldi00NDQ4ZSIsImF1dGhfdGltZSI6MTc3NTY3NTQwMCwidXNlcl9pZCI6IjgyZmNmOWZjLTI3MzctNDMxZC1hYzA4LTA2ZGIxODlmMDg2OCIsInN1YiI6IjgyZmNmOWZjLTI3MzctNDMxZC1hYzA4LTA2ZGIxODlmMDg2OCIsImlhdCI6MTc3NTY3NTQwMCwiZXhwIjoxNzc1Njc5MDAwLCJlbWFpbCI6ImFkbS5jYXN0ZWxhQG1paG1vLmNvbS5iciIsImVtYWlsX3ZlcmlmaWVkIjpmYWxzZSwicGhvbmVfbnVtYmVyIjoiKzU1MTE4OTg4NzQzNjYiLCJmaXJlYmFzZSI6eyJpZGVudGl0aWVzIjp7ImVtYWlsIjpbImFkbS5jYXN0ZWxhQG1paG1vLmNvbS5iciJdLCJwaG9uZSI6WyIrNTUxMTg5ODg3NDM2NiJdfSwic2lnbl9pbl9wcm92aWRlciI6InBhc3N3b3JkIn19.IhqMah1SP9QAEB2n-EejE_F9ZbyuIXp6MNUOWm9dt4l0fE0aZVkwMhJBymVsDtbS_OkilnBLqiywFKsqc9J1QZDslWMqMHGbSqTuZaV2GlC1qmEy-QfslDDawFFW7twxwa5rv7iMRNFhcLXjEQ-XSXFqMKXssmOyUEcgax12vAUxXNfXl04wqu7MtdR2lDMzswp7E2DRAxjJq8AI2NIFAsrlb5H_IFjRS_9YLt-ZT01OQrTbIakBLdRimZvFxJMYC1zg1Lmz5-rWPeo9XX4adsvo5omR5W8goCvp8RCM7VwLOSCwb--whPg19LSKI7N_Aa8ZblvfAqzOc_yxsFUueA",
   "registered": true,
-  "refreshToken": "AMf-vByWO4s8Ymji5iCXHiIZPjjAlZ919eZwVNZ3QhA6oolu5VviLnpuKRXxjHrgUyit6pqTMCJvUUD0mp60TxRsVG6Z7llFP9nDtKRNSkJrRRUK1dzpqKAT3Y2WPj4JiteBwF9fttoLZb3NDNy_WIflkmDNAC8DhkTDiQ1dJUAtdHwBwBfK32qoT3Dg-pkKALuocjs2oCvadzJy82FpEUv1OibcUVldHs57xMJR6cYsTNDfket55RQ",
+  "refreshToken": "AMf-vBxVUw_XIkthDrMk4HG7pxwrPYokYty4wEC3Tzr451aQ-Te1kQ2ZEERQZTJvRRDa8uRtoea371uJflJTmgeIcgdshZFzH_x3ck5Y9KkHz9Yo6lG5_cXplU55dsBJT0TNYXfcQdMhDyqqd5KY9CrZ_Hcwjdd4YhmTo6QEiQcOj0jJKMUGw__L-7iE7XyWOTmY__Zn9jlYH3vZlcqdhwdhvdmqa1RA5S3oQYDRqQawR38zvLYRWvo",
   "expiresIn": "3600"
 }
  
  </msg>
-<msg time="2026-04-07T21:28:00.852013" level="INFO">${response} = &lt;Response [200]&gt;</msg>
+<msg time="2026-04-08T16:09:49.121612" level="INFO">${response} = &lt;Response [200]&gt;</msg>
 <var>${response}</var>
 <arg>${FIREBASE_URL}</arg>
 <arg>params=key=${FIREBASE_KEY}</arg>
 <arg>json=${body}</arg>
 <arg>expected_status=200</arg>
 <doc>Sends a POST request.</doc>
-<status status="PASS" start="2026-04-07T21:27:56.443744" elapsed="4.409262"/>
+<status status="PASS" start="2026-04-08T16:09:48.440650" elapsed="0.681062"/>
 </kw>
 <kw name="Get From Dictionary" owner="Collections">
-<msg time="2026-04-07T21:28:00.854005" level="INFO">${token} = eyJhbGciOiJSUzI1NiIsImtpZCI6IjVlODJhZmI0ZWY2OWI3NjM4MzA2OWFjNmI1N2U3ZTY1MjAzYmZlOTYiLCJ0eXAiOiJKV1QifQ.eyJuYW1lIjoiYWRtLmNhc3RlbGEiLCJpc3MiOiJodHRwczovL3NlY3VyZXRva2VuLmdvb2dsZS5jb20vbG9raS1kZXYtNDQ0O...</msg>
+<msg time="2026-04-08T16:09:49.122474" level="INFO">${token} = eyJhbGciOiJSUzI1NiIsImtpZCI6IjVlODJhZmI0ZWY2OWI3NjM4MzA2OWFjNmI1N2U3ZTY1MjAzYmZlOTYiLCJ0eXAiOiJKV1QifQ.eyJuYW1lIjoiYWRtLmNhc3RlbGEiLCJpc3MiOiJodHRwczovL3NlY3VyZXRva2VuLmdvb2dsZS5jb20vbG9raS1kZXYtNDQ0O...</msg>
 <var>${token}</var>
 <arg>${response.json()}</arg>
 <arg>idToken</arg>
 <doc>Returns a value from the given ``dictionary`` based on the given ``key``.</doc>
-<status status="PASS" start="2026-04-07T21:28:00.853006" elapsed="0.000999"/>
+<status status="PASS" start="2026-04-08T16:09:49.121911" elapsed="0.000921"/>
 </kw>
 <return>
 <value>${token}</value>
-<status status="PASS" start="2026-04-07T21:28:00.854005" elapsed="0.000000"/>
+<status status="PASS" start="2026-04-08T16:09:49.122952" elapsed="0.000180"/>
 </return>
-<msg time="2026-04-07T21:28:00.854005" level="INFO">${token} = eyJhbGciOiJSUzI1NiIsImtpZCI6IjVlODJhZmI0ZWY2OWI3NjM4MzA2OWFjNmI1N2U3ZTY1MjAzYmZlOTYiLCJ0eXAiOiJKV1QifQ.eyJuYW1lIjoiYWRtLmNhc3RlbGEiLCJpc3MiOiJodHRwczovL3NlY3VyZXRva2VuLmdvb2dsZS5jb20vbG9raS1kZXYtNDQ0O...</msg>
+<msg time="2026-04-08T16:09:49.123302" level="INFO">${token} = eyJhbGciOiJSUzI1NiIsImtpZCI6IjVlODJhZmI0ZWY2OWI3NjM4MzA2OWFjNmI1N2U3ZTY1MjAzYmZlOTYiLCJ0eXAiOiJKV1QifQ.eyJuYW1lIjoiYWRtLmNhc3RlbGEiLCJpc3MiOiJodHRwczovL3NlY3VyZXRva2VuLmdvb2dsZS5jb20vbG9raS1kZXYtNDQ0O...</msg>
 <var>${token}</var>
-<status status="PASS" start="2026-04-07T21:27:56.442743" elapsed="4.411262"/>
+<status status="PASS" start="2026-04-08T16:09:48.439598" elapsed="0.683898"/>
 </kw>
 <kw name="Sleep" owner="BuiltIn">
-<msg time="2026-04-07T21:28:05.854107" level="INFO">Slept 5 seconds.</msg>
+<msg time="2026-04-08T16:09:54.124123" level="INFO">Slept 5 seconds.</msg>
 <arg>5s</arg>
 <doc>Pauses the test executed for the given time.</doc>
-<status status="PASS" start="2026-04-07T21:28:00.854005" elapsed="5.000102"/>
+<status status="PASS" start="2026-04-08T16:09:49.123660" elapsed="5.000748"/>
 </kw>
 <kw name="Verificar Especialista Api" owner="pericia_helper">
-<msg time="2026-04-07T21:28:07.263857" level="INFO">Especialista (cache): role=Clínico Geral, medicalBoard=False, attendance_id=692113f4-0a74-4aa6-a479-f8b5f6598dc3</msg>
-<msg time="2026-04-07T21:28:07.263857" level="INFO">${role} = Clínico Geral</msg>
-<msg time="2026-04-07T21:28:07.263857" level="INFO">${is_junta} = False</msg>
-<msg time="2026-04-07T21:28:07.263857" level="INFO">${board_roles} = []</msg>
-<msg time="2026-04-07T21:28:07.263857" level="INFO">${att_id} = 692113f4-0a74-4aa6-a479-f8b5f6598dc3</msg>
+<msg time="2026-04-08T16:09:54.747825" level="INFO">Especialista (cache): role=Clínico Geral, medicalBoard=False, attendance_id=327336cf-89ce-4ef9-98fa-64d790aa5d90</msg>
+<msg time="2026-04-08T16:09:54.748132" level="INFO">${role} = Clínico Geral</msg>
+<msg time="2026-04-08T16:09:54.748268" level="INFO">${is_junta} = False</msg>
+<msg time="2026-04-08T16:09:54.748386" level="INFO">${board_roles} = []</msg>
+<msg time="2026-04-08T16:09:54.748504" level="INFO">${att_id} = 327336cf-89ce-4ef9-98fa-64d790aa5d90</msg>
 <var>${role}</var>
 <var>${is_junta}</var>
 <var>${board_roles}</var>
@@ -94,7 +94,7 @@
 <arg>${API_URL}</arg>
 <arg>${token}</arg>
 <arg>${regra}</arg>
-<status status="PASS" start="2026-04-07T21:28:05.854107" elapsed="1.409750"/>
+<status status="PASS" start="2026-04-08T16:09:54.124637" elapsed="0.623963"/>
 </kw>
 <if>
 <branch type="IF" condition="${junta}">
@@ -102,16 +102,16 @@
 <arg>${is_junta}</arg>
 <arg>Esperado Junta Médica mas isMedicalBoard=False para regra '${regra}'</arg>
 <doc>Fails if the given condition is not true.</doc>
-<status status="NOT RUN" start="2026-04-07T21:28:07.263857" elapsed="0.000000"/>
+<status status="NOT RUN" start="2026-04-08T16:09:54.749236" elapsed="0.000359"/>
 </kw>
 <kw name="Should Contain" owner="BuiltIn">
 <arg>${board_roles}</arg>
 <arg>${especialista_esperado}</arg>
 <arg>Especialista '${especialista_esperado}' não encontrado na junta. Encontrado: ${board_roles}</arg>
 <doc>Fails if ``container`` does not contain ``item`` one or more times.</doc>
-<status status="NOT RUN" start="2026-04-07T21:28:07.265360" elapsed="0.000000"/>
+<status status="NOT RUN" start="2026-04-08T16:09:54.749813" elapsed="0.000223"/>
 </kw>
-<status status="NOT RUN" start="2026-04-07T21:28:07.263857" elapsed="0.001503"/>
+<status status="NOT RUN" start="2026-04-08T16:09:54.748821" elapsed="0.001392"/>
 </branch>
 <branch type="ELSE">
 <kw name="Should Be Equal" owner="BuiltIn">
@@ -119,24 +119,24 @@
 <arg>${especialista_esperado}</arg>
 <arg>Especialista errado! Esperado: '${especialista_esperado}' | Recebido: '${role}'</arg>
 <doc>Fails if the given objects are unequal.</doc>
-<status status="PASS" start="2026-04-07T21:28:07.265360" elapsed="0.001003"/>
+<status status="PASS" start="2026-04-08T16:09:54.750804" elapsed="0.000734"/>
 </kw>
-<status status="PASS" start="2026-04-07T21:28:07.265360" elapsed="0.001003"/>
+<status status="PASS" start="2026-04-08T16:09:54.750387" elapsed="0.001313"/>
 </branch>
-<status status="PASS" start="2026-04-07T21:28:07.263857" elapsed="0.002506"/>
+<status status="PASS" start="2026-04-08T16:09:54.748783" elapsed="0.002986"/>
 </if>
 <kw name="Enviar Para Fila" owner="pericia_helper">
-<msg time="2026-04-07T21:28:08.924200" level="INFO">enviar_para_fila: 201 | {"eventUri":"https://www.google.com/calendar/event?eid=ZTY0aHJsZTBianRkZnZnczJrdGFtMHQ2M2cgcG1mLmNsaW5pY29nZXJhbDFAbQ","name":"Pericia Licença para Tratamento de Saúde (LTS)","attendanceUrl":null,"rea
+<msg time="2026-04-08T16:09:55.491377" level="INFO">enviar_para_fila: 201 | {"eventUri":"https://www.google.com/calendar/event?eid=cjZtdmo3MzlpM3IxbXBvdWc4ZzR0cm1kNmMgcG1mLmNsaW5pY29nZXJhbDFAbQ","name":"Pericia Licença para Tratamento de Saúde (LTS)","attendanceUrl":null,"rea
 Enviado para fila. eventType=Clínico Geral, medicalBoard=False</msg>
-<msg time="2026-04-07T21:28:08.924200" level="INFO">${event_type} = Clínico Geral</msg>
-<msg time="2026-04-07T21:28:08.924200" level="INFO">${is_junta_fila} = False</msg>
+<msg time="2026-04-08T16:09:55.491639" level="INFO">${event_type} = Clínico Geral</msg>
+<msg time="2026-04-08T16:09:55.491768" level="INFO">${is_junta_fila} = False</msg>
 <var>${event_type}</var>
 <var>${is_junta_fila}</var>
 <arg>${API_URL}</arg>
 <arg>${token}</arg>
 <arg>${att_id}</arg>
 <arg>${regra}</arg>
-<status status="PASS" start="2026-04-07T21:28:07.266363" elapsed="1.657837"/>
+<status status="PASS" start="2026-04-08T16:09:54.751905" elapsed="0.739958"/>
 </kw>
 <if>
 <branch type="IF" condition="${junta}">
@@ -144,9 +144,9 @@ Enviado para fila. eventType=Clínico Geral, medicalBoard=False</msg>
 <arg>${is_junta_fila}</arg>
 <arg>Junta não confirmada após envio para fila. regra='${regra}'</arg>
 <doc>Fails if the given condition is not true.</doc>
-<status status="NOT RUN" start="2026-04-07T21:28:08.925703" elapsed="0.000000"/>
+<status status="NOT RUN" start="2026-04-08T16:09:55.492395" elapsed="0.000140"/>
 </kw>
-<status status="NOT RUN" start="2026-04-07T21:28:08.924200" elapsed="0.001503"/>
+<status status="NOT RUN" start="2026-04-08T16:09:55.492035" elapsed="0.000588"/>
 </branch>
 <branch type="ELSE">
 <kw name="Should Be Equal" owner="BuiltIn">
@@ -154,19 +154,19 @@ Enviado para fila. eventType=Clínico Geral, medicalBoard=False</msg>
 <arg>${especialista_esperado}</arg>
 <arg>eventType na fila diverge! Esperado: '${especialista_esperado}' | Recebido: '${event_type}'</arg>
 <doc>Fails if the given objects are unequal.</doc>
-<status status="PASS" start="2026-04-07T21:28:08.925703" elapsed="0.000000"/>
+<status status="PASS" start="2026-04-08T16:09:55.492992" elapsed="0.000419"/>
 </kw>
-<status status="PASS" start="2026-04-07T21:28:08.925703" elapsed="0.000000"/>
+<status status="PASS" start="2026-04-08T16:09:55.492673" elapsed="0.000834"/>
 </branch>
-<status status="PASS" start="2026-04-07T21:28:08.924200" elapsed="0.002508"/>
+<status status="PASS" start="2026-04-08T16:09:55.492013" elapsed="0.001542"/>
 </if>
 <if>
 <branch type="IF" condition="not ${junta}">
 <kw name="Homologar Pericia" owner="pericia_helper">
-<msg time="2026-04-07T21:29:02.354986" level="INFO">[auto-login] Obtendo token para 'CLINICA' (gestormihmo@mihmo.com.br)...
+<msg time="2026-04-08T16:10:32.186719" level="INFO">[auto-login] Obtendo token para 'CLINICA' (gestormihmo@mihmo.com.br)...
 [auto-login] Token para 'CLINICA' obtido. Expira em 3600s.
-Especialista (cache): role=Clínico Geral, medicalBoard=False, attendance_id=692113f4-0a74-4aa6-a479-f8b5f6598dc3
-enviar_para_fila: 201 | {"eventUri":"https://www.google.com/calendar/event?eid=ZTY0aHJsZTBianRkZnZnczJrdGFtMHQ2M2cgcG1mLmNsaW5pY29nZXJhbDFAbQ","name":"Pericia Licença para Tratamento de Saúde (LTS)","attendanceUrl":null,"rea
+Especialista (cache): role=Clínico Geral, medicalBoard=False, attendance_id=327336cf-89ce-4ef9-98fa-64d790aa5d90
+enviar_para_fila: 201 | {"eventUri":"https://www.google.com/calendar/event?eid=cjZtdmo3MzlpM3IxbXBvdWc4ZzR0cm1kNmMgcG1mLmNsaW5pY29nZXJhbDFAbQ","name":"Pericia Licença para Tratamento de Saúde (LTS)","attendanceUrl":null,"rea
 Enviado para fila. eventType=Clínico Geral, medicalBoard=False
 [auto-login] Obtendo token para 'Clínico Geral' (clinicogeral1@mihmo.com.br)...
 [auto-login] Token para 'Clínico Geral' obtido. Expira em 3600s.
@@ -184,21 +184,26 @@ GET attendance: 200
   clinicalRecord: False
   medicalExpertReportRequestConclusion: True
   squad_user_id via 'squadUserId': 8c1caaf5-c94e-4b8d-aac7-72260aec4ed7
-Ficha clínica: 201 | {"id":"67a42e3c-abf4-4d30-9168-a3800df17593","typeId":"bcfc80cf-12ea-4cb5-8ac2-195895418db1","typeName":"Ficha de HOMOLOG","version":1,"date":"2026-04-07T21:26:40.557Z","link":"https://mihmosaude.limesurvey.net/257595?lang=pt&amp;CPF=80008741212","customerId":"ed89b1e1-7c5c-45b8-ab68-a7c6d62458d7","cust
-  survey_link: https://mihmosaude.limesurvey.net/257595?lang=pt&amp;CPF=80008741212
-  Tentando submeter LimeSurvey survey 257595 para CPF 80008741212...
-LimeSurvey GET survey 257595...
-  GET status: 200
-  hidden fields encontrados: ['YII_CSRF_TOKEN', 'fieldnames', 'thisstep', 'sid', 'start_time', 'LEMpostKey', 'relevance11666', 'relevance11661', 'relevance11662', 'relevance11663', 'relevance11664', 'relevance11665', 'relevanceG0', 'ajax']
-  perguntas encontradas: ['257595X174X11666', '257595X174X11661', '257595X174X11662', '257595X174X11663', '257595X174X11664', '257595X174X11665']
-  step 0: POST com 6 perguntas, move=movenext
-  step 0 resposta: 200 | len=1737
-  LimeSurvey: submissão concluída (step 0)
-  Notificando Mihmo: GET https://homolog.mihmo.com.br/backend-nest/clinical-record/survey/257595
-  Notificação Mihmo: 200 | {"integrated":0,"notIntegrated":0,"responseIds":[],"surveyId":257595}
-  LimeSurvey submit result: True
-validate-data tentando: PATCH https://homolog.mihmo.com.br/attendance/api/scheduled-attendance/692113f4-0a74-4aa6-a479-f8b5f6598dc3/validate-data-requested
-  payload: {'startDate': '2026-04-07', 'cid': '', 'days': 14}
+  stepper: 200 | {"hasNext":false,"items":[{"id":"a4376550-8bf6-4a5c-9bf4-1c83488a655c","typeId":"bcfc80cf-12ea-4cb5-8ac2-195895418db1","typeName":"Ficha de HOMOLOG","version":2,"date":"2026-04-08T16:08:47.922Z","link":"https://mihmosaude.limesurvey.net/257595?lang=pt&amp;CPF=95857718619","customerId":"fc793c8b-d968-460
+  previousVersionId encontrado: a4376550-8bf6-4a5c-9bf4-1c83488a655c
+Ficha clínica: 201 | {"id":"ac98964b-fc4c-46f0-a2ef-d3b8b61d900a","typeId":"bcfc80cf-12ea-4cb5-8ac2-195895418db1","typeName":"Ficha de HOMOLOG","version":3,"date":"2026-04-08T16:10:13.533Z","link":"https://mihmosaude.limesurvey.net/257595?lang=pt&amp;CPF=95857718619","customerId":"fc793c8b-d968-4609-a2d0-95972ea7aa01","customerName":"TESTE_LTS_14DIAS_GERAL_20260408_BSN0","squadUserId":"8c1caaf5-c94e-4b8d-aac7-72260aec4ed7","squadUserName":"Clínico Geral1","serviceName":"Licença para Tratamento de Saúde (LTS)","serviceType":"HealthCareLicense","customerAge":"36","customerCpf":"95857718619","canProceed":true}
+  GET clinical-record/ac98964b-fc4c-46f0-a2ef-d3b8b61d900a: 200 | {"id":"ac98964b-fc4c-46f0-a2ef-d3b8b61d900a","typeId":"bcfc80cf-12ea-4cb5-8ac2-195895418db1","typeName":"Ficha de HOMOLOG","version":3,"date":"2026-04-08T16:10:13.533Z","link":"https://mihmosaude.limesurvey.net/257595?lang=pt&amp;CPF=95857718619","customerId":"fc793c8b-d968-4609-a2d0-95972ea7aa01","customerName":"TESTE_LTS_14DIAS_GERAL_20260408_BSN0","squadUserId":"8c1caaf5-c94e-4b8d-aac7-72260aec4ed7","squadUserName":"Clínico Geral1","answers":[],"serviceName":"Licença para Tratamento de Saúde (LTS)","serviceType":"HealthCareLicense"}
+  survey_link: https://mihmosaude.limesurvey.net/257595?lang=pt&amp;CPF=95857718619
+  Submetendo Ficha de HOMOLOG via Playwright...
+  [playwright] Abrindo survey: https://mihmosaude.limesurvey.net/257595?lang=pt&amp;CPF=95857718619
+  [playwright] URL atual: https://mihmosaude.limesurvey.net/257595?lang=pt&amp;CPF=95857718619
+  [playwright] Título: Ficha de HOMOLOG
+  [playwright] Clicando no botão de submit (força navegação real)...
+  [playwright] response: 200 https://homolog.mihmo.com.br/backend-nest/clinical-record/survey/257595/integrate
+  [playwright] clicou: button[name='move'][value='movesubmit']
+  [playwright] chegou em /integrate: https://homolog.mihmo.com.br/backend-nest/clinical-record/survey/257595/integrate
+  [playwright] URL final: https://homolog.mihmo.com.br/backend-nest/clinical-record/survey/257595/integrate
+  [playwright] integrate_called: [200]
+  Playwright result: True
+  clinical-record pós-Playwright: answers=5, canProceed=False
+  Ficha integrada com sucesso!
+validate-data tentando: PATCH https://homolog.mihmo.com.br/attendance/api/scheduled-attendance/327336cf-89ce-4ef9-98fa-64d790aa5d90/validate-data-requested
+  payload: {'startDate': '2026-04-08', 'cid': 'J00', 'days': 14}
   resposta: 404 | &lt;!DOCTYPE html&gt;
 &lt;html lang="pt-br"&gt;
   &lt;head&gt;
@@ -207,8 +212,8 @@ validate-data tentando: PATCH https://homolog.mihmo.com.br/attendance/api/schedu
     &lt;base href="/"/&gt;
     &lt;meta content="no-cache, no-store, must-revalidate" http-equiv="cache-contr
 AVISO: validate-data-requested retornou 404 — seguindo sem ele.
-validate-data tentando: POST https://homolog.mihmo.com.br/attendance/api/scheduled-attendance/692113f4-0a74-4aa6-a479-f8b5f6598dc3/validate-data-requested
-  payload: {'startDate': '2026-04-07', 'cid': '', 'days': 14}
+validate-data tentando: POST https://homolog.mihmo.com.br/attendance/api/scheduled-attendance/327336cf-89ce-4ef9-98fa-64d790aa5d90/validate-data-requested
+  payload: {'startDate': '2026-04-08', 'cid': 'J00', 'days': 14}
   resposta: 404 | &lt;!DOCTYPE html&gt;
 &lt;html lang="pt-br"&gt;
   &lt;head&gt;
@@ -217,8 +222,8 @@ validate-data tentando: POST https://homolog.mihmo.com.br/attendance/api/schedul
     &lt;base href="/"/&gt;
     &lt;meta content="no-cache, no-store, must-revalidate" http-equiv="cache-contr
 AVISO: validate-data-requested retornou 404 — seguindo sem ele.
-validate-data tentando: PATCH https://homolog.mihmo.com.br/attendance/api/scheduled-attendance/692113f4-0a74-4aa6-a479-f8b5f6598dc3/validate-data
-  payload: {'startDate': '2026-04-07', 'cid': '', 'days': 14}
+validate-data tentando: PATCH https://homolog.mihmo.com.br/attendance/api/scheduled-attendance/327336cf-89ce-4ef9-98fa-64d790aa5d90/validate-data
+  payload: {'startDate': '2026-04-08', 'cid': 'J00', 'days': 14}
   resposta: 404 | &lt;!DOCTYPE html&gt;
 &lt;html lang="pt-br"&gt;
   &lt;head&gt;
@@ -227,8 +232,8 @@ validate-data tentando: PATCH https://homolog.mihmo.com.br/attendance/api/schedu
     &lt;base href="/"/&gt;
     &lt;meta content="no-cache, no-store, must-revalidate" http-equiv="cache-contr
 AVISO: validate-data-requested retornou 404 — seguindo sem ele.
-validate-data tentando: PATCH https://homolog.mihmo.com.br/backend-nest/medical-expert-report-request/d2987c17-d5db-469c-9aea-a0d7acfecc30/validate-data-requested
-  payload: {'startDate': '2026-04-07', 'cid': '', 'days': 14}
+validate-data tentando: PATCH https://homolog.mihmo.com.br/backend-nest/medical-expert-report-request/2cba86b4-ac41-4c71-ad80-2137835e84f7/validate-data-requested
+  payload: {'startDate': '2026-04-08', 'cid': 'J00', 'days': 14}
   resposta: 404 | &lt;!DOCTYPE html&gt;
 &lt;html lang="pt-br"&gt;
   &lt;head&gt;
@@ -237,8 +242,8 @@ validate-data tentando: PATCH https://homolog.mihmo.com.br/backend-nest/medical-
     &lt;base href="/"/&gt;
     &lt;meta content="no-cache, no-store, must-revalidate" http-equiv="cache-contr
 AVISO: validate-data-requested retornou 404 — seguindo sem ele.
-validate-data tentando: PATCH https://homolog.mihmo.com.br/backend-nest/medical-expert-report-request/d2987c17-d5db-469c-9aea-a0d7acfecc30/validate-data
-  payload: {'startDate': '2026-04-07', 'cid': '', 'days': 14}
+validate-data tentando: PATCH https://homolog.mihmo.com.br/backend-nest/medical-expert-report-request/2cba86b4-ac41-4c71-ad80-2137835e84f7/validate-data
+  payload: {'startDate': '2026-04-08', 'cid': 'J00', 'days': 14}
   resposta: 404 | &lt;!DOCTYPE html&gt;
 &lt;html lang="pt-br"&gt;
   &lt;head&gt;
@@ -247,8 +252,8 @@ validate-data tentando: PATCH https://homolog.mihmo.com.br/backend-nest/medical-
     &lt;base href="/"/&gt;
     &lt;meta content="no-cache, no-store, must-revalidate" http-equiv="cache-contr
 AVISO: validate-data-requested retornou 404 — seguindo sem ele.
-validate-data tentando: POST https://homolog.mihmo.com.br/backend-nest/medical-expert-report-request/d2987c17-d5db-469c-9aea-a0d7acfecc30/validate-data-requested
-  payload: {'startDate': '2026-04-07', 'cid': '', 'days': 14}
+validate-data tentando: POST https://homolog.mihmo.com.br/backend-nest/medical-expert-report-request/2cba86b4-ac41-4c71-ad80-2137835e84f7/validate-data-requested
+  payload: {'startDate': '2026-04-08', 'cid': 'J00', 'days': 14}
   resposta: 404 | &lt;!DOCTYPE html&gt;
 &lt;html lang="pt-br"&gt;
   &lt;head&gt;
@@ -257,8 +262,8 @@ validate-data tentando: POST https://homolog.mihmo.com.br/backend-nest/medical-e
     &lt;base href="/"/&gt;
     &lt;meta content="no-cache, no-store, must-revalidate" http-equiv="cache-contr
 AVISO: validate-data-requested retornou 404 — seguindo sem ele.
-validate-data tentando: POST https://homolog.mihmo.com.br/backend-nest/medical-expert-report-request/d2987c17-d5db-469c-9aea-a0d7acfecc30/validate-data
-  payload: {'startDate': '2026-04-07', 'cid': '', 'days': 14}
+validate-data tentando: POST https://homolog.mihmo.com.br/backend-nest/medical-expert-report-request/2cba86b4-ac41-4c71-ad80-2137835e84f7/validate-data
+  payload: {'startDate': '2026-04-08', 'cid': 'J00', 'days': 14}
   resposta: 404 | &lt;!DOCTYPE html&gt;
 &lt;html lang="pt-br"&gt;
   &lt;head&gt;
@@ -267,8 +272,8 @@ validate-data tentando: POST https://homolog.mihmo.com.br/backend-nest/medical-e
     &lt;base href="/"/&gt;
     &lt;meta content="no-cache, no-store, must-revalidate" http-equiv="cache-contr
 AVISO: validate-data-requested retornou 404 — seguindo sem ele.
-validate-data tentando: PUT https://homolog.mihmo.com.br/backend-nest/medical-expert-report-request/d2987c17-d5db-469c-9aea-a0d7acfecc30/validate-data-requested
-  payload: {'startDate': '2026-04-07', 'cid': '', 'days': 14}
+validate-data tentando: PUT https://homolog.mihmo.com.br/backend-nest/medical-expert-report-request/2cba86b4-ac41-4c71-ad80-2137835e84f7/validate-data-requested
+  payload: {'startDate': '2026-04-08', 'cid': 'J00', 'days': 14}
   resposta: 404 | &lt;!DOCTYPE html&gt;
 &lt;html lang="pt-br"&gt;
   &lt;head&gt;
@@ -277,8 +282,8 @@ validate-data tentando: PUT https://homolog.mihmo.com.br/backend-nest/medical-ex
     &lt;base href="/"/&gt;
     &lt;meta content="no-cache, no-store, must-revalidate" http-equiv="cache-contr
 AVISO: validate-data-requested retornou 404 — seguindo sem ele.
-validate-data tentando: PATCH https://homolog.mihmo.com.br/backend-nest/medical-expert-report-request/d2987c17-d5db-469c-9aea-a0d7acfecc30
-  payload: {'startDate': '2026-04-07', 'cid': '', 'days': 14}
+validate-data tentando: PATCH https://homolog.mihmo.com.br/backend-nest/medical-expert-report-request/2cba86b4-ac41-4c71-ad80-2137835e84f7
+  payload: {'startDate': '2026-04-08', 'cid': 'J00', 'days': 14}
   resposta: 404 | &lt;!DOCTYPE html&gt;
 &lt;html lang="pt-br"&gt;
   &lt;head&gt;
@@ -287,47 +292,47 @@ validate-data tentando: PATCH https://homolog.mihmo.com.br/backend-nest/medical-
     &lt;base href="/"/&gt;
     &lt;meta content="no-cache, no-store, must-revalidate" http-equiv="cache-contr
 AVISO: validate-data-requested retornou 404 — seguindo sem ele.
-validate-data tentando: PATCH https://homolog.mihmo.com.br/backend-nest/medical-expert-report-request/692113f4-0a74-4aa6-a479-f8b5f6598dc3/validate-data-requested
-  payload: {'startDate': '2026-04-07', 'cid': '', 'days': 14}
-  resposta: 200 | [{"id":"d2987c17-d5db-469c-9aea-a0d7acfecc30","number":40639,"type":"HealthCareLicense","start_date":"2026-04-07T00:00:00.000Z","days":14,"medic_crm":"1515","medic_uf":"AC","cid":"","dependent_name":n
+validate-data tentando: PATCH https://homolog.mihmo.com.br/backend-nest/medical-expert-report-request/327336cf-89ce-4ef9-98fa-64d790aa5d90/validate-data-requested
+  payload: {'startDate': '2026-04-08', 'cid': 'J00', 'days': 14}
+  resposta: 200 | [{"id":"2cba86b4-ac41-4c71-ad80-2137835e84f7","number":40701,"type":"HealthCareLicense","start_date":"2026-04-08T00:00:00.000Z","days":14,"medic_crm":"1515","medic_uf":"AC","cid":"J00","dependent_name
 validate-data-requested OK
 GET customer: 200
-  customer registrations: [{'jobTitle': 'Tecnico', 'department': 'Educacao', 'location': 'Posto 01', 'cnpjLocation': '48618573333522', 'registrationId': '395a1189-1e57-4cfe-8672-bc3310a5ef64', 'employmentCategory': '301', 'admissionDate': '2026-03-07', 'functionalRegistration': '55843'}]
+  customer registrations: [{'jobTitle': 'Analista', 'department': 'Educacao', 'location': 'Filial Norte', 'cnpjLocation': '04307201990536', 'registrationId': '2de8d778-692a-408f-bf3d-1a5386a57a97', 'employmentCategory': '301', 'admissionDate': '2026-03-08', 'functionalRegistration': '35430'}]
   customer regs[0] keys: ['jobTitle', 'department', 'location', 'cnpjLocation', 'registrationId', 'employmentCategory', 'admissionDate', 'functionalRegistration']
-  registration_id: 395a1189-1e57-4cfe-8672-bc3310a5ef64, category: 301, functionalRegistration: 55843
-registration_id=395a1189-1e57-4cfe-8672-bc3310a5ef64, category=301, functionalRegistration=55843
-Buscando artigos: GET https://homolog.mihmo.com.br/backend-nest/medical-expert-report-request/article/d2987c17-d5db-469c-9aea-a0d7acfecc30/55843/Accepted
+  registration_id: 2de8d778-692a-408f-bf3d-1a5386a57a97, category: 301, functionalRegistration: 35430
+registration_id=2de8d778-692a-408f-bf3d-1a5386a57a97, category=301, functionalRegistration=35430
+Buscando artigos: GET https://homolog.mihmo.com.br/backend-nest/medical-expert-report-request/article/2cba86b4-ac41-4c71-ad80-2137835e84f7/35430/Accepted
   status: 200
   Artigo selecionado: Acidente de Trabalho - ARTIGO 97 (8df9d57e-b94e-4177-8cc1-b5c8b6280697)
-eligibility-check: GET https://homolog.mihmo.com.br/backend-nest/medical-expert-report-request/d2987c17-d5db-469c-9aea-a0d7acfecc30/eligibility-check
-  params: {'acceptedDays': 14, 'acceptedStartDate': '2026-04-07', 'conclusionId': '8df9d57e-b94e-4177-8cc1-b5c8b6280697', 'functionalRegistration': '55843'}
-  resposta: 200 | {"startDate":"2026-04-07","finalMedicalExpertiseDate":null,"recommendedAcceptDays":"14","isEligible":true,"message":"Nenhum afastamento encontrado para o período informado.","isMandatory":true,"inssForwarding":false,"inssRecommendDays":null,"inssStartDate":null,"inssCid":null,"messageOptions":[],"is
+eligibility-check: GET https://homolog.mihmo.com.br/backend-nest/medical-expert-report-request/2cba86b4-ac41-4c71-ad80-2137835e84f7/eligibility-check
+  params: {'acceptedDays': 14, 'acceptedStartDate': '2026-04-08', 'conclusionId': '8df9d57e-b94e-4177-8cc1-b5c8b6280697', 'functionalRegistration': '35430'}
+  resposta: 200 | {"startDate":"2026-04-08","finalMedicalExpertiseDate":null,"recommendedAcceptDays":"14","isEligible":true,"message":"Nenhum afastamento encontrado para o período informado.","isMandatory":true,"inssForwarding":false,"inssRecommendDays":null,"inssStartDate":null,"inssCid":null,"messageOptions":[],"is
 eligibility-check OK — DataValideted deve ser True agora.
 GET memed-token/8c1caaf5-c94e-4b8d-aac7-72260aec4ed7: 200 | {"token":"eyJ0eXAiOiJKV1QiLCJhbGciOiJIUzI1NiJ9.WzY1NDc0MCwiYjU5MTBmNTk3YmI1MmVmMGNjY2Q1ODg1ZmYyYzQ4ODgiLCIyMDI2LTA0LTA2Iiwic2luYXBzZS5wcmVzY3JpY2FvIiwicGFydG5lci40NDQuNjAwMzEwIl0._vxnQbZwC4ca1IfrphfA8
 DEBUG memed-token response keys: ['token']
 DEBUG memed-token response: {'token': 'eyJ0eXAiOiJKV1QiLCJhbGciOiJIUzI1NiJ9.WzY1NDc0MCwiYjU5MTBmNTk3YmI1MmVmMGNjY2Q1ODg1ZmYyYzQ4ODgiLCIyMDI2LTA0LTA2Iiwic2luYXBzZS5wcmVzY3JpY2FvIiwicGFydG5lci40NDQuNjAwMzEwIl0._vxnQbZwC4ca1IfrphfA8pkQPw0LD1YwiaMdcFOZKC0'}
 Token Memed obtido para squadUser 8c1caaf5-c94e-4b8d-aac7-72260aec4ed7: ok
   memed_token prefix: eyJ0eXAiOiJKV1QiLCJhbGciOiJIUz... alg_guess=HS256(Memed)
-Prescrição Memed criada: memedFileId=261908027 (tipo: int)
-  memedFileId convertido: 261908027 (tipo: int)
-check-clinical-record: 200 | {"title":"Atenção! Você precisa preencher ao menos uma Ficha Clínica entre as listadas abaixo.","message":"Pericia - Exame Clínico, Ficha médica - PMV - Única, Ficha médica - PMV - Homologação, Ficha de HOMOLOG","allow":false}
+Prescrição Memed criada: memedFileId=262126700 (tipo: int)
+  memedFileId convertido: 262126700 (tipo: int)
+check-clinical-record: 200 | {"title":"Atenção! Antes de fazer qualquer homologação, você deve preencher os campos:","message":"Quantidade de Dias no atestado, Data Início do afastamento, CID informado no atestado","allow":true}
 generate-memed-file payload: {
-  "scheduledAttendanceId": "692113f4-0a74-4aa6-a479-f8b5f6598dc3",
-  "medicalExpertReportRequestId": "d2987c17-d5db-469c-9aea-a0d7acfecc30",
+  "scheduledAttendanceId": "327336cf-89ce-4ef9-98fa-64d790aa5d90",
+  "medicalExpertReportRequestId": "2cba86b4-ac41-4c71-ad80-2137835e84f7",
   "type": "MedicalExpertReportRequest",
-  "registrationId": "395a1189-1e57-4cfe-8672-bc3310a5ef64",
-  "memedFileId": 261908027,
+  "memedFileId": 262126700,
   "token": "eyJ0eXAiOiJKV1QiLCJhbGciOiJIUzI1NiJ9.WzY1NDc0MCwiYjU5MTBmNTk3YmI1MmVmMGNjY2Q1ODg1ZmYyYzQ4ODgiLCIyMDI2LTA0LTA2Iiwic2luYXBzZS5wcmVzY3JpY2FvIiwicGFydG5lci40NDQuNjAwMzEwIl0._vxnQbZwC4ca1IfrphfA8pkQPw0LD1YwiaMdcFOZKC0",
+  "medicalBoardIds": [],
+  "registrationId": "2de8d778-692a-408f-bf3d-1a5386a57a97",
   "status": "Accepted",
   "days": 14,
   "cid": "J00",
-  "startDate": "2026-04-07",
-  "calculateEndDate": "20/04/2026",
+  "startDate": "2026-04-08T00:00:00.000Z",
   "observations": "Teste automatizado",
   "articleId": "8df9d57e-b94e-4177-8cc1-b5c8b6280697"
 }
 generate-memed-file: 500 | {"statusCode":500,"message":"Internal server error"}</msg>
-<msg time="2026-04-07T21:29:02.355958" level="FAIL">Erro generate-memed-file: 500 - {"statusCode":500,"message":"Internal server error"}</msg>
+<msg time="2026-04-08T16:10:32.187892" level="FAIL">Erro generate-memed-file: 500 - {"statusCode":500,"message":"Internal server error"}</msg>
 <var>${status}</var>
 <arg>${API_URL}</arg>
 <arg>${token}</arg>
@@ -341,39 +346,39 @@ generate-memed-file: 500 | {"statusCode":500,"message":"Internal server error"}<
 6. Cria prescrição no Memed
 7. Salva homologação no Mihmo (generate-memed-file)
 Retorna o status final ("Accepted").</doc>
-<status status="FAIL" start="2026-04-07T21:28:08.926708" elapsed="53.434678">Erro generate-memed-file: 500 - {"statusCode":500,"message":"Internal server error"}</status>
+<status status="FAIL" start="2026-04-08T16:09:55.493870" elapsed="36.710333">Erro generate-memed-file: 500 - {"statusCode":500,"message":"Internal server error"}</status>
 </kw>
 <kw name="Should Be Equal" owner="BuiltIn">
 <arg>${status}</arg>
 <arg>Accepted</arg>
 <arg>Status da homologação diverge! Esperado: 'Accepted' | Recebido: '${status}'</arg>
 <doc>Fails if the given objects are unequal.</doc>
-<status status="NOT RUN" start="2026-04-07T21:29:02.361386" elapsed="0.000000"/>
+<status status="NOT RUN" start="2026-04-08T16:10:32.204855" elapsed="0.000372"/>
 </kw>
-<status status="FAIL" start="2026-04-07T21:28:08.926708" elapsed="53.434678">Erro generate-memed-file: 500 - {"statusCode":500,"message":"Internal server error"}</status>
+<status status="FAIL" start="2026-04-08T16:09:55.493615" elapsed="36.711902">Erro generate-memed-file: 500 - {"statusCode":500,"message":"Internal server error"}</status>
 </branch>
-<status status="FAIL" start="2026-04-07T21:28:08.926708" elapsed="53.434678">Erro generate-memed-file: 500 - {"statusCode":500,"message":"Internal server error"}</status>
+<status status="FAIL" start="2026-04-08T16:09:55.493600" elapsed="36.712078">Erro generate-memed-file: 500 - {"statusCode":500,"message":"Internal server error"}</status>
 </if>
 <arg>LTS_14DIAS_GERAL</arg>
 <arg>Clínico Geral</arg>
-<status status="FAIL" start="2026-04-07T21:27:56.440742" elapsed="65.920644">Erro generate-memed-file: 500 - {"statusCode":500,"message":"Internal server error"}</status>
+<status status="FAIL" start="2026-04-08T16:09:48.437189" elapsed="43.768766">Erro generate-memed-file: 500 - {"statusCode":500,"message":"Internal server error"}</status>
 </kw>
 <tag>api</tag>
 <tag>homolog</tag>
 <tag>lts</tag>
 <tag>lts_geral</tag>
 <tag>pmv</tag>
-<status status="FAIL" start="2026-04-07T21:27:56.438744" elapsed="65.922642">Erro generate-memed-file: 500 - {"statusCode":500,"message":"Internal server error"}</status>
+<status status="FAIL" start="2026-04-08T16:09:48.433996" elapsed="43.773148">Erro generate-memed-file: 500 - {"statusCode":500,"message":"Internal server error"}</status>
 </test>
-<status status="FAIL" start="2026-04-07T21:27:56.271878" elapsed="66.097025"/>
+<status status="FAIL" start="2026-04-08T16:09:48.324911" elapsed="43.900641"/>
 </suite>
-<status status="FAIL" start="2026-04-07T21:27:56.268880" elapsed="66.104196"/>
+<status status="FAIL" start="2026-04-08T16:09:48.321909" elapsed="43.910038"/>
 </suite>
-<status status="FAIL" start="2026-04-07T21:27:56.265372" elapsed="66.109706"/>
+<status status="FAIL" start="2026-04-08T16:09:48.318400" elapsed="43.916213"/>
 </suite>
-<status status="FAIL" start="2026-04-07T21:27:56.258403" elapsed="66.123184"/>
+<status status="FAIL" start="2026-04-08T16:09:48.310188" elapsed="43.927409"/>
 </suite>
-<status status="FAIL" start="2026-04-07T21:27:56.227579" elapsed="66.159518"/>
+<status status="FAIL" start="2026-04-08T16:09:48.284126" elapsed="43.955760"/>
 </suite>
 <statistics>
 <total>
@@ -387,11 +392,11 @@ Retorna o status final ("Accepted").</doc>
 <stat pass="0" fail="1" skip="0">pmv</stat>
 </tag>
 <suite>
-<stat name="Qa-Recriar" id="s1" pass="0" fail="1" skip="0">Qa-Recriar</stat>
-<stat name="Tests" id="s1-s1" pass="0" fail="1" skip="0">Qa-Recriar.Tests</stat>
-<stat name="Api" id="s1-s1-s1" pass="0" fail="1" skip="0">Qa-Recriar.Tests.Api</stat>
-<stat name="Pericia" id="s1-s1-s1-s1" pass="0" fail="1" skip="0">Qa-Recriar.Tests.Api.Pericia</stat>
-<stat name="Homologacao Pmv Api" id="s1-s1-s1-s1-s1" pass="0" fail="1" skip="0">Qa-Recriar.Tests.Api.Pericia.Homologacao Pmv Api</stat>
+<stat pass="0" fail="1" skip="0" id="s1" name="Qa-Recriar">Qa-Recriar</stat>
+<stat pass="0" fail="1" skip="0" id="s1-s1" name="Tests">Qa-Recriar.Tests</stat>
+<stat pass="0" fail="1" skip="0" id="s1-s1-s1" name="Api">Qa-Recriar.Tests.Api</stat>
+<stat pass="0" fail="1" skip="0" id="s1-s1-s1-s1" name="Pericia">Qa-Recriar.Tests.Api.Pericia</stat>
+<stat pass="0" fail="1" skip="0" id="s1-s1-s1-s1-s1" name="Homologacao Pmv Api">Qa-Recriar.Tests.Api.Pericia.Homologacao Pmv Api</stat>
 </suite>
 </statistics>
 <errors>

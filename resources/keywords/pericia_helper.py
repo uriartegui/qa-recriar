@@ -505,6 +505,107 @@ def iniciar_atendimento(base_url, token, attendance_id, squad_user_id):
 LIMESURVEY_URL = "https://mihmosaude.limesurvey.net"
 LIMESURVEY_USER = "admin"
 LIMESURVEY_PASS = "REMOVIDO"  # ajuste se necessário
+MIHMO_URL = "https://homolog.mihmo.com.br"
+
+
+def _submeter_ficha_playwright(survey_url, token_medico, cpf, api_url):
+    """Abre o LimeSurvey com sessão real do Mihmo via Playwright e submete o formulário.
+    O browser executa o fetch JS para /integrate com os cookies corretos."""
+    from playwright.sync_api import sync_playwright
+
+    base = api_url.rsplit('/backend-nest', 1)[0]
+
+    with sync_playwright() as p:
+        browser = p.chromium.launch(headless=True)
+        context = browser.new_context()
+
+        # Injetar o token do Mihmo como cookie de sessão
+        context.add_cookies([
+            {"name": "token",       "value": token_medico, "domain": "homolog.mihmo.com.br", "path": "/"},
+            {"name": "accessToken", "value": token_medico, "domain": "homolog.mihmo.com.br", "path": "/"},
+        ])
+
+        page = context.new_page()
+
+        # Monitorar requests para capturar o /integrate
+        integrate_called = []
+        def on_response(response):
+            if "/integrate" in response.url or "limesurveyintegration" in response.url:
+                print(f"  [playwright] response: {response.status} {response.url}")
+                integrate_called.append(response.status)
+
+        page.on("response", on_response)
+
+        print(f"  [playwright] Abrindo survey: {survey_url}")
+        page.goto(survey_url, wait_until="domcontentloaded", timeout=30000)
+        print(f"  [playwright] URL atual: {page.url}")
+        print(f"  [playwright] Título: {page.title()}")
+
+        # Preencher textareas vazias usando Playwright (persiste no DOM)
+        for ta in page.locator("textarea").all():
+            try:
+                if not ta.input_value():
+                    ta.fill("Teste automatizado")
+            except Exception:
+                pass
+
+        # Preencher inputs de texto vazios
+        for inp in page.locator("input[type='text']").all():
+            try:
+                if not inp.input_value():
+                    inp.fill("Teste automatizado")
+            except Exception:
+                pass
+
+        print(f"  [playwright] Clicando no botão de submit (força navegação real)...")
+        # Usar click forçado para disparar o submit com navegação real (segue redirect corretamente)
+        submitted = False
+        for selector in [
+            "input[type='submit'][value*='nviar']",
+            "input[type='submit'][value*='inaliz']",
+            "input[type='submit']",
+            "button[name='move'][value='movesubmit']",
+            "button[name='move']",
+            "#defaultbtn",
+        ]:
+            btn = page.locator(selector).first
+            if btn.count() > 0:
+                try:
+                    btn.click(force=True, timeout=5000)
+                    submitted = True
+                    print(f"  [playwright] clicou: {selector}")
+                    break
+                except Exception as ce:
+                    print(f"  [playwright] click falhou ({selector}): {ce}")
+
+        if not submitted:
+            # Fallback: submeter via JS setando hidden input e disparando submit
+            page.evaluate("""
+                var form = document.querySelector('form');
+                if (form) {
+                    var inp = document.createElement('input');
+                    inp.type = 'hidden'; inp.name = 'move'; inp.value = 'movesubmit';
+                    form.appendChild(inp);
+                    form.submit();
+                }
+            """)
+            print(f"  [playwright] submeteu via form.submit() fallback")
+
+        # Aguardar navegação real para /integrate no Mihmo
+        try:
+            page.wait_for_url("**/integrate**", timeout=20000)
+            print(f"  [playwright] chegou em /integrate: {page.url}")
+        except Exception:
+            try:
+                page.wait_for_load_state("networkidle", timeout=15000)
+            except Exception:
+                pass
+
+        print(f"  [playwright] URL final: {page.url}")
+        print(f"  [playwright] integrate_called: {integrate_called}")
+        browser.close()
+
+    return bool(integrate_called)
 
 
 def _limesurvey_api_add_response(survey_id):
@@ -592,19 +693,39 @@ def _limesurvey_submit(survey_id, cpf, responses=None):
 
     def _extract_questions(h):
         fields = {}
+        sid_pat = str(survey_id) + r'X\d+X\d+[^"\']*'
+        # inputs: extrai value real (CPF, etc.)
         for m in _re.finditer(
-            r'name=["\'](' + str(survey_id) + r'X\d+X\d+[^"\']*)["\']',
+            r'<input([^>]+name=["\'](' + sid_pat + r')["\'][^>]*)>',
             h, _re.IGNORECASE
         ):
-            fname = m.group(1)
+            tag_attrs = m.group(1)
+            fname = m.group(2)
+            val_m = _re.search(r'value=["\']([^"\']*)["\']', tag_attrs)
+            value = val_m.group(1) if val_m else ""
             if fname not in fields:
-                fields[fname] = "A"
+                fields[fname] = value if value else "Teste automatizado"
+        # textareas: extrai conteúdo real
+        for m in _re.finditer(
+            r'<textarea[^>]+name=["\'](' + sid_pat + r')["\'][^>]*>(.*?)</textarea>',
+            h, _re.IGNORECASE | _re.DOTALL
+        ):
+            fname = m.group(1)
+            content = m.group(2).strip()
+            if fname not in fields:
+                fields[fname] = content if content else "Teste automatizado"
         return fields
 
-    def _is_done(h):
+    # Palavras que indicam conclusão REAL (resposta já salva no LimeSurvey)
+    _TRULY_DONE = ["obrigado", "thank", "enviado", "survey complete", "salva com sucesso", "fechar esta guia"]
+    # "finaliz" sozinho é ambíguo — pode ser o botão "Finalizar" numa página de revisão
+
+    def _is_truly_done(h):
         low = h.lower()
-        return any(w in low for w in ["obrigado", "thank", "enviado", "survey complete", "finaliz",
-                                       "salva com sucesso", "fechar esta guia"])
+        return any(w in low for w in _TRULY_DONE)
+
+    def _is_done(h):
+        return _is_truly_done(h) or "finaliz" in h.lower()
 
     # 2. Se a página inicial não tem perguntas, fazer POST com move=start
     questions = _extract_questions(html)
@@ -628,8 +749,8 @@ def _limesurvey_submit(survey_id, cpf, responses=None):
         hidden = _extract_hidden(current_html)
         qs = _extract_questions(current_html)
 
-        if _is_done(current_html):
-            print(f"  LimeSurvey: submissão concluída (step {step})")
+        if _is_truly_done(current_html):
+            print(f"  LimeSurvey: submissão realmente concluída (step {step})")
             return True
 
         if not qs and step > 0:
@@ -639,25 +760,32 @@ def _limesurvey_submit(survey_id, cpf, responses=None):
 
         post_data = {}
         post_data.update(hidden)
+        post_data.pop("ajax", None)  # desabilitar modo AJAX para forçar submissão síncrona
         post_data.update({k: "A" for k in qs})
-        post_data["move"] = "movenext"
+        # Última página → usar movesubmit diretamente para garantir gravação
+        post_data["move"] = "movesubmit"
         post_data["sid"] = str(survey_id)
         post_data["lang"] = "pt"
 
-        print(f"  step {step}: POST com {len(qs)} perguntas, move=movenext")
-        resp = session.post(survey_url, data=post_data, timeout=20, allow_redirects=True)
-        print(f"  step {step} resposta: {resp.status_code} | len={len(resp.text)}")
+        print(f"  step {step}: POST com {len(qs)} perguntas, move=movesubmit | valores: {dict(list(qs.items())[:4])}")
+        resp = session.post(survey_url, data=post_data, timeout=20, allow_redirects=False)
+        redirect_url = resp.headers.get("Location", "")
+        print(f"  step {step} resposta: {resp.status_code} | Location: {redirect_url or 'N/A'}")
+        if redirect_url:
+            # Retorna o redirect_url para que o caller possa seguir com auth Mihmo
+            return redirect_url
         current_html = resp.text
 
         if _is_done(current_html):
-            # Verificar falso positivo: "finaliz" pode estar no botão Finalizar,
-            # não na mensagem de conclusão. Se ainda há perguntas, enviar movesubmit.
-            qs_final = _extract_questions(current_html)
-            if qs_final:
-                print(f"  _is_done falso positivo (botão Finalizar) — enviando movesubmit com {len(qs_final)} perguntas...")
+            # Se ainda não é "truly done" (só tem botão Finalizar / página de revisão),
+            # enviar movesubmit independente de ter ou não perguntas visíveis.
+            if not _is_truly_done(current_html):
+                qs_final = _extract_questions(current_html)
+                print(f"  Página de revisão detectada (botão Finalizar) — enviando movesubmit com {len(qs_final)} perguntas...")
                 submit_data = {}
                 submit_data.update(_extract_hidden(current_html))
-                submit_data.update({k: "A" for k in qs_final})
+                if qs_final:
+                    submit_data.update({k: "A" for k in qs_final})
                 submit_data["move"] = "movesubmit"
                 submit_data["sid"] = str(survey_id)
                 submit_data["lang"] = "pt"
@@ -669,11 +797,11 @@ def _limesurvey_submit(survey_id, cpf, responses=None):
             _re_survey = _re.search(r"clinical-record/survey/(\d+)", current_html)
             if not _re_survey:
                 _re_survey = _re.search(r"clinical-record/survey/(\d+)", str(survey_id))
-            notify_url = f"https://homolog.mihmo.com.br/backend-nest/clinical-record/survey/{survey_id}"
-            print(f"  Notificando Mihmo: GET {notify_url}")
+            notify_url = f"https://homolog.mihmo.com.br/backend-nest/limesurveyintegration/integrate-responses/clinical-record"
+            print(f"  Notificando Mihmo (limesurveyintegration): POST {notify_url}")
             try:
-                notify_resp = requests.get(notify_url, timeout=10)
-                print(f"  Notificação Mihmo: {notify_resp.status_code} | {notify_resp.text[:200]}")
+                notify_resp = requests.post(notify_url, json={"surveyId": survey_id}, timeout=15)
+                print(f"  limesurveyintegration: {notify_resp.status_code} | {notify_resp.text[:200]}")
             except Exception as e:
                 print(f"  Notificação Mihmo erro: {e}")
             return True
@@ -682,36 +810,100 @@ def _limesurvey_submit(survey_id, cpf, responses=None):
     return None
 
 
+def _notificar_mihmo_survey(api_url, survey_id, token=None):
+    """Integra respostas do LimeSurvey via POST limesurveyintegration/integrate-responses/clinical-record."""
+    base = api_url.rsplit('/backend-nest', 1)[0]
+    headers = {"Content-Type": "application/json"}
+    if token:
+        headers["Authorization"] = f"Bearer {token}"
+
+    # Endpoint correto para integração de clinical-record
+    url = f"{base}/backend-nest/limesurveyintegration/integrate-responses/clinical-record"
+    try:
+        resp = requests.post(url, json={"surveyId": survey_id}, headers=headers, timeout=15)
+        print(f"  limesurvey integrate-responses/clinical-record: {resp.status_code} | {resp.text[:300]}")
+        if resp.status_code in (200, 201) and resp.text.strip().startswith("{"):
+            data = resp.json()
+            return data.get("integrated", 0)
+        return 0
+    except Exception as e:
+        print(f"  integrate-responses/clinical-record erro: {e}")
+        return 0
+
+
 def criar_ficha_clinica(api_url, token, customer_id, attendance_id, cpf=None):
     """Cria a Ficha de HOMOLOG e submete o LimeSurvey automaticamente."""
     url = f"{api_url}/clinical-record"
     headers = {"Authorization": f"Bearer {token}", "Content-Type": "application/json"}
+    # Buscar versão anterior para usar como previousVersionId
+    base_url = api_url.rsplit('/backend-nest', 1)[0]
+    stepper_url = f"{base_url}/backend-nest/clinical-record/scheduled-attendance/{attendance_id}/stepper?page=1&pageSize=1"
+    stepper_resp = requests.get(stepper_url, headers=headers)
+    previous_version_id = None
+    print(f"  stepper: {stepper_resp.status_code} | {stepper_resp.text[:300]}")
+    if stepper_resp.status_code == 200:
+        items = stepper_resp.json().get("items", [])
+        if items:
+            previous_version_id = items[0].get("id")
+            print(f"  previousVersionId encontrado: {previous_version_id}")
+
     payload = {
         "typeId": FICHA_HOMOLOG_TYPE_ID,
         "customerId": customer_id,
         "scheduledAttendanceId": attendance_id
     }
+    if previous_version_id:
+        payload["previousVersionId"] = previous_version_id
+
     response = requests.post(url, json=payload, headers=headers)
-    print(f"Ficha clínica: {response.status_code} | {response.text[:300]}")
+    print(f"Ficha clínica: {response.status_code} | {response.text}")
     if response.status_code not in (200, 201):
         print(f"Aviso: Ficha clínica retornou {response.status_code} — pode já existir.")
         return response.status_code
 
     # Extrair surveyId e link do LimeSurvey
     ficha_data = safe_json(response)
-    if ficha_data:
-        survey_link = ficha_data.get("link", "")
-        print(f"  survey_link: {survey_link}")
-        # Tentar submeter via RemoteControl2
-        survey_id_str = survey_link.split("/")[-1].split("?")[0] if survey_link else None
-        if survey_id_str and survey_id_str.isdigit():
-            survey_id = int(survey_id_str)
-            print(f"  Tentando submeter LimeSurvey survey {survey_id} para CPF {cpf}...")
-            result = _limesurvey_submit(survey_id, cpf)
-            print(f"  LimeSurvey submit result: {result}")
-            # Aguardar integração
-            time.sleep(3)
+    if not ficha_data:
+        return response.status_code
 
+    # GET no clinical record para ver todos os campos (especialmente token de participante)
+    ficha_id = ficha_data.get("id")
+    if ficha_id:
+        get_resp = requests.get(f"{api_url}/clinical-record/{ficha_id}", headers=headers)
+        print(f"  GET clinical-record/{ficha_id}: {get_resp.status_code} | {get_resp.text}")
+
+    survey_link = ficha_data.get("link", "")
+    print(f"  survey_link: {survey_link}")
+    survey_id_str = survey_link.split("/")[-1].split("?")[0] if survey_link else None
+    if not (survey_id_str and survey_id_str.isdigit()):
+        return response.status_code
+
+    survey_id = int(survey_id_str)
+
+    # Playwright: submeter formulário com sessão real do Mihmo
+    print(f"  Submetendo Ficha de HOMOLOG via Playwright...")
+    try:
+        pw_ok = _submeter_ficha_playwright(survey_link, token, cpf, api_url)
+        print(f"  Playwright result: {pw_ok}")
+    except Exception as e:
+        print(f"  Playwright erro: {e}")
+        pw_ok = False
+
+    # Verificar se o Playwright já integrou (canProceed/answers)
+    time.sleep(3)
+
+    # Verificar se integrou
+    if ficha_id:
+        cr_resp = requests.get(f"{api_url}/clinical-record/{ficha_id}", headers=headers)
+        cr_data = cr_resp.json() if cr_resp.status_code == 200 else {}
+        answers = cr_data.get("answers", [])
+        can_proceed = cr_data.get("canProceed", False)
+        print(f"  clinical-record pós-Playwright: answers={len(answers)}, canProceed={can_proceed}")
+        if answers or can_proceed:
+            print(f"  Ficha integrada com sucesso!")
+            return response.status_code
+
+    print(f"  AVISO: Ficha não integrada — check-clinical-record pode retornar allow:false")
     return response.status_code
 
 
@@ -721,7 +913,7 @@ def patch_validate_data(api_url, token, pericia_id, start_date, cid, days, **kwa
     responder 2xx, ou None se nenhum funcionar (fluxo continuará sem o PATCH).
     """
     headers = {"Authorization": f"Bearer {token}", "Content-Type": "application/json"}
-    payload = {"startDate": start_date, "cid": "", "days": int(days)}
+    payload = {"startDate": start_date, "cid": cid or "", "days": int(days)}
 
     base = api_url if api_url.endswith('/backend-nest') \
         else api_url.rsplit('/backend-nest', 1)[0] + '/backend-nest'
@@ -1066,18 +1258,20 @@ def gerar_memed_file_mihmo(api_url, token, attendance_id, pericia_id,
     base = api_url.rsplit('/backend-nest', 1)[0]
     url = f"{base}/backend-nest/memed/generate-memed-file"
     headers = {"Authorization": f"Bearer {token}", "Content-Type": "application/json"}
+    # startDate must be ISO date-time per Swagger schema
+    start_dt = start_date if "T" in str(start_date) else f"{start_date}T00:00:00.000Z"
     payload = {
         "scheduledAttendanceId": attendance_id,
         "medicalExpertReportRequestId": pericia_id,
         "type": "MedicalExpertReportRequest",
-        "registrationId": registration_id,
         "memedFileId": memed_file_id,
         "token": memed_token,
+        "medicalBoardIds": [],          # required by Swagger — empty for non-junta
+        "registrationId": registration_id,
         "status": "Accepted",
         "days": int(days),
         "cid": cid,
-        "startDate": start_date,
-        "calculateEndDate": calculate_end_date,
+        "startDate": start_dt,
         "observations": observations,
     }
     if article_id:
@@ -1087,7 +1281,17 @@ def gerar_memed_file_mihmo(api_url, token, attendance_id, pericia_id,
     ccr_url = f"{att_base2}/attendance/api/scheduled-attendance/check-clinical-record/{attendance_id}"
     ccr_resp = requests.get(ccr_url, headers=headers, timeout=10)
     print(f"check-clinical-record: {ccr_resp.status_code} | {ccr_resp.text[:300]}")
-
+    try:
+        ccr_data = ccr_resp.json()
+        if not ccr_data.get("allow", True):
+            raise Exception(
+                f"check-clinical-record: allow=false — ficha clínica não integrada. "
+                f"Mensagem: {ccr_data.get('message', '')} | Título: {ccr_data.get('title', '')}"
+            )
+    except Exception as e:
+        if "allow=false" in str(e):
+            raise
+        print(f"  check-clinical-record parse warning: {e}")
 
     print(f"generate-memed-file payload: {json.dumps(payload, indent=2)}")
     response = requests.post(url, json=payload, headers=headers)
