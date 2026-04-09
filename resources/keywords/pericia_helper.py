@@ -8,6 +8,7 @@ import base64
 from datetime import datetime, timedelta
 
 
+# Artigos para serviços de licença médica (LTS, LTF, LTS_INSS)
 PMV_ARTICLES_LTS = [
     {"id": "89d556e7-edb3-4862-9888-765de680f28e", "article": "Acidente de Trabalho - 15 Dias", "applicableCategories": ["101","306","410","302","771"], "medicalBoard": False},
     {"id": "592f16be-8304-49db-9d87-c20bb76f1c8e", "article": "Licença Médica - CLT/CTD/CC/CONSELHO TUTELAR", "applicableCategories": ["101","306","302","771"], "medicalBoard": False},
@@ -15,6 +16,13 @@ PMV_ARTICLES_LTS = [
     {"id": "232cce2b-1f07-4447-bf21-364556770d37", "article": "Auxílio Doença Administrativo - ACIDENTE DE TRABALHO", "applicableCategories": ["301","101","306","410","302","771"], "medicalBoard": False},
     {"id": "7e4757a6-f056-4396-96f5-529f66a5700f", "article": "T89-REGISTRO DE ACIDENTE DE TRABALHO - SEM AFASTAMENTO", "applicableCategories": ["301","101","306","410","302","771"], "medicalBoard": False},
 ]
+
+# Tipos de serviço que usam PMV_ARTICLES_LTS (hardcoded — API pode retornar artigos obsoletos)
+PMV_SERVICE_TYPES_LTS = {
+    "HealthCareLicense",
+    "FamilyPersonTreatmentLicense",
+    "HealthCareLicenseInss",
+}
 
 def _jwt_user_id(token):
     """Extrai user_id do payload JWT sem verificar assinatura."""
@@ -32,11 +40,15 @@ _customer_regra = {}
 
 # Credenciais para auto-login Firebase (não precisam de atualização manual)
 CREDENTIALS = {
-    "CLINICA":         {"email": "gestormihmo@mihmo.com.br",   "password": "REMOVIDO"},
-    "Clínico Geral":   {"email": "clinicogeral1@mihmo.com.br", "password": "REMOVIDO"},
-    "Médico Trabalho": {"email": "SEU_EMAIL_MEDICO_TRABALHO",  "password": "REMOVIDO"},
-    "Ortopedista":     {"email": "SEU_EMAIL_ORTOPEDISTA",      "password": "REMOVIDO"},
-    "Psiquiatra":      {"email": "SEU_EMAIL_PSIQUIATRA",       "password": "REMOVIDO"},
+    "CLINICA":             {"email": "gestormihmo@mihmo.com.br",      "password": "REMOVIDO"},
+    "Clínico Geral":       {"email": "clinicogeral1@mihmo.com.br",    "password": "REMOVIDO"},
+    "Clínico Geral 2":     {"email": "clinicogeral2@mihmo.com.br",    "password": "REMOVIDO"},
+    "Médico Trabalho":     {"email": "medicopmv@mihmo.com.br",        "password": "REMOVIDO"},
+    "Ortopedista":         {"email": "ortopedista1@mihmo.com.br",     "password": "REMOVIDO"},
+    "Psiquiatra":          {"email": "psiquiatra1@mihmo.com.br",      "password": "REMOVIDO"},
+    "Assistente Social":   {"email": "assistente.social@mihmo.com.br","password": "REMOVIDO"},
+    "Psicólogo":           {"email": "psicologo@mihmo.com.br",        "password": "REMOVIDO"},
+    "Enfermeiro":          {"email": "teste@mihmo.com.br",            "password": "REMOVIDO"},
 }
 
 FIREBASE_AUTH_URL = (
@@ -153,6 +165,7 @@ def salvar_massa(regra, customer_id, cpf, nome):
         "role": None,
         "is_junta": False,
         "matricula": None,
+        "service_type": None,
         "data_criacao": datetime.now().strftime("%Y-%m-%d %H:%M:%S")
     }
     os.makedirs(os.path.dirname(MASSA_FILE), exist_ok=True)
@@ -235,6 +248,7 @@ def criar_pericia_api(api_url, token, customer_id, cpf, cellphone, email,
                 dados[regra]["cid"] = cid
                 dados[regra]["days"] = int(days)
                 dados[regra]["start_date"] = start_date
+                dados[regra]["service_type"] = tipo
                 try:
                     resp_json = safe_json(response)
                     print(f"criar_pericia resposta keys: {list(resp_json.keys())}")
@@ -826,6 +840,23 @@ def _notificar_mihmo_survey(api_url, survey_id, token=None):
         return 0
 
 
+def _verificar_ficha_integrada(base_url, token, attendance_id):
+    """Verifica se a ficha clínica está integrada via check-clinical-record.
+    Retorna True se allow=True (ou se não for possível determinar)."""
+    headers = {"Authorization": f"Bearer {token}", "Content-Type": "application/json"}
+    ccr_url = f"{base_url}/attendance/api/scheduled-attendance/check-clinical-record/{attendance_id}"
+    try:
+        ccr_resp = requests.get(ccr_url, headers=headers, timeout=10)
+        print(f"_verificar_ficha_integrada: {ccr_resp.status_code} | {ccr_resp.text[:300]}")
+        if ccr_resp.status_code == 200:
+            ccr_data = ccr_resp.json()
+            return ccr_data.get("allow", True)
+        return True  # se endpoint não retornou 200, assume OK
+    except Exception as e:
+        print(f"  _verificar_ficha_integrada parse warning: {e}")
+        return True  # em caso de erro de parse, assume OK
+
+
 def criar_ficha_clinica(api_url, token, customer_id, attendance_id, cpf=None):
     """Cria a Ficha de HOMOLOG e submete o LimeSurvey automaticamente."""
     url = f"{api_url}/clinical-record"
@@ -1107,31 +1138,55 @@ def obter_memed_token(api_url, token, squad_user_id):
     return memed_token
 
 
-def obter_primeiro_artigo(api_url, token, pericia_id, attendance_id=None, cid=None, category=None, is_junta=False, functional_registration=None):
-    """Retorna (article_id, article_name) do primeiro artigo aplicável para a perícia."""
+def obter_primeiro_artigo(api_url, token, pericia_id, attendance_id=None, cid=None, category=None, is_junta=False, functional_registration=None, service_type=None):
+    """Retorna (article_id, article_name) do primeiro artigo aplicável para a perícia.
+    - Para tipos LTS/LTF/LTS_INSS usa PMV_ARTICLES_LTS (hardcoded, API pode retornar obsoletos).
+    - Para outros tipos usa a API e retorna o primeiro artigo válido.
+    """
     base = api_url if api_url.endswith('/backend-nest') \
         else api_url.rsplit('/backend-nest', 1)[0] + '/backend-nest'
     headers = {"Authorization": f"Bearer {token}"}
-    candidates_urls = []
-    if functional_registration:
+
+    # Para tipos de licença médica, usar lista hardcoded (API retorna artigos obsoletos)
+    if service_type in PMV_SERVICE_TYPES_LTS or service_type is None:
+        print(f"Usando PMV_ARTICLES_LTS como fonte autoritativa de artigos (service_type={service_type}).")
+        items = PMV_ARTICLES_LTS
+    else:
+        # Para outros tipos (Consulta, Admissional, Acidente, etc.) consultar a API
+        print(f"Consultando API de artigos para service_type={service_type}...")
+        items = None
+        candidates_urls = []
+        if functional_registration:
+            candidates_urls += [
+                f"{base}/medical-expert-report-request/article/{pericia_id}/{functional_registration}/Accepted",
+                f"{base}/medical-expert-report-request/article/{pericia_id}/{functional_registration}",
+            ]
         candidates_urls += [
-            f"{base}/medical-expert-report-request/article/{pericia_id}/{functional_registration}/Accepted",
-            f"{base}/medical-expert-report-request/article/{pericia_id}/{functional_registration}",
+            f"{base}/medical-expert-report-request/article/{pericia_id}/Accepted",
+            f"{base}/medical-expert-report-request/article/{pericia_id}",
         ]
-    candidates_urls += [
-        f"{base}/medical-expert-report-request/article/{pericia_id}/Accepted",
-        f"{base}/medical-expert-report-request/article/{pericia_id}",
-    ]
-    if attendance_id:
-        candidates_urls += [
-            f"{base}/medical-expert-report-request/article/{attendance_id}/Accepted",
-            f"{base}/medical-expert-report-request/article/{attendance_id}",
-        ]
-    print("Usando PMV_ARTICLES_LTS como fonte autoritativa de artigos.")
-    items = PMV_ARTICLES_LTS
+        if attendance_id:
+            candidates_urls += [
+                f"{base}/medical-expert-report-request/article/{attendance_id}/Accepted",
+                f"{base}/medical-expert-report-request/article/{attendance_id}",
+            ]
+        for url in candidates_urls:
+            try:
+                resp = requests.get(url, headers=headers, timeout=10)
+                print(f"  GET {url}: {resp.status_code}")
+                if resp.status_code == 200:
+                    data = safe_json(resp)
+                    raw = data if isinstance(data, list) else (data or {}).get("items", [])
+                    if raw:
+                        items = raw
+                        break
+            except Exception as e:
+                print(f"  Erro ao consultar {url}: {e}")
+        if not items:
+            print("  API não retornou artigos — usando PMV_ARTICLES_LTS como fallback.")
+            items = PMV_ARTICLES_LTS
 
     filtered = [a for a in items if a.get("medicalBoard", False) == is_junta]
-
     if category:
         by_cat = [a for a in filtered if category in (a.get("applicableCategories") or [])]
         if by_cat:
@@ -1380,6 +1435,7 @@ def homologar_pericia(api_url, token, regra):
     cpf           = entrada.get("cpf")
     category      = entrada.get("employmentCategory")
     start_date    = entrada.get("start_date") or gerar_data_hoje()
+    service_type  = entrada.get("service_type")
     observations  = "Teste automatizado"
 
     if not all([pericia_id, attendance_id, cid, days, customer_id]):
@@ -1402,6 +1458,20 @@ def homologar_pericia(api_url, token, regra):
     # Re-fetch após iniciar para pegar token Memed se disponível
     _, memed_token_attendance = obter_squad_user_do_attendance(base_url, token_medico, attendance_id)
     criar_ficha_clinica(api_url, token_medico, customer_id, attendance_id, cpf=cpf)
+
+    # Verificar se a ficha clínica integrou — retry automático se allow=false (máx 2 tentativas)
+    _check_base = api_url.rsplit('/backend-nest', 1)[0]
+    for _tentativa in range(1, 3):
+        if _verificar_ficha_integrada(_check_base, token_medico, attendance_id):
+            print(f"  Ficha clínica integrada OK (tentativa {_tentativa})")
+            break
+        print(f"  Ficha não integrada (tentativa {_tentativa}/2) — aguardando e re-submetendo...")
+        time.sleep(5)
+        criar_ficha_clinica(api_url, token_medico, customer_id, attendance_id, cpf=cpf)
+        time.sleep(5)
+    else:
+        print("  AVISO: Ficha pode não ter integrado após 2 tentativas — prosseguindo (generate-memed-file vai confirmar)")
+
     pericia_data = patch_validate_data(
         api_url, token_medico, pericia_id, start_date, cid, days,
         attendance_id=attendance_id
@@ -1445,7 +1515,8 @@ def homologar_pericia(api_url, token, regra):
     article_id, article_name = obter_primeiro_artigo(
         api_url, token_medico, pericia_id,
         attendance_id=attendance_id, cid=cid, category=category,
-        is_junta=is_junta, functional_registration=functional_registration
+        is_junta=is_junta, functional_registration=functional_registration,
+        service_type=service_type
     )
 
     # 4.5 eligibility-check — valida dados e habilita DataValideted no backend
