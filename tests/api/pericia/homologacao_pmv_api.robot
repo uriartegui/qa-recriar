@@ -79,21 +79,21 @@ LTS - 60 Dias - CID Geral - Deve ir para Junta Medica
 # LTS — CID F
 # ══════════════════════════════════════════════════════════
 
-LTS - 4 Dias - CID F - Deve ir para Clinico Geral
+LTS - 4 Dias - CID F - Deve ir para Psiquiatra
     [Tags]    homolog    api    pmv    lts    lts_psiquiatria
-    Homologar Regra API    LTS_4DIAS_PSIQ    Clínico Geral
+    Homologar Regra API    LTS_4DIAS_PSIQ    Psiquiatra
 
-LTS - 29 Dias - CID F - Deve ir para Clinico Geral
+LTS - 29 Dias - CID F - Deve ir para Psiquiatra
     [Tags]    homolog    api    pmv    lts    lts_psiquiatria
-    Homologar Regra API    LTS_29DIAS_PSIQ    Clínico Geral
+    Homologar Regra API    LTS_29DIAS_PSIQ    Psiquiatra
 
-LTS - 30 Dias - CID F - Deve ir para Clinico Geral
+LTS - 30 Dias - CID F - Deve ir para Psiquiatra
     [Tags]    homolog    api    pmv    lts    lts_psiquiatria
-    Homologar Regra API    LTS_30DIAS_PSIQ    Clínico Geral
+    Homologar Regra API    LTS_30DIAS_PSIQ    Psiquiatra
 
-LTS - 59 Dias - CID F - Deve ir para Clinico Geral
+LTS - 59 Dias - CID F - Deve ir para Psiquiatra
     [Tags]    homolog    api    pmv    lts    lts_psiquiatria
-    Homologar Regra API    LTS_59DIAS_PSIQ    Clínico Geral
+    Homologar Regra API    LTS_59DIAS_PSIQ    Psiquiatra
 
 LTS - 60 Dias - CID F - Deve ir para Junta Psiquiatra
     [Tags]    homolog    api    pmv    lts    lts_psiquiatria    junta
@@ -103,13 +103,13 @@ LTS - 60 Dias - CID F - Deve ir para Junta Psiquiatra
 # LTS — CID M,S
 # ══════════════════════════════════════════════════════════
 
-LTS - 4 Dias - CID MS - Deve ir para Clinico Geral
+LTS - 4 Dias - CID MS - Deve ir para Ortopedista
     [Tags]    homolog    api    pmv    lts    lts_ortopedia
-    Homologar Regra API    LTS_4DIAS_ORTOP    Clínico Geral
+    Homologar Regra API    LTS_4DIAS_ORTOP    Ortopedista
 
-LTS - 14 Dias - CID MS - Deve ir para Clinico Geral
+LTS - 14 Dias - CID MS - Deve ir para Ortopedista
     [Tags]    homolog    api    pmv    lts    lts_ortopedia
-    Homologar Regra API    LTS_14DIAS_ORTOP    Clínico Geral
+    Homologar Regra API    LTS_14DIAS_ORTOP    Ortopedista
 
 LTS - 15 Dias - CID MS - Deve ir para Ortopedista
     [Tags]    homolog    api    pmv    lts    lts_ortopedia

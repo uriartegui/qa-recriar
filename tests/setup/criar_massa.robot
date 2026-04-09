@@ -116,11 +116,10 @@ LTS - 61 Dias - CID Geral - Junta Medica Clinico Geral
 
 # ══════════════════════════════════════════════════════════
 # LTS — CID F (Psiquiatria)
-# Regras: 4-29d → Clínico Geral | 30-59d → Clínico Geral
-#         60+d → Junta/Psiquiatra+Clínico Geral
+# Regras: 4-59d → Psiquiatra | 60+d → Junta/Psiquiatra+Clínico Geral
 # ══════════════════════════════════════════════════════════
 
-LTS - 4 Dias - CID F - Inicio Clinico Geral
+LTS - 4 Dias - CID F - Inicio Psiquiatra
     [Tags]    setup    pmv    lts    lts_psiquiatria    borda
     ${token}=    Autenticar No Mihmo
     ${id}    ${cpf}    ${nome}=    Criar Customer
@@ -131,7 +130,7 @@ LTS - 4 Dias - CID F - Inicio Clinico Geral
     ...    ${DATA_HOJE}    4    ${LTS}    ${CID_PSIQ}    ${FIXTURE}
     Should Be True    ${status} < 300    API retornou ${status}: ${body}
 
-LTS - 29 Dias - CID F - Limite Faixa 4-30
+LTS - 29 Dias - CID F - Limite Psiquiatra Antes Junta
     [Tags]    setup    pmv    lts    lts_psiquiatria    borda
     ${token}=    Autenticar No Mihmo
     ${id}    ${cpf}    ${nome}=    Criar Customer
@@ -142,7 +141,7 @@ LTS - 29 Dias - CID F - Limite Faixa 4-30
     ...    ${DATA_HOJE}    29    ${LTS}    ${CID_PSIQ}    ${FIXTURE}
     Should Be True    ${status} < 300    API retornou ${status}: ${body}
 
-LTS - 30 Dias - CID F - Inicio Faixa 30-59
+LTS - 30 Dias - CID F - Inicio Psiquiatra
     [Tags]    setup    pmv    lts    lts_psiquiatria    borda
     ${token}=    Autenticar No Mihmo
     ${id}    ${cpf}    ${nome}=    Criar Customer
@@ -153,7 +152,7 @@ LTS - 30 Dias - CID F - Inicio Faixa 30-59
     ...    ${DATA_HOJE}    30    ${LTS}    ${CID_PSIQ}    ${FIXTURE}
     Should Be True    ${status} < 300    API retornou ${status}: ${body}
 
-LTS - 59 Dias - CID F - Limite Antes Junta
+LTS - 59 Dias - CID F - Limite Psiquiatra Antes Junta
     [Tags]    setup    pmv    lts    lts_psiquiatria    borda
     ${token}=    Autenticar No Mihmo
     ${id}    ${cpf}    ${nome}=    Criar Customer
@@ -177,11 +176,11 @@ LTS - 61 Dias - CID F - Junta Medica Psiquiatra e Clinico Geral
 
 # ══════════════════════════════════════════════════════════
 # LTS — CID M e S (Ortopedia)
-# Regras: 4-14d → Clínico Geral | 15-59d → Ortopedista
+# Regras: 4-14d → Ortopedista | 15-59d → Ortopedista
 #         60+d → Junta/Ortopedista+Clínico Geral
 # ══════════════════════════════════════════════════════════
 
-LTS - 4 Dias - CID M S - Inicio Clinico Geral
+LTS - 4 Dias - CID M S - Inicio Ortopedista
     [Tags]    setup    pmv    lts    lts_ortopedia    borda
     ${token}=    Autenticar No Mihmo
     ${id}    ${cpf}    ${nome}=    Criar Customer
@@ -192,7 +191,7 @@ LTS - 4 Dias - CID M S - Inicio Clinico Geral
     ...    ${DATA_HOJE}    4    ${LTS}    ${CID_ORTOPEDIA}    ${FIXTURE}
     Should Be True    ${status} < 300    API retornou ${status}: ${body}
 
-LTS - 14 Dias - CID M S - Limite Faixa 4-14 Clinico Geral
+LTS - 14 Dias - CID M S - Limite Faixa 4-14 Ortopedista
     [Tags]    setup    pmv    lts    lts_ortopedia    borda
     ${token}=    Autenticar No Mihmo
     ${id}    ${cpf}    ${nome}=    Criar Customer
