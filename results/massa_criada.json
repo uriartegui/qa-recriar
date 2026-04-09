@@ -1,17 +1,17 @@
 {
   "LTS_14DIAS_GERAL": {
-    "customer_id": "fc793c8b-d968-4609-a2d0-95972ea7aa01",
-    "cpf": "95857718619",
-    "nome": "TESTE_LTS_14DIAS_GERAL_20260408_BSN0",
+    "customer_id": "1ff9ccb4-2fdb-44c2-8ca5-3e0ea2fcec21",
+    "cpf": "84547979391",
+    "nome": "TESTE_LTS_14DIAS_GERAL_20260409_U98W",
     "cid": "J00",
     "days": 14,
-    "start_date": "2026-04-08",
-    "attendance_id": "327336cf-89ce-4ef9-98fa-64d790aa5d90",
+    "start_date": "2026-04-09",
+    "attendance_id": "d6e84ae9-c397-4baa-be5c-2fba91738caf",
     "role": "Clínico Geral",
     "is_junta": false,
-    "matricula": "35430",
-    "data_criacao": "2026-04-08 15:52:57",
-    "pericia_id": "2cba86b4-ac41-4c71-ad80-2137835e84f7",
+    "matricula": "77400",
+    "data_criacao": "2026-04-09 15:20:08",
+    "pericia_id": "df546ca6-452a-4a86-85b3-1a5756a1bfe0",
     "registration_id": null
   }
 }

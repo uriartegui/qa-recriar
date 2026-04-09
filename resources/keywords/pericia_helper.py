@@ -9,17 +9,12 @@ from datetime import datetime, timedelta
 
 
 PMV_ARTICLES_LTS = [
-    {"id": "6a1ee0cf-49b5-4c37-ac48-03b6a87fecc6", "article": "Licença para Tratamento de Saúde - ARTIGO 92", "applicableCategories": ["301"], "medicalBoard": False},
-    {"id": "262c9513-dba2-4dcf-826b-b13a80874dc1", "article": "Licença Tratamento de Saúde - ARTIGO 91", "applicableCategories": ["301"], "medicalBoard": False},
-    {"id": "8df9d57e-b94e-4177-8cc1-b5c8b6280697", "article": "Acidente de Trabalho - ARTIGO 97", "applicableCategories": ["301"], "medicalBoard": False},
+    {"id": "89d556e7-edb3-4862-9888-765de680f28e", "article": "Acidente de Trabalho - 15 Dias", "applicableCategories": ["101","306","410","302","771"], "medicalBoard": False},
+    {"id": "592f16be-8304-49db-9d87-c20bb76f1c8e", "article": "Licença Médica - CLT/CTD/CC/CONSELHO TUTELAR", "applicableCategories": ["101","306","302","771"], "medicalBoard": False},
     {"id": "e5ff7f0c-9585-4bb5-84e2-8048fb7f111f", "article": "Auxílio Doença Administrativo", "applicableCategories": ["301","101","306","410","302","771"], "medicalBoard": False},
     {"id": "232cce2b-1f07-4447-bf21-364556770d37", "article": "Auxílio Doença Administrativo - ACIDENTE DE TRABALHO", "applicableCategories": ["301","101","306","410","302","771"], "medicalBoard": False},
-    {"id": "7e4757a6-f056-4396-96f5-529f66a5700f", "article": "T89-REGISTRO DE ACIDENTE DE TRABALHO - SEM AFASTAMENTO", "applicableCategories": ["410","301","101","306","302","771"], "medicalBoard": False},
-    {"id": "9b1ed97e-f4ea-41dc-a74b-6bba81dbd677", "article": "Junta Médica - ARTIGO 91", "applicableCategories": ["301"], "medicalBoard": True},
-    {"id": "dae57233-a18d-4c4b-b87c-36bb353ac70c", "article": "Junta Médica - ARTIGO 92", "applicableCategories": ["301"], "medicalBoard": True},
-    {"id": "942bae7e-0869-41d8-97b6-3650ec502b11", "article": "Junta Médica - ACIDENTE TRABALHO", "applicableCategories": ["301"], "medicalBoard": True},
+    {"id": "7e4757a6-f056-4396-96f5-529f66a5700f", "article": "T89-REGISTRO DE ACIDENTE DE TRABALHO - SEM AFASTAMENTO", "applicableCategories": ["301","101","306","410","302","771"], "medicalBoard": False},
 ]
-
 
 def _jwt_user_id(token):
     """Extrai user_id do payload JWT sem verificar assinatura."""
@@ -1132,23 +1127,11 @@ def obter_primeiro_artigo(api_url, token, pericia_id, attendance_id=None, cid=No
             f"{base}/medical-expert-report-request/article/{attendance_id}/Accepted",
             f"{base}/medical-expert-report-request/article/{attendance_id}",
         ]
-    items = []
-    for url in candidates_urls:
-        print(f"Buscando artigos: GET {url}")
-        resp = requests.get(url, headers=headers)
-        print(f"  status: {resp.status_code}")
-        if resp.status_code == 200:
-            try:
-                data = resp.json()
-                items = data if isinstance(data, list) else (data.get("items") or data.get("data") or [])
-                if items:
-                    break
-            except Exception:
-                continue
-    if not items:
-        print("AVISO: API não retornou artigos — usando fallback PMV_ARTICLES_LTS.")
-        items = PMV_ARTICLES_LTS
+    print("Usando PMV_ARTICLES_LTS como fonte autoritativa de artigos.")
+    items = PMV_ARTICLES_LTS
+
     filtered = [a for a in items if a.get("medicalBoard", False) == is_junta]
+
     if category:
         by_cat = [a for a in filtered if category in (a.get("applicableCategories") or [])]
         if by_cat:
@@ -1247,6 +1230,41 @@ def criar_prescricao_memed(memed_token, customer_id, customer_name, cpf,
     print(f"  memedFileId convertido: {memed_file_id} (tipo: {type(memed_file_id).__name__})")
     return memed_file_id
 
+
+def emitir_certificado_memed(api_url, token_medico, pericia_id, memed_file_id, memed_token):
+    """Gera o PDF da prescrição no Memed via GET /v1/prescricoes/pdf/{id}?printConfig=...
+    Este passo é obrigatório antes de chamar generate-memed-file."""
+    import urllib.parse
+    import json as _json
+
+    today_br = datetime.now().strftime("%d/%m/%Y")
+    print_config = {
+        "simple": {
+            "all": {
+                "print": True,
+                "showDate": True,
+                "isToHideActiveIngredient": False,
+                "copies": {today_br: 1}
+            }
+        }
+    }
+    print_config_encoded = urllib.parse.quote(_json.dumps(print_config, separators=(',', ':')), safe='')
+    ts = int(time.time() * 1000)
+    url = (
+        f"https://api.memed.com.br/v1/prescricoes/pdf/{memed_file_id}"
+        f"?printConfig={print_config_encoded}&signed=false&reprint=false&print=false&_={ts}"
+    )
+    headers = {
+        "Authorization": f"Bearer {memed_token}",
+        "Accept": "application/vnd.api+json"
+    }
+    response = requests.get(url, headers=headers, timeout=30)
+    print(f"memed printConfig (gerar PDF): {response.status_code} | {response.text[:200]}")
+    if response.status_code not in (200, 201):
+        print(f"AVISO: memed printConfig retornou {response.status_code} — continuando mesmo assim")
+    return response.status_code
+
+
 def gerar_memed_file_mihmo(api_url, token, attendance_id, pericia_id,
                             registration_id, memed_file_id, memed_token,
                             days, cid, start_date, observations, article_id):
@@ -1258,22 +1276,23 @@ def gerar_memed_file_mihmo(api_url, token, attendance_id, pericia_id,
     base = api_url.rsplit('/backend-nest', 1)[0]
     url = f"{base}/backend-nest/memed/generate-memed-file"
     headers = {"Authorization": f"Bearer {token}", "Content-Type": "application/json"}
-    # startDate must be ISO date-time per Swagger schema
-    start_dt = start_date if "T" in str(start_date) else f"{start_date}T00:00:00.000Z"
+    # startDate: apenas a data (YYYY-MM-DD), calculateEndDate: DD/MM/YYYY (igual ao payload manual)
+    start_dt = start_date.split("T")[0] if "T" in str(start_date) else start_date
     payload = {
         "scheduledAttendanceId": attendance_id,
         "medicalExpertReportRequestId": pericia_id,
         "type": "MedicalExpertReportRequest",
+        "registrationId": registration_id,
         "memedFileId": memed_file_id,
         "token": memed_token,
-        "medicalBoardIds": [],          # required by Swagger — empty for non-junta
-        "registrationId": registration_id,
         "status": "Accepted",
         "days": int(days),
         "cid": cid,
         "startDate": start_dt,
+        "calculateEndDate": calculate_end_date,
         "observations": observations,
     }
+
     if article_id:
         payload["articleId"] = article_id
     # Verificar check-clinical-record antes de enviar
@@ -1300,6 +1319,15 @@ def gerar_memed_file_mihmo(api_url, token, attendance_id, pericia_id,
         raise Exception(f"Erro generate-memed-file: {response.status_code} - {response.text}")
     status = safe_json(response).get("status", "")
     print(f"Homologação concluída. Status: {status}")
+
+    # 8. Finaliza o atendimento (queue → realized/Finalizado)
+    base2 = api_url.rsplit('/backend-nest', 1)[0]
+    finish_url = f"{base2}/attendance/api/scheduled-attendance/{attendance_id}/finish"
+    finish_resp = requests.post(finish_url, json={"id": attendance_id}, headers=headers, timeout=15)
+    print(f"finish attendance: {finish_resp.status_code} | {finish_resp.text[:200]}")
+    if finish_resp.status_code not in (200, 201):
+        print(f"AVISO: finish retornou {finish_resp.status_code} — seguindo mesmo assim")
+
     return status
 
 
@@ -1430,7 +1458,11 @@ def homologar_pericia(api_url, token, regra):
     )
 
     # 5. Token Memed
-    memed_token = memed_token_attendance or obter_memed_token(api_url, token_medico, squad_user_id)
+    # Sempre obtém token Memed fresco — token em cache pode estar expirado
+    memed_token = obter_memed_token(api_url, token_medico, squad_user_id)
+    if not memed_token:
+        memed_token = memed_token_attendance
+
     if memed_token:
         prefix = memed_token[:30]
         alg = "HS256(Memed)" if "eyJ0eXAiOiJKV1Qi" in memed_token[:30] else "RS256(Firebase?)"
@@ -1442,6 +1474,9 @@ def homologar_pericia(api_url, token, regra):
         memed_token, customer_id, customer_name, cpf,
         cid, days, start_date, observations
     )
+
+    # 6.5 Emite o certificado Memed no Mihmo (equivale ao clique em "Emitir" no widget)
+    emitir_certificado_memed(api_url, token_medico, pericia_id, memed_file_id, memed_token)
 
     # 7. Finaliza no Mihmo
     status = gerar_memed_file_mihmo(
