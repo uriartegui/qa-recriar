@@ -34,12 +34,10 @@ Homologar Regra API
         Should Be Equal    ${event_type}    ${especialista_esperado}
         ...    eventType na fila diverge! Esperado: '${especialista_esperado}' | Recebido: '${event_type}'
     END
-    # Passo 3: Homologar a perícia (apenas casos não-junta)
-    IF    not ${junta}
-        ${status}=    Homologar Pericia    ${API_URL}    ${token}    ${regra}
-        Should Be Equal    ${status}    Accepted
-        ...    Status da homologação diverge! Esperado: 'Accepted' | Recebido: '${status}'
-    END
+    # Passo 3: Homologar a perícia (junta e não-junta)
+    ${status}=    Homologar Pericia    ${API_URL}    ${token}    ${regra}
+    Should Be Equal    ${status}    Accepted
+    ...    Status da homologação diverge! Esperado: 'Accepted' | Recebido: '${status}'
 
 *** Test Cases ***
 
@@ -79,21 +77,21 @@ LTS - 60 Dias - CID Geral - Deve ir para Junta Medica
 # LTS — CID F
 # ══════════════════════════════════════════════════════════
 
-LTS - 4 Dias - CID F - Deve ir para Psiquiatra
+LTS - 4 Dias - CID F - Deve ir para Clinico Geral
     [Tags]    homolog    api    pmv    lts    lts_psiquiatria
-    Homologar Regra API    LTS_4DIAS_PSIQ    Psiquiatra
+    Homologar Regra API    LTS_4DIAS_PSIQ    Clínico Geral
 
-LTS - 29 Dias - CID F - Deve ir para Psiquiatra
+LTS - 29 Dias - CID F - Deve ir para Clinico Geral
     [Tags]    homolog    api    pmv    lts    lts_psiquiatria
-    Homologar Regra API    LTS_29DIAS_PSIQ    Psiquiatra
+    Homologar Regra API    LTS_29DIAS_PSIQ    Clínico Geral
 
-LTS - 30 Dias - CID F - Deve ir para Psiquiatra
+LTS - 30 Dias - CID F - Deve ir para Clinico Geral
     [Tags]    homolog    api    pmv    lts    lts_psiquiatria
-    Homologar Regra API    LTS_30DIAS_PSIQ    Psiquiatra
+    Homologar Regra API    LTS_30DIAS_PSIQ    Clínico Geral
 
-LTS - 59 Dias - CID F - Deve ir para Psiquiatra
+LTS - 59 Dias - CID F - Deve ir para Clinico Geral
     [Tags]    homolog    api    pmv    lts    lts_psiquiatria
-    Homologar Regra API    LTS_59DIAS_PSIQ    Psiquiatra
+    Homologar Regra API    LTS_59DIAS_PSIQ    Clínico Geral
 
 LTS - 60 Dias - CID F - Deve ir para Junta Psiquiatra
     [Tags]    homolog    api    pmv    lts    lts_psiquiatria    junta
@@ -103,13 +101,13 @@ LTS - 60 Dias - CID F - Deve ir para Junta Psiquiatra
 # LTS — CID M,S
 # ══════════════════════════════════════════════════════════
 
-LTS - 4 Dias - CID MS - Deve ir para Ortopedista
+LTS - 4 Dias - CID MS - Deve ir para Clinico Geral
     [Tags]    homolog    api    pmv    lts    lts_ortopedia
-    Homologar Regra API    LTS_4DIAS_ORTOP    Ortopedista
+    Homologar Regra API    LTS_4DIAS_ORTOP    Clínico Geral
 
-LTS - 14 Dias - CID MS - Deve ir para Ortopedista
+LTS - 14 Dias - CID MS - Deve ir para Clinico Geral
     [Tags]    homolog    api    pmv    lts    lts_ortopedia
-    Homologar Regra API    LTS_14DIAS_ORTOP    Ortopedista
+    Homologar Regra API    LTS_14DIAS_ORTOP    Clínico Geral
 
 LTS - 15 Dias - CID MS - Deve ir para Ortopedista
     [Tags]    homolog    api    pmv    lts    lts_ortopedia

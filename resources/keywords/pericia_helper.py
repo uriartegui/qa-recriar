@@ -43,6 +43,7 @@ CREDENTIALS = {
     "CLINICA":             {"email": "gestormihmo@mihmo.com.br",      "password": "REMOVIDO"},
     "Clínico Geral":       {"email": "clinicogeral1@mihmo.com.br",    "password": "REMOVIDO"},
     "Clínico Geral 2":     {"email": "clinicogeral2@mihmo.com.br",    "password": "REMOVIDO"},
+    "Clínico Geral 3":     {"email": "clinicogeral3@mihmo.com.br",    "password": "REMOVIDO"},
     "Médico Trabalho":     {"email": "medicopmv@mihmo.com.br",        "password": "REMOVIDO"},
     "Ortopedista":         {"email": "ortopedista1@mihmo.com.br",     "password": "REMOVIDO"},
     "Psiquiatra":          {"email": "psiquiatra1@mihmo.com.br",      "password": "REMOVIDO"},
@@ -50,6 +51,9 @@ CREDENTIALS = {
     "Psicólogo":           {"email": "psicologo@mihmo.com.br",        "password": "REMOVIDO"},
     "Enfermeiro":          {"email": "teste@mihmo.com.br",            "password": "REMOVIDO"},
 }
+
+# Mapeamento email → chave de credencial (para identificar squad users pelos nossos logins)
+_EMAIL_TO_CRED_KEY = {v["email"]: k for k, v in CREDENTIALS.items()}
 
 FIREBASE_AUTH_URL = (
     "https://www.googleapis.com/identitytoolkit/v3/relyingparty/verifyPassword"
@@ -1272,7 +1276,13 @@ def criar_prescricao_memed(memed_token, customer_id, customer_name, cpf,
     "Content-Type": "application/json"
 }
     url = f"https://api.memed.com.br/v1/prescricoes?_={int(time.time() * 1000)}"
-    response = requests.post(url, json=payload, headers=headers)
+    response = None
+    for _attempt in range(3):
+        response = requests.post(url, json=payload, headers=headers)
+        if response.status_code in (200, 201):
+            break
+        print(f"Memed prescricoes tentativa {_attempt+1}/3: {response.status_code} — aguardando...")
+        time.sleep(4)
     if response.status_code not in (200, 201):
         raise Exception(f"Erro Memed prescricoes: {response.status_code} - {response.text[:300]}")
     memed_file_id = safe_json(response).get("data", {}).get("id")
@@ -1322,7 +1332,7 @@ def emitir_certificado_memed(api_url, token_medico, pericia_id, memed_file_id, m
 
 def gerar_memed_file_mihmo(api_url, token, attendance_id, pericia_id,
                             registration_id, memed_file_id, memed_token,
-                            days, cid, start_date, observations, article_id):
+                            days, cid, start_date, observations, article_id, do_finish=True):
     """Finaliza a homologação no Mihmo via generate-memed-file. Retorna status."""
     start = datetime.strptime(start_date, "%Y-%m-%d")
     end = start + timedelta(days=int(days) - 1)
@@ -1368,22 +1378,228 @@ def gerar_memed_file_mihmo(api_url, token, attendance_id, pericia_id,
         print(f"  check-clinical-record parse warning: {e}")
 
     print(f"generate-memed-file payload: {json.dumps(payload, indent=2)}")
-    response = requests.post(url, json=payload, headers=headers)
-    print(f"generate-memed-file: {response.status_code} | {response.text[:1000]}")
+    response = None
+    for _attempt in range(3):
+        response = requests.post(url, json=payload, headers=headers)
+        print(f"generate-memed-file tentativa {_attempt+1}/3: {response.status_code} | {response.text[:300]}")
+        if response.status_code in (200, 201):
+            break
+        print(f"  Aguardando antes de retry...")
+        time.sleep(4)
     if response.status_code not in (200, 201):
         raise Exception(f"Erro generate-memed-file: {response.status_code} - {response.text}")
     status = safe_json(response).get("status", "")
     print(f"Homologação concluída. Status: {status}")
 
-    # 8. Finaliza o atendimento (queue → realized/Finalizado)
-    base2 = api_url.rsplit('/backend-nest', 1)[0]
-    finish_url = f"{base2}/attendance/api/scheduled-attendance/{attendance_id}/finish"
-    finish_resp = requests.post(finish_url, json={"id": attendance_id}, headers=headers, timeout=15)
-    print(f"finish attendance: {finish_resp.status_code} | {finish_resp.text[:200]}")
-    if finish_resp.status_code not in (200, 201):
-        print(f"AVISO: finish retornou {finish_resp.status_code} — seguindo mesmo assim")
+    # 8. Finaliza o atendimento (apenas após o último profissional assinar)
+    if do_finish:
+        base2 = api_url.rsplit('/backend-nest', 1)[0]
+        finish_url = f"{base2}/attendance/api/scheduled-attendance/{attendance_id}/finish"
+        finish_resp = requests.post(finish_url, json={"id": attendance_id}, headers=headers, timeout=15)
+        print(f"finish attendance: {finish_resp.status_code} | {finish_resp.text[:200]}")
+        if finish_resp.status_code not in (200, 201):
+            print(f"AVISO: finish retornou {finish_resp.status_code} — seguindo mesmo assim")
+    else:
+        print(f"finish attendance: pulado (aguardando demais profissionais da junta)")
 
     return status
+
+
+def obter_squad_users_por_role(api_url, token, role_id, count=1):
+    """Busca squad users disponíveis para um roleId, priorizando os que temos credenciais."""
+    base = api_url.rsplit('/backend-nest', 1)[0] + '/backend-nest'
+    headers = {"Authorization": f"Bearer {token}"}
+    params = {"page": 1, "pageSize": 50, "roleId": role_id}
+    resp = requests.get(f"{base}/squad-user", params=params, headers=headers, timeout=10)
+    print(f"GET squad-user roleId={role_id}: {resp.status_code}")
+    if resp.status_code != 200:
+        raise Exception(f"Erro ao buscar squad users para role {role_id}: {resp.status_code} - {resp.text[:200]}")
+    items = resp.json().get("items", [])
+    with_creds = [u for u in items if u.get("email") in _EMAIL_TO_CRED_KEY]
+    print(f"  {len(items)} squad users encontrados, {len(with_creds)} com credenciais cadastradas")
+    if len(with_creds) < count:
+        raise Exception(
+            f"Precisamos de {count} squad user(s) com credenciais para role {role_id}, "
+            f"mas só temos {len(with_creds)}. Adicione mais credenciais em CREDENTIALS."
+        )
+    return with_creds[:count]
+
+
+def selecionar_profissionais_junta(api_url, token_clinica, attendance_id, board_role_ids):
+    """
+    Seleciona os profissionais para a Junta Médica via POST /medical-board.
+    board_role_ids: lista de (role_id, role_description) — uma entrada por vaga.
+    Retorna lista de dicts com {squad_user_id, email, role_name, cred_key}.
+    """
+    from collections import Counter
+    base_url = api_url.rsplit('/backend-nest', 1)[0]
+
+    role_counts = Counter(rid for rid, _ in board_role_ids)
+    role_name_map = {rid: desc for rid, desc in board_role_ids}
+
+    selected = []
+    for role_id, count in role_counts.items():
+        users = obter_squad_users_por_role(api_url, token_clinica, role_id, count)
+        for u in users:
+            selected.append({
+                "squad_user_id": u["id"],
+                "email":         u["email"],
+                "role_name":     role_name_map[role_id],
+                "cred_key":      _EMAIL_TO_CRED_KEY[u["email"]],
+            })
+
+    squad_ids = [s["squad_user_id"] for s in selected]
+    url = f"{base_url}/attendance/api/scheduled-attendance/medical-board"
+    headers = {"Authorization": f"Bearer {token_clinica}", "Content-Type": "application/json"}
+    payload = {"id": attendance_id, "squadUserIds": squad_ids}
+    print(f"POST medical-board payload: {payload}")
+    resp = requests.post(url, json=payload, headers=headers, timeout=15)
+    print(f"POST medical-board: {resp.status_code} | {resp.text[:300]}")
+    if resp.status_code not in (200, 201):
+        raise Exception(
+            f"Erro ao selecionar profissionais da junta: {resp.status_code} - {resp.text[:300]}"
+        )
+    print(f"Junta: {len(selected)} profissional(is) selecionado(s): "
+          f"{[s['role_name'] + ' (' + s['cred_key'] + ')' for s in selected]}")
+    return selected
+
+
+def _homologar_junta(api_url, token_clinica, attendance_id, entrada):
+    """
+    Orquestra o fluxo de Junta Médica:
+    1. Busca medicalBoardRoles com IDs do attendance
+    2. Seleciona profissionais via POST /medical-board
+    3. Envia para fila
+    4. Cada profissional executa o fluxo completo de homologação
+    5. Finish apenas após o último profissional assinar
+    """
+    base_url = api_url.rsplit('/backend-nest', 1)[0]
+
+    # 1. Buscar medicalBoardRoles com roleIds
+    headers_clinica = {"Authorization": f"Bearer {token_clinica}"}
+    resp = requests.get(
+        f"{base_url}/attendance/api/scheduled-attendance/{attendance_id}",
+        headers=headers_clinica, timeout=15
+    )
+    if resp.status_code != 200:
+        raise Exception(f"Erro ao buscar attendance para junta: {resp.status_code}")
+    att_data = resp.json()
+    board_role_ids = [
+        (r["id"], r["description"])
+        for r in att_data.get("medicalBoardRoles", [])
+    ]
+    if not board_role_ids:
+        raise Exception(f"attendance {attendance_id} não tem medicalBoardRoles — não é junta?")
+    print(f"Junta: {len(board_role_ids)} vagas: {[d for _, d in board_role_ids]}")
+
+    # 2. Selecionar profissionais (GET squad-user + POST /medical-board)
+    selected_users = selecionar_profissionais_junta(api_url, token_clinica, attendance_id, board_role_ids)
+
+    # 3. Enviar para fila
+    enviar_para_fila(api_url, token_clinica, attendance_id)
+
+    # 4. Cada profissional homologa
+    status = None
+    total = len(selected_users)
+    for i, prof in enumerate(selected_users):
+        is_last = (i == total - 1)
+        print(f"\n{'='*60}")
+        print(f"Homologando profissional {i+1}/{total}: {prof['role_name']} ({prof['cred_key']})")
+        print(f"{'='*60}")
+        token_medico = _obter_token(prof["cred_key"])
+        squad_user_id = _jwt_user_id(token_medico)
+        if not squad_user_id:
+            raise Exception(f"Não foi possível extrair user_id do token de '{prof['cred_key']}'.")
+
+        iniciar_atendimento(base_url, token_medico, attendance_id, squad_user_id)
+        _, memed_token_attendance = obter_squad_user_do_attendance(base_url, token_medico, attendance_id)
+
+        customer_id   = entrada.get("customer_id")
+        cpf           = entrada.get("cpf")
+        cid           = entrada.get("cid")
+        days          = entrada.get("days")
+        start_date    = entrada.get("start_date") or gerar_data_hoje()
+        service_type  = entrada.get("service_type")
+        pericia_id    = entrada.get("pericia_id")
+        observations  = "Teste automatizado"
+
+        criar_ficha_clinica(api_url, token_medico, customer_id, attendance_id, cpf=cpf)
+
+        _check_base = api_url.rsplit('/backend-nest', 1)[0]
+        for _tentativa in range(1, 3):
+            if _verificar_ficha_integrada(_check_base, token_medico, attendance_id):
+                print(f"  Ficha clínica integrada OK (tentativa {_tentativa})")
+                break
+            print(f"  Ficha não integrada (tentativa {_tentativa}/2) — re-submetendo...")
+            time.sleep(5)
+            criar_ficha_clinica(api_url, token_medico, customer_id, attendance_id, cpf=cpf)
+            time.sleep(5)
+
+        pericia_data = patch_validate_data(
+            api_url, token_medico, pericia_id, start_date, cid, days,
+            attendance_id=attendance_id
+        )
+
+        def _extrair_registration_id_junta(data):
+            if not data:
+                return None
+            reg = data.get("registration")
+            if reg:
+                rid = reg.get("registrationId") or reg.get("registrationid") or reg.get("id")
+                if rid:
+                    return rid
+            regs = (data.get("customer") or {}).get("registrations") or data.get("registrations") or []
+            if regs:
+                return regs[0].get("registrationId") or regs[0].get("registrationid") or regs[0].get("id")
+            return None
+
+        registration_id = _extrair_registration_id_junta(pericia_data)
+        rid_customer, category_from_customer, functional_registration = obter_registration_id_do_customer(
+            api_url, token_medico, customer_id
+        )
+        if not registration_id:
+            registration_id = rid_customer
+        category = categoria = category_from_customer
+
+        if not registration_id:
+            raise Exception(f"registration_id não encontrado para profissional {prof['cred_key']}.")
+
+        article_id, article_name = obter_primeiro_artigo(
+            api_url, token_medico, pericia_id,
+            attendance_id=attendance_id, cid=cid, category=category,
+            is_junta=True, functional_registration=functional_registration,
+            service_type=service_type
+        )
+
+        eligibility_check(
+            api_url, token_medico, pericia_id,
+            accepted_days=days, accepted_start_date=start_date,
+            conclusion_id=article_id, functional_registration=functional_registration
+        )
+
+        memed_token = obter_memed_token(api_url, token_medico, squad_user_id)
+        if not memed_token:
+            memed_token = memed_token_attendance
+
+        customer_name = entrada.get("nome")
+        memed_file_id = criar_prescricao_memed(
+            memed_token, customer_id, customer_name, cpf,
+            cid, days, start_date, observations
+        )
+
+        emitir_certificado_memed(api_url, token_medico, pericia_id, memed_file_id, memed_token)
+
+        status = gerar_memed_file_mihmo(
+            api_url, token_medico, attendance_id, pericia_id,
+            registration_id, memed_file_id, memed_token,
+            days, cid, start_date, observations, article_id,
+            do_finish=is_last
+        )
+        print(f"Profissional {i+1}/{total} concluído. Status: {status}")
+
+    # Para junta, a API retorna 'SignaturePending' por profissional;
+    # o atendimento é dado como concluído após todos assinarem e o finish ser chamado.
+    return "Accepted"
 
 
 def homologar_pericia(api_url, token, regra):
@@ -1410,13 +1626,15 @@ def homologar_pericia(api_url, token, regra):
 
     token_clinica = _obter_token("CLINICA")
 
-
     role, is_junta, board_roles, attendance_id = verificar_especialista_api(
         api_url, token, regra
     )
 
     if not attendance_id:
         raise Exception(f"attendance_id não encontrado para regra {regra}")
+
+    if is_junta:
+        return _homologar_junta(api_url, token_clinica, attendance_id, entrada)
 
     enviar_para_fila(api_url, token_clinica, attendance_id)
 
