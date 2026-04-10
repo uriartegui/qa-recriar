@@ -1405,6 +1405,108 @@ def gerar_memed_file_mihmo(api_url, token, attendance_id, pericia_id,
     return status
 
 
+def _gerar_chave_certificado_teste():
+    """Gera chave RSA + certificado autoassinado para testes de assinatura digital."""
+    from cryptography import x509
+    from cryptography.x509.oid import NameOID
+    from cryptography.hazmat.primitives import hashes as crypto_hashes, serialization
+    from cryptography.hazmat.primitives.asymmetric import rsa
+    from cryptography.hazmat.backends import default_backend
+    import datetime
+
+    private_key = rsa.generate_private_key(
+        public_exponent=65537, key_size=2048, backend=default_backend()
+    )
+    subject = issuer = x509.Name([
+        x509.NameAttribute(NameOID.COMMON_NAME, "Medico Teste Automacao"),
+        x509.NameAttribute(NameOID.ORGANIZATION_NAME, "Mihmo QA"),
+        x509.NameAttribute(NameOID.COUNTRY_NAME, "BR"),
+    ])
+    cert = (
+        x509.CertificateBuilder()
+        .subject_name(subject)
+        .issuer_name(issuer)
+        .public_key(private_key.public_key())
+        .serial_number(x509.random_serial_number())
+        .not_valid_before(datetime.datetime.utcnow())
+        .not_valid_after(datetime.datetime.utcnow() + datetime.timedelta(days=365))
+        .sign(private_key, crypto_hashes.SHA256(), default_backend())
+    )
+    cert_b64 = base64.b64encode(cert.public_bytes(serialization.Encoding.DER)).decode()
+    return private_key, cert_b64
+
+
+def _assinar_hashes(private_key, hashes_lista, algoritmo="SHA1"):
+    """Assina lista de hashes (já digeridos) com RSA PKCS1v15."""
+    from cryptography.hazmat.primitives import hashes as crypto_hashes
+    from cryptography.hazmat.primitives.asymmetric import padding
+    from cryptography.hazmat.primitives.asymmetric.utils import Prehashed
+
+    algo_map = {
+        "SHA1":   crypto_hashes.SHA1(),
+        "SHA256": crypto_hashes.SHA256(),
+        "SHA512": crypto_hashes.SHA512(),
+    }
+    hash_algo = algo_map.get(algoritmo.upper(), crypto_hashes.SHA1())
+
+    signed = []
+    for h_b64 in hashes_lista:
+        h_bytes = base64.b64decode(h_b64)
+        signature = private_key.sign(h_bytes, padding.PKCS1v15(), Prehashed(hash_algo))
+        signed.append(base64.b64encode(signature).decode())
+    return signed
+
+
+def assinar_pericia(api_url, token, pericia_id):
+    """
+    Executa o fluxo completo de assinatura digital da perícia (junta médica):
+    1. Gera certificado de teste autoassinado
+    2. POST /sign/initialize  → recebe hashes para assinar
+    3. Assina os hashes com RSA + SHA1
+    4. POST /sign/finalize    → envia assinatura
+    Retorna o status retornado pelo finalize.
+    """
+    base = api_url.rsplit('/backend-nest', 1)[0]
+    headers = {"Authorization": f"Bearer {token}", "Content-Type": "application/json"}
+
+    private_key, cert_b64 = _gerar_chave_certificado_teste()
+
+    # 1. Initialize
+    init_url = f"{base}/backend-nest/medical-expert-report-request/sign/initialize"
+    init_payload = {"id": pericia_id, "certificate": cert_b64}
+    print(f"sign/initialize → pericia_id={pericia_id}")
+    init_resp = requests.post(init_url, json=init_payload, headers=headers, timeout=30)
+    print(f"sign/initialize: {init_resp.status_code} | {init_resp.text[:300]}")
+    if init_resp.status_code not in (200, 201):
+        raise Exception(f"Erro sign/initialize: {init_resp.status_code} - {init_resp.text[:300]}")
+    init_data = safe_json(init_resp)
+
+    assinaturas_resp = init_data.get("assinaturas", [])
+    nonce_global = init_data.get("nonce", "")
+
+    # 2. Assinar cada bloco de hashes
+    assinaturas_payload = []
+    for bloco in assinaturas_resp:
+        algoritmo  = bloco.get("algoritmoHash", "SHA1")
+        nonce      = bloco.get("nonce", "")
+        hashes_raw = bloco.get("hashes", [])
+        signed     = _assinar_hashes(private_key, hashes_raw, algoritmo)
+        assinaturas_payload.append({"hashes": signed, "nonce": nonce})
+
+    # 3. Finalize
+    fin_url = f"{base}/backend-nest/medical-expert-report-request/sign/finalize"
+    fin_payload = {"id": pericia_id, "assinaturas": assinaturas_payload, "nonce": nonce_global}
+    print(f"sign/finalize payload: {json.dumps(fin_payload, indent=2)}")
+    fin_resp = requests.post(fin_url, json=fin_payload, headers=headers, timeout=30)
+    print(f"sign/finalize: {fin_resp.status_code} | {fin_resp.text[:300]}")
+    if fin_resp.status_code not in (200, 201):
+        raise Exception(f"Erro sign/finalize: {fin_resp.status_code} - {fin_resp.text[:300]}")
+
+    status = safe_json(fin_resp).get("status", "")
+    print(f"Assinatura concluída. Status: {status}")
+    return status
+
+
 def obter_squad_users_por_role(api_url, token, role_id, count=1):
     """Busca squad users disponíveis para um roleId, priorizando os que temos credenciais."""
     base = api_url.rsplit('/backend-nest', 1)[0] + '/backend-nest'
@@ -1597,9 +1699,10 @@ def _homologar_junta(api_url, token_clinica, attendance_id, entrada):
         )
         print(f"Profissional {i+1}/{total} concluído. Status: {status}")
 
-    # Para junta, a API retorna 'SignaturePending' por profissional;
-    # o atendimento é dado como concluído após todos assinarem e o finish ser chamado.
-    return "Accepted"
+        # Assinatura digital após homologação de cada profissional da junta
+        assinar_pericia(api_url, token_medico, pericia_id)
+
+    return status
 
 
 def homologar_pericia(api_url, token, regra):
