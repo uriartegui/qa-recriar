@@ -1,7 +1,7 @@
 *** Settings ***
-Library       ../../resources/keywords/pericia_helper.py
-Resource      ../../resources/keywords/mihmo_auth.robot
-Variables     ../../resources/variables/homolog.yaml
+Library       ../../../resources/keywords/pericia_helper.py
+Resource      ../../../resources/keywords/mihmo_auth.robot
+Variables     ../../../resources/variables/homolog.yaml
 Suite Setup   Inicializar Data
 
 *** Keywords ***
@@ -11,7 +11,7 @@ Inicializar Data
 
 *** Variables ***
 ${COMPANY_PMV}      32e94042-51d1-4270-a5ea-88b9915f22d4
-${FIXTURE}          ${CURDIR}/../../resources/fixtures/atestado.png
+${FIXTURE}          ${CURDIR}/../../../resources/fixtures/atestado.png
 ${EMAIL_TESTE}      teste.auto@mihmo.com
 ${CELL_TESTE}       11999999999
 

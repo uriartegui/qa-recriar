@@ -1,20 +1,9 @@
-# Claude
-.claude
-
 # Robot Framework outputs
 output.xml
 log.html
 report.html
 results/
 results_homolog/
-
-# Python
-__pycache__/
-*.pyc
-*.pyo
-.venv/
-venv/
-*.egg-info/
 
 # Secrets / env
 .env
