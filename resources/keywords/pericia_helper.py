@@ -1511,7 +1511,7 @@ def obter_squad_users_por_role(api_url, token, role_id, count=1):
     """Busca squad users disponíveis para um roleId, priorizando os que temos credenciais."""
     base = api_url.rsplit('/backend-nest', 1)[0] + '/backend-nest'
     headers = {"Authorization": f"Bearer {token}"}
-    params = {"page": 1, "pageSize": 50, "roleId": role_id}
+    params = {"page": 1, "pageSize": 50, "roleId": role_id, "search": ""}
     resp = requests.get(f"{base}/squad-user", params=params, headers=headers, timeout=10)
     print(f"GET squad-user roleId={role_id}: {resp.status_code}")
     if resp.status_code != 200:
@@ -1586,13 +1586,17 @@ def _homologar_junta(api_url, token_clinica, attendance_id, entrada):
     if resp.status_code != 200:
         raise Exception(f"Erro ao buscar attendance para junta: {resp.status_code}")
     att_data = resp.json()
+    raw_roles = att_data.get("medicalBoardRoles", [])
+    if raw_roles:
+        print(f"medicalBoardRoles keys disponíveis: {list(raw_roles[0].keys())}")
     board_role_ids = [
-        (r["id"], r["description"])
-        for r in att_data.get("medicalBoardRoles", [])
+        (r.get("roleId") or r.get("role", {}).get("id") or r["id"], r.get("description", ""))
+        for r in raw_roles
     ]
     if not board_role_ids:
         raise Exception(f"attendance {attendance_id} não tem medicalBoardRoles — não é junta?")
     print(f"Junta: {len(board_role_ids)} vagas: {[d for _, d in board_role_ids]}")
+    print(f"Junta roleIds: {[rid for rid, _ in board_role_ids]}")
 
     # 2. Selecionar profissionais (GET squad-user + POST /medical-board)
     selected_users = selecionar_profissionais_junta(api_url, token_clinica, attendance_id, board_role_ids)
@@ -1600,30 +1604,47 @@ def _homologar_junta(api_url, token_clinica, attendance_id, entrada):
     # 3. Enviar para fila
     enviar_para_fila(api_url, token_clinica, attendance_id)
 
-    # 4. Cada profissional homologa
+    # 4. Fase 1: cada profissional completa sua homologação (memed file)
     status = None
     total = len(selected_users)
+    tokens_medicos = []  # guarda tokens para fase de assinatura
+
+    customer_id   = entrada.get("customer_id")
+    cpf           = entrada.get("cpf")
+    cid           = entrada.get("cid")
+    days          = entrada.get("days")
+    start_date    = entrada.get("start_date") or gerar_data_hoje()
+    service_type  = entrada.get("service_type")
+    pericia_id    = entrada.get("pericia_id")
+    customer_name = entrada.get("nome")
+    observations  = "Teste automatizado"
+
+    def _extrair_registration_id_junta(data):
+        if not data:
+            return None
+        reg = data.get("registration")
+        if reg:
+            rid = reg.get("registrationId") or reg.get("registrationid") or reg.get("id")
+            if rid:
+                return rid
+        regs = (data.get("customer") or {}).get("registrations") or data.get("registrations") or []
+        if regs:
+            return regs[0].get("registrationId") or regs[0].get("registrationid") or regs[0].get("id")
+        return None
+
     for i, prof in enumerate(selected_users):
         is_last = (i == total - 1)
         print(f"\n{'='*60}")
         print(f"Homologando profissional {i+1}/{total}: {prof['role_name']} ({prof['cred_key']})")
         print(f"{'='*60}")
         token_medico = _obter_token(prof["cred_key"])
+        tokens_medicos.append(token_medico)
         squad_user_id = _jwt_user_id(token_medico)
         if not squad_user_id:
             raise Exception(f"Não foi possível extrair user_id do token de '{prof['cred_key']}'.")
 
         iniciar_atendimento(base_url, token_medico, attendance_id, squad_user_id)
         _, memed_token_attendance = obter_squad_user_do_attendance(base_url, token_medico, attendance_id)
-
-        customer_id   = entrada.get("customer_id")
-        cpf           = entrada.get("cpf")
-        cid           = entrada.get("cid")
-        days          = entrada.get("days")
-        start_date    = entrada.get("start_date") or gerar_data_hoje()
-        service_type  = entrada.get("service_type")
-        pericia_id    = entrada.get("pericia_id")
-        observations  = "Teste automatizado"
 
         criar_ficha_clinica(api_url, token_medico, customer_id, attendance_id, cpf=cpf)
 
@@ -1642,26 +1663,13 @@ def _homologar_junta(api_url, token_clinica, attendance_id, entrada):
             attendance_id=attendance_id
         )
 
-        def _extrair_registration_id_junta(data):
-            if not data:
-                return None
-            reg = data.get("registration")
-            if reg:
-                rid = reg.get("registrationId") or reg.get("registrationid") or reg.get("id")
-                if rid:
-                    return rid
-            regs = (data.get("customer") or {}).get("registrations") or data.get("registrations") or []
-            if regs:
-                return regs[0].get("registrationId") or regs[0].get("registrationid") or regs[0].get("id")
-            return None
-
         registration_id = _extrair_registration_id_junta(pericia_data)
         rid_customer, category_from_customer, functional_registration = obter_registration_id_do_customer(
             api_url, token_medico, customer_id
         )
         if not registration_id:
             registration_id = rid_customer
-        category = categoria = category_from_customer
+        category = category_from_customer
 
         if not registration_id:
             raise Exception(f"registration_id não encontrado para profissional {prof['cred_key']}.")
@@ -1683,7 +1691,6 @@ def _homologar_junta(api_url, token_clinica, attendance_id, entrada):
         if not memed_token:
             memed_token = memed_token_attendance
 
-        customer_name = entrada.get("nome")
         memed_file_id = criar_prescricao_memed(
             memed_token, customer_id, customer_name, cpf,
             cid, days, start_date, observations
@@ -1697,9 +1704,14 @@ def _homologar_junta(api_url, token_clinica, attendance_id, entrada):
             days, cid, start_date, observations, article_id,
             do_finish=is_last
         )
-        print(f"Profissional {i+1}/{total} concluído. Status: {status}")
+        print(f"Profissional {i+1}/{total} memed file concluído. Status: {status}")
 
-        # Assinatura digital após homologação de cada profissional da junta
+    # 5. Fase 2: todos assinam após o último ter finalizado a perícia
+    print(f"\n{'='*60}")
+    print(f"Fase de assinatura — {total} profissional(is)")
+    print(f"{'='*60}")
+    for i, (prof, token_medico) in enumerate(zip(selected_users, tokens_medicos)):
+        print(f"Assinando [{i+1}/{total}]: {prof['role_name']} ({prof['cred_key']})")
         assinar_pericia(api_url, token_medico, pericia_id)
 
     return status

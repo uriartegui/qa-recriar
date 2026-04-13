@@ -389,6 +389,46 @@ def _find_regra(suite, tipo, cid, dias):
             return r
     return None
 
+# ──────────────────────────────────────────────────────────────────────────────
+# Categorias
+# ──────────────────────────────────────────────────────────────────────────────
+# Sentinels para categorias com suite fixa (independem do radio selecionado)
+_PMV       = object()
+_PPV       = object()
+_PMV_PPV   = object()
+
+CATEGORIAS_DEF = [
+    ("Todas PMV",          _PMV),
+    ("Todas PPV",          _PPV),
+    ("Todas (PMV + PPV)",  _PMV_PPV),
+    ("Todas as Juntas",    lambda r: r["junta"]),
+    ("Médico Trabalho",    lambda r: r["especialista"] == "Médico Trabalho"),
+    ("Clínico Geral",      lambda r: "Clínico Geral" in r["especialista"] and not r["junta"]),
+    ("Ortopedista",        lambda r: "Ortopedista" in r["especialista"] and not r["junta"]),
+    ("Psiquiatra",         lambda r: "Psiquiatra" in r["especialista"] and not r["junta"]),
+    ("Assistente Social",  lambda r: "Assistente Social" in r["especialista"]),
+]
+
+def _resolve_regras(suite, fn):
+    if fn is _PMV:      return [r for r in REGRAS if r["suite"] == "PMV"]
+    if fn is _PPV:      return [r for r in REGRAS if r["suite"] == "PPV"]
+    if fn is _PMV_PPV:  return list(REGRAS)
+    return [r for r in REGRAS if r["suite"] == suite and fn(r)]
+
+def _categorias_disponiveis(suite):
+    result = []
+    for nome, fn in CATEGORIAS_DEF:
+        matching = _resolve_regras(suite, fn)
+        if matching:
+            result.append((nome, len(matching)))
+    return result
+
+def _regras_da_categoria(suite, categ_nome):
+    entry = next(((n, fn) for n, fn in CATEGORIAS_DEF if n == categ_nome), None)
+    if entry is None:
+        return []
+    return _resolve_regras(suite, entry[1])
+
 
 # ──────────────────────────────────────────────────────────────────────────────
 # App
@@ -401,13 +441,19 @@ class App(tk.Tk):
         self.configure(bg="#1e1e2e")
 
         self._running = False
+        self._proc   = None          # subprocess atual do robot
         self._suite  = tk.StringVar(value="PMV")
         self._tipo   = tk.StringVar()
         self._cid    = tk.StringVar()
         self._dias   = tk.StringVar()
+        self._modo   = tk.StringVar(value="individual")
+        self._categ  = tk.StringVar()
+
+        self.protocol("WM_DELETE_WINDOW", self._on_close)
 
         self._build_ui()
         self._refresh_tipos()
+        self._refresh_categorias()
 
     # ── UI ────────────────────────────────────────────────────────────────────
     def _build_ui(self):
@@ -430,7 +476,7 @@ class App(tk.Tk):
         right = tk.Frame(main, bg="#1e1e2e")
         right.pack(side="left", fill="both", expand=True)
 
-        # ── seleções ──
+        # helpers
         def lbl(parent, text):
             return tk.Label(parent, text=text, bg="#1e1e2e", fg="#a6adc8",
                             font=("Segoe UI", 9), anchor="w")
@@ -441,52 +487,83 @@ class App(tk.Tk):
             c.configure(font=("Segoe UI", 10))
             return c
 
-        # Clínica / Suite
-        lbl(left, "Clínica (suite)").pack(fill="x", **PAD)
+        # ── Modo toggle ──────────────────────────────────────────────────────
+        lbl(left, "Modo").pack(fill="x", **PAD)
+        modo_frame = tk.Frame(left, bg="#1e1e2e")
+        modo_frame.pack(fill="x", padx=10)
+        for val, txt in [("individual", "Regra Individual"), ("categoria", "Por Categoria")]:
+            tk.Radiobutton(modo_frame, text=txt, variable=self._modo, value=val,
+                           bg="#1e1e2e", fg="#cdd6f4", selectcolor="#313244",
+                           activebackground="#1e1e2e", activeforeground="#cdd6f4",
+                           font=("Segoe UI", 10), command=self._on_modo_change
+                           ).pack(side="left", padx=4)
+
+        tk.Frame(left, bg="#45475a", height=1).pack(fill="x", padx=10, pady=8)
+
+        # ── Clínica / Suite (compartilhada entre modos) ──────────────────────
+        lbl(left, "Clínica (suite)").pack(fill="x", padx=10)
         suite_frame = tk.Frame(left, bg="#1e1e2e")
-        suite_frame.pack(fill="x", padx=10)
+        suite_frame.pack(fill="x", padx=10, pady=(2, 8))
         for s in _suites():
             tk.Radiobutton(suite_frame, text=s, variable=self._suite, value=s,
                            bg="#1e1e2e", fg="#cdd6f4", selectcolor="#313244",
                            activebackground="#1e1e2e", activeforeground="#cdd6f4",
-                           font=("Segoe UI", 10), command=self._refresh_tipos
+                           font=("Segoe UI", 10), command=self._on_suite_change
                            ).pack(side="left", padx=4)
 
-        # Tipo
-        lbl(left, "Tipo de perícia").pack(fill="x", **PAD)
-        self._cb_tipo = combo(left, self._tipo)
+        # ── Container que segura o frame de modo (fica sempre acima dos botões) ──
+        self._frm_modo_holder = tk.Frame(left, bg="#1e1e2e")
+        self._frm_modo_holder.pack(fill="x")
+
+        # ── Frame Individual ─────────────────────────────────────────────────
+        self._frm_individual = tk.Frame(self._frm_modo_holder, bg="#1e1e2e")
+
+        lbl(self._frm_individual, "Tipo de perícia").pack(fill="x", **PAD)
+        self._cb_tipo = combo(self._frm_individual, self._tipo)
         self._cb_tipo.pack(fill="x", padx=10)
         self._cb_tipo.bind("<<ComboboxSelected>>", self._refresh_cids)
 
-        # CID
-        lbl(left, "CID").pack(fill="x", **PAD)
-        self._cb_cid = combo(left, self._cid)
+        lbl(self._frm_individual, "CID").pack(fill="x", **PAD)
+        self._cb_cid = combo(self._frm_individual, self._cid)
         self._cb_cid.pack(fill="x", padx=10)
         self._cb_cid.bind("<<ComboboxSelected>>", self._refresh_dias)
 
-        # Duração / Regra
-        lbl(left, "Duração").pack(fill="x", **PAD)
-        self._cb_dias = combo(left, self._dias)
+        lbl(self._frm_individual, "Duração").pack(fill="x", **PAD)
+        self._cb_dias = combo(self._frm_individual, self._dias)
         self._cb_dias.pack(fill="x", padx=10)
         self._cb_dias.bind("<<ComboboxSelected>>", self._refresh_especialista)
 
-        # Especialista esperado
-        sep = tk.Frame(left, bg="#45475a", height=1)
-        sep.pack(fill="x", padx=10, pady=10)
-
-        lbl(left, "Especialista esperado").pack(fill="x", padx=10)
-        self._lbl_esp = tk.Label(left, text="—", bg="#313244", fg="#a6e3a1",
+        tk.Frame(self._frm_individual, bg="#45475a", height=1).pack(
+            fill="x", padx=10, pady=10)
+        lbl(self._frm_individual, "Especialista esperado").pack(fill="x", padx=10)
+        self._lbl_esp = tk.Label(self._frm_individual, text="—",
+                                  bg="#313244", fg="#a6e3a1",
                                   font=("Segoe UI", 11, "bold"),
                                   anchor="w", relief="flat", padx=8, pady=6)
         self._lbl_esp.pack(fill="x", padx=10, pady=(2, 0))
-
-        self._lbl_junta = tk.Label(left, text="", bg="#1e1e2e", fg="#f38ba8",
+        self._lbl_junta = tk.Label(self._frm_individual, text="",
+                                    bg="#1e1e2e", fg="#f38ba8",
                                     font=("Segoe UI", 9, "italic"), anchor="w")
         self._lbl_junta.pack(fill="x", padx=10)
 
-        # Botões
-        sep2 = tk.Frame(left, bg="#45475a", height=1)
-        sep2.pack(fill="x", padx=10, pady=10)
+        # ── Frame Categoria ──────────────────────────────────────────────────
+        self._frm_categoria = tk.Frame(self._frm_modo_holder, bg="#1e1e2e")
+
+        lbl(self._frm_categoria, "Categoria").pack(fill="x", **PAD)
+        self._cb_categ = combo(self._frm_categoria, self._categ)
+        self._cb_categ.pack(fill="x", padx=10)
+        self._cb_categ.bind("<<ComboboxSelected>>", self._update_cat_count)
+
+        self._lbl_cat_count = tk.Label(self._frm_categoria, text="",
+                                        bg="#1e1e2e", fg="#a6adc8",
+                                        font=("Segoe UI", 9, "italic"), anchor="w")
+        self._lbl_cat_count.pack(fill="x", padx=12, pady=(4, 0))
+
+        # Exibe o frame do modo inicial (individual)
+        self._frm_individual.pack(fill="x")
+
+        # ── Botões (sempre abaixo dos frames de modo) ─────────────────────────
+        tk.Frame(left, bg="#45475a", height=1).pack(fill="x", padx=10, pady=10)
 
         self._btn = tk.Button(left, text="▶  Executar",
                               command=self._executar,
@@ -496,12 +573,20 @@ class App(tk.Tk):
                               padx=10, pady=8, activebackground="#74c7ec")
         self._btn.pack(fill="x", padx=10)
 
+        self._btn_parar = tk.Button(left, text="⏹  Parar",
+                                    command=self._parar,
+                                    bg="#f38ba8", fg="#1e1e2e",
+                                    font=("Segoe UI", 11, "bold"),
+                                    relief="flat", cursor="hand2",
+                                    padx=10, pady=8, activebackground="#eba0ac")
+        # aparece só durante execução
+
         tk.Button(left, text="Limpar saída", command=self._limpar,
                   bg="#313244", fg="#a6adc8",
                   font=("Segoe UI", 9), relief="flat", cursor="hand2",
                   pady=4).pack(fill="x", padx=10, pady=(6, 0))
 
-        # ── output ──
+        # ── output ──────────────────────────────────────────────────────────
         tk.Label(right, text="Saída", bg="#1e1e2e", fg="#a6adc8",
                  font=("Segoe UI", 9)).pack(anchor="w")
         self._out = scrolledtext.ScrolledText(
@@ -516,7 +601,41 @@ class App(tk.Tk):
         self._out.tag_config("info",  foreground="#89b4fa")
         self._out.tag_config("aviso", foreground="#f9e2af")
 
-    # ── Cascata de filtros ────────────────────────────────────────────────────
+    # ── Modo ─────────────────────────────────────────────────────────────────
+    def _on_modo_change(self, *_):
+        if self._modo.get() == "individual":
+            self._frm_categoria.pack_forget()
+            self._frm_individual.pack(fill="x")
+        else:
+            self._frm_individual.pack_forget()
+            self._frm_categoria.pack(fill="x")
+        self._refresh_categorias()
+
+    def _on_suite_change(self, *_):
+        self._refresh_tipos()
+        self._refresh_categorias()
+
+    # ── Categoria ─────────────────────────────────────────────────────────────
+    def _refresh_categorias(self, *_):
+        cats = _categorias_disponiveis(self._suite.get())
+        labels = [f"{nome}  ({qtd} regra{'s' if qtd > 1 else ''})" for nome, qtd in cats]
+        self._cb_categ["values"] = labels
+        if labels:
+            self._cb_categ.current(0)
+            self._categ.set(labels[0])
+        self._update_cat_count()
+
+    def _update_cat_count(self, *_):
+        nome = self._categ.get().split("  (")[0]  # remove "(X regras)"
+        regras = _regras_da_categoria(self._suite.get(), nome)
+        if regras:
+            specs = sorted({r["especialista"] for r in regras})
+            self._lbl_cat_count.configure(
+                text=f"{len(regras)} regras → {', '.join(specs)}")
+        else:
+            self._lbl_cat_count.configure(text="")
+
+    # ── Cascata de filtros (modo individual) ──────────────────────────────────
     def _refresh_tipos(self, *_):
         tipos = _tipos(self._suite.get())
         self._cb_tipo["values"] = tipos
@@ -527,7 +646,6 @@ class App(tk.Tk):
         cids = _cids(self._suite.get(), self._tipo.get())
         self._cb_cid["values"] = cids
         self._cid.set(cids[0] if cids else "")
-        # ocultar CID se só há opção "—"
         if cids == ["—"]:
             self._cb_cid.configure(state="disabled")
         else:
@@ -555,15 +673,108 @@ class App(tk.Tk):
     def _executar(self):
         if self._running:
             return
-        r = _find_regra(self._suite.get(), self._tipo.get(),
-                        self._cid.get(), self._dias.get())
-        if not r:
-            self._log("Nenhuma regra selecionada.\n", "erro")
-            return
-
         self._running = True
-        self._btn.configure(state="disabled", text="Executando...")
-        threading.Thread(target=self._run_regra, args=(r,), daemon=True).start()
+        self._btn.pack_forget()
+        self._btn_parar.pack(fill="x", padx=10)
+
+        if self._modo.get() == "categoria":
+            nome = self._categ.get().split("  (")[0]
+            regras = _regras_da_categoria(self._suite.get(), nome)
+            if not regras:
+                self._log("Nenhuma regra na categoria selecionada.\n", "erro")
+                self.after(0, self._finalizar)
+                return
+            threading.Thread(target=self._run_lista,
+                             args=(regras, nome), daemon=True).start()
+        else:
+            r = _find_regra(self._suite.get(), self._tipo.get(),
+                            self._cid.get(), self._dias.get())
+            if not r:
+                self._log("Nenhuma regra selecionada.\n", "erro")
+                self.after(0, self._finalizar)
+                return
+            threading.Thread(target=self._run_regra, args=(r,), daemon=True).start()
+
+    # ── Execução: lista de regras (modo categoria) ────────────────────────────
+    def _run_lista(self, regras, nome_cat):
+        self._log(f"\n{'═'*60}\n", "info")
+        self._log(f"  Categoria : {nome_cat}\n", "info")
+        self._log(f"  Suite     : {self._suite.get()}\n", "info")
+        self._log(f"  Regras    : {len(regras)}\n", "info")
+        self._log(f"{'═'*60}\n\n", "info")
+
+        # Limpar massa
+        massa_file = os.path.join(ROOT, "results", "massa_criada.json")
+        if os.path.exists(massa_file):
+            os.remove(massa_file)
+            self._log("  massa_criada.json limpo.\n\n", "aviso")
+
+        # Agrupar por arquivo de setup (pode haver PMV e PPV misturados no "Todas")
+        from collections import defaultdict
+        setup_grupos  = defaultdict(list)
+        homolog_grupos = defaultdict(list)
+        for r in regras:
+            setup_grupos[r["setup_file"]].append(r["setup_test"])
+            if r["homolog_file"]:
+                homolog_grupos[r["homolog_file"]].append(r["homolog_test"])
+
+        # Fase 1: todos os criar_massa
+        ok = True
+        for arquivo, testes in setup_grupos.items():
+            label = f"CRIAR MASSA ({len(testes)} testes)"
+            ok = self._run_robot_multi(arquivo, testes, label) and ok
+
+        # Fase 2: todos os homologação
+        if ok:
+            for arquivo, testes in homolog_grupos.items():
+                label = f"HOMOLOGAÇÃO ({len(testes)} testes)"
+                self._run_robot_multi(arquivo, testes, label)
+
+        self.after(0, self._finalizar)
+
+    def _run_robot_multi(self, rel_file, test_names, fase):
+        """Roda robot com múltiplos --test em uma única invocação."""
+        listener = "resources/keywords/console_listener.py"
+        cmd = ["robot", "--outputdir", "results", "--listener", listener]
+        for tn in test_names:
+            cmd += ["--test", tn]
+        cmd.append(rel_file)
+
+        self._log(f"\n── {fase} ──────────────────────────────────────\n", "aviso")
+        self._log(f"  {len(test_names)} testes · {rel_file}\n\n", "info")
+
+        try:
+            self._proc = subprocess.Popen(
+                cmd,
+                stdout=subprocess.PIPE,
+                stderr=subprocess.STDOUT,
+                cwd=ROOT,
+                encoding="utf-8",
+                errors="replace",
+            )
+        except FileNotFoundError:
+            self._log("ERRO: 'robot' não encontrado no PATH.\n", "erro")
+            return False
+
+        proc = self._proc
+        for line in proc.stdout:
+            tag = None
+            low = line.lower()
+            if "→" in line:
+                tag = "info"
+            elif "| pass |" in low or "passed" in low:
+                tag = "ok"
+            elif "| fail |" in low or "failed" in low or "error" in low:
+                tag = "erro"
+            self._log(line, tag)
+
+        proc.wait()
+        success = proc.returncode == 0
+        if success:
+            self._log(f"\n✔ {fase} concluída com sucesso.\n", "ok")
+        else:
+            self._log(f"\n✘ {fase} falhou (código {proc.returncode}).\n", "erro")
+        return success
 
     def _run_regra(self, r):
         self._log(f"\n{'═'*60}\n", "info")
@@ -602,7 +813,7 @@ class App(tk.Tk):
         self._log(f"$ robot --test \"{test_name}\"\n\n", "info")
 
         try:
-            proc = subprocess.Popen(
+            self._proc = subprocess.Popen(
                 cmd,
                 stdout=subprocess.PIPE,
                 stderr=subprocess.STDOUT,
@@ -614,6 +825,7 @@ class App(tk.Tk):
             self._log("ERRO: 'robot' não encontrado no PATH.\n", "erro")
             return False
 
+        proc = self._proc
         for line in proc.stdout:
             tag = None
             low = line.lower()
@@ -633,9 +845,30 @@ class App(tk.Tk):
             self._log(f"\n✘ {fase} falhou (código {proc.returncode}).\n", "erro")
         return success
 
+    def _parar(self):
+        if self._proc and self._proc.poll() is None:
+            self._proc.terminate()
+            try:
+                self._proc.wait(timeout=3)
+            except Exception:
+                self._proc.kill()
+        self._log("\n⏹ Execução interrompida pelo usuário.\n", "erro")
+        self._finalizar()
+
+    def _on_close(self):
+        if self._proc and self._proc.poll() is None:
+            self._proc.terminate()
+            try:
+                self._proc.wait(timeout=3)
+            except Exception:
+                self._proc.kill()
+        self.destroy()
+
     def _finalizar(self):
         self._running = False
-        self._btn.configure(state="normal", text="▶  Executar")
+        self._proc = None
+        self._btn_parar.pack_forget()
+        self._btn.pack(fill="x", padx=10)
 
     # ── Helpers de output ─────────────────────────────────────────────────────
     def _log(self, text, tag=None):
