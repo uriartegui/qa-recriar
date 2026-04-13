@@ -9,7 +9,9 @@ This is a best practices repository for Claude Code configuration, demonstrating
 ## Key Components
 
 ### Weather System (Example Workflow)
+
 A demonstration of two distinct skill patterns via the **Command → Agent → Skill** architecture:
+
 - `/weather-orchestrator` command (`.claude/commands/weather-orchestrator.md`): Entry point — asks user for C/F, invokes agent, then invokes SVG skill
 - `weather-agent` agent (`.claude/agents/weather-agent.md`): Fetches temperature using its preloaded `weather-fetcher` skill (agent skill pattern)
 - `weather-fetcher` skill (`.claude/skills/weather-fetcher/SKILL.md`): Preloaded into agent — instructions for fetching temperature from Open-Meteo
@@ -18,7 +20,9 @@ A demonstration of two distinct skill patterns via the **Command → Agent → S
 Two skill patterns: agent skills (preloaded via `skills:` field) vs skills (invoked via `Skill` tool). See `orchestration-workflow/orchestration-workflow.md` for the complete flow diagram.
 
 ### Skill Definition Structure
+
 Skills in `.claude/skills/<name>/SKILL.md` use YAML frontmatter:
+
 - `name`: Display name and `/slash-command` (defaults to directory name)
 - `description`: When to invoke (recommended for auto-discovery)
 - `argument-hint`: Autocomplete hint (e.g., `[issue-number]`)
@@ -31,10 +35,13 @@ Skills in `.claude/skills/<name>/SKILL.md` use YAML frontmatter:
 - `hooks`: Lifecycle hooks scoped to this skill
 
 ### Presentation System
+
 See `.claude/rules/presentation.md` — all presentation work is delegated to the `presentation-curator` agent.
 
 ### Hooks System
+
 Cross-platform sound notification system in `.claude/hooks/`:
+
 - `scripts/hooks.py`: Main handler for Claude Code hook events
 - `config/hooks-config.json`: Shared team configuration
 - `config/hooks-config.local.json`: Personal overrides (git-ignored)
@@ -47,7 +54,9 @@ Special handling: git commits trigger `pretooluse-git-committing` sound.
 ## Critical Patterns
 
 ### Subagent Orchestration
+
 Subagents **cannot** invoke other subagents via bash commands. Use the Agent tool (renamed from Task in v2.1.63; `Task(...)` still works as an alias):
+
 ```
 Agent(subagent_type="agent-name", description="...", prompt="...", model="haiku")
 ```
@@ -55,7 +64,9 @@ Agent(subagent_type="agent-name", description="...", prompt="...", model="haiku"
 Be explicit about tool usage in subagent definitions. Avoid vague terms like "launch" that could be misinterpreted as bash commands.
 
 ### Subagent Definition Structure
+
 Subagents in `.claude/agents/*.md` use YAML frontmatter:
+
 - `name`: Subagent identifier
 - `description`: When to invoke (use "PROACTIVELY" for auto-invocation)
 - `tools`: Comma-separated allowlist of tools (inherits all if omitted). Supports `Agent(agent_type)` syntax
@@ -73,6 +84,7 @@ Subagents in `.claude/agents/*.md` use YAML frontmatter:
 - `color`: CLI output color for visual distinction
 
 ### Configuration Hierarchy
+
 1. **Managed** (`managed-settings.json` / MDM plist / Registry): Organization-enforced, cannot be overridden
 2. Command line arguments: Single-session overrides
 3. `.claude/settings.local.json`: Personal project settings (git-ignored)
@@ -81,6 +93,7 @@ Subagents in `.claude/agents/*.md` use YAML frontmatter:
 6. `hooks-config.local.json` overrides `hooks-config.json`
 
 ### Disable Hooks
+
 Set `"disableAllHooks": true` in `.claude/settings.local.json`, or disable individual hooks in `hooks-config.json`.
 
 ## Answering Best Practice Questions
@@ -111,6 +124,7 @@ From experience with this repository:
 When committing changes, **create separate commits per file**. Do NOT bundle multiple file changes into a single commit. Each file gets its own commit with a descriptive message specific to that file's changes.
 
 For example, if `README.md`, `best-practice/claude-subagents.md`, and a skill file all changed:
+
 - Commit 1: `git add README.md` → commit with README-specific message
 - Commit 2: `git add best-practice/claude-subagents.md` → commit with subagents-doc-specific message
 - Commit 3: `git add .claude/skills/weather-fetcher/SKILL.md` → commit with skill-specific message
@@ -120,6 +134,42 @@ This makes the git history cleaner and easier to review, revert, or cherry-pick 
 ## Documentation
 
 See `.claude/rules/markdown-docs.md` for documentation standards. Key docs:
+
 - `best-practice/claude-subagents.md`: Subagent frontmatter, hooks, and repository agents
 - `best-practice/claude-commands.md`: Slash command patterns and built-in command reference
 - `orchestration-workflow/orchestration-workflow.md`: Weather system flow diagram
+
+---
+
+## Coding Principles (Karpathy-Inspired)
+
+### 1. Think Before Coding
+
+- State assumptions explicitly
+- If uncertain, ask instead of guessing
+- Present multiple interpretations when ambiguous
+- Push back if a simpler approach exists
+- Stop and clarify when confused
+
+### 2. Simplicity First
+
+- Write the minimum code needed
+- No unnecessary abstractions
+- No speculative features
+- Avoid overengineering
+- Prefer 50 lines over 200 if possible
+
+### 3. Surgical Changes
+
+- Only modify what is required
+- Do not refactor unrelated code
+- Do not change formatting or comments unnecessarily
+- Match existing code style
+- Only clean up code YOU introduced
+
+### 4. Goal-Driven Execution
+
+- Define clear success criteria before coding
+- Prefer tests to validate behavior
+- Iterate until criteria is met
+- Avoid vague goals like "make it work"
