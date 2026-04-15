@@ -353,6 +353,274 @@ REGRAS = [
      "setup_test": "LTF - 30 Dias - Clinico Geral e Assistente Social",
      "homolog_file": "tests/ppv/api/homologacao_ppv.robot",
      "homolog_test": "LTF - 30 Dias - Deve ir para Clinico Geral e Assistente Social"},
+
+    # ── PPV / Abandono de Emprego ────────────────────────────────────────────
+    {"suite": "PPV", "tipo": "Abandono", "cid": "Geral (J00)", "dias": "1 dia",
+     "especialista": "—", "junta": False,
+     "setup_file": "tests/ppv/setup/criar_massa_ppv.robot",
+     "setup_test": "Abandono de Emprego - 1 Dia - CID Geral",
+     "homolog_file": None,
+     "homolog_test": None},
+
+    # ── PPV / Aposentadoria por Invalidez ────────────────────────────────────
+    {"suite": "PPV", "tipo": "Aposentadoria", "cid": "Geral (J00)", "dias": "1 dia",
+     "especialista": "Médico do Trabalho", "junta": False,
+     "setup_file": "tests/ppv/setup/criar_massa_ppv.robot",
+     "setup_test": "Aposentadoria por Invalidez - 1 Dia - CID Geral - Medico Trabalho",
+     "homolog_file": "tests/ppv/api/homologacao_ppv.robot",
+     "homolog_test": "Aposentadoria por Invalidez - CID Geral - Deve ir para Medico Trabalho"},
+
+    {"suite": "PPV", "tipo": "Aposentadoria", "cid": "Psiquiatria (F32)", "dias": "1 dia",
+     "especialista": "Psiquiatra", "junta": False,
+     "setup_file": "tests/ppv/setup/criar_massa_ppv.robot",
+     "setup_test": "Aposentadoria por Invalidez - 1 Dia - CID F - Psiquiatra",
+     "homolog_file": "tests/ppv/api/homologacao_ppv.robot",
+     "homolog_test": "Aposentadoria por Invalidez - CID F - Deve ir para Psiquiatra"},
+
+    {"suite": "PPV", "tipo": "Aposentadoria", "cid": "Ortopedia (M54)", "dias": "1 dia",
+     "especialista": "Ortopedista", "junta": False,
+     "setup_file": "tests/ppv/setup/criar_massa_ppv.robot",
+     "setup_test": "Aposentadoria por Invalidez - 1 Dia - CID MS - Ortopedista",
+     "homolog_file": "tests/ppv/api/homologacao_ppv.robot",
+     "homolog_test": "Aposentadoria por Invalidez - CID MS - Deve ir para Ortopedista"},
+
+    # ── PPV / Consulta Médica ────────────────────────────────────────────────
+    {"suite": "PPV", "tipo": "Consulta", "cid": "Geral (J00)", "dias": "1 dia",
+     "especialista": "Clínico Geral", "junta": False,
+     "setup_file": "tests/ppv/setup/criar_massa_ppv.robot",
+     "setup_test": "Consulta Medica - 1 Dia - CID Geral - Clinico Geral",
+     "homolog_file": "tests/ppv/api/homologacao_ppv.robot",
+     "homolog_test": "Consulta Medica - Deve ir para Clinico Geral"},
+
+    # ── PPV / Gestação Pré-parto ─────────────────────────────────────────────
+    {"suite": "PPV", "tipo": "Gestação Pré", "cid": "—", "dias": "1 dia",
+     "especialista": "Clínico Geral", "junta": False,
+     "setup_file": "tests/ppv/setup/criar_massa_ppv.robot",
+     "setup_test": "Licenca Gestacao Pre-parto - 1 Dia - Clinico Geral",
+     "homolog_file": "tests/ppv/api/homologacao_ppv.robot",
+     "homolog_test": "Gestacao Pre-parto - Deve ir para Clinico Geral"},
+
+    # ── PPV / Gestação Pós-parto ─────────────────────────────────────────────
+    {"suite": "PPV", "tipo": "Gestação Pós", "cid": "—", "dias": "1 dia",
+     "especialista": "Clínico Geral", "junta": False,
+     "setup_file": "tests/ppv/setup/criar_massa_ppv.robot",
+     "setup_test": "Licenca Gestacao Pos-parto - 1 Dia - Clinico Geral",
+     "homolog_file": "tests/ppv/api/homologacao_ppv.robot",
+     "homolog_test": "Gestacao Pos-parto - Deve ir para Clinico Geral"},
+
+    # ── PPV / Férias Pecúnia ─────────────────────────────────────────────────
+    {"suite": "PPV", "tipo": "Férias Pecúnia", "cid": "Geral (J00)", "dias": "1 dia",
+     "especialista": "Clínico Geral", "junta": False,
+     "setup_file": "tests/ppv/setup/criar_massa_ppv.robot",
+     "setup_test": "Ferias Pecunia - 1 Dia - CID Geral - Clinico Geral",
+     "homolog_file": "tests/ppv/api/homologacao_ppv.robot",
+     "homolog_test": "Ferias Pecunia - CID Geral - Deve ir para Clinico Geral"},
+
+    {"suite": "PPV", "tipo": "Férias Pecúnia", "cid": "Psiquiatria (F32)", "dias": "1 dia",
+     "especialista": "Psiquiatra", "junta": False,
+     "setup_file": "tests/ppv/setup/criar_massa_ppv.robot",
+     "setup_test": "Ferias Pecunia - 1 Dia - CID F - Psiquiatra",
+     "homolog_file": "tests/ppv/api/homologacao_ppv.robot",
+     "homolog_test": "Ferias Pecunia - CID F - Deve ir para Psiquiatra"},
+
+    {"suite": "PPV", "tipo": "Férias Pecúnia", "cid": "Ortopedia (M54)", "dias": "1 dia",
+     "especialista": "Ortopedista", "junta": False,
+     "setup_file": "tests/ppv/setup/criar_massa_ppv.robot",
+     "setup_test": "Ferias Pecunia - 1 Dia - CID MS - Ortopedista",
+     "homolog_file": "tests/ppv/api/homologacao_ppv.robot",
+     "homolog_test": "Ferias Pecunia - CID MS - Deve ir para Ortopedista"},
+
+    # ── PPV / Férias Pecúnia Dependente ─────────────────────────────────────
+    {"suite": "PPV", "tipo": "Férias Pecúnia Dep", "cid": "Geral (J00)", "dias": "1 dia",
+     "especialista": "Clínico Geral", "junta": False,
+     "setup_file": "tests/ppv/setup/criar_massa_ppv.robot",
+     "setup_test": "Ferias Pecunia Dependente - 1 Dia - CID Geral - Clinico Geral",
+     "homolog_file": "tests/ppv/api/homologacao_ppv.robot",
+     "homolog_test": "Ferias Pecunia Dependente - CID Geral - Deve ir para Clinico Geral"},
+
+    {"suite": "PPV", "tipo": "Férias Pecúnia Dep", "cid": "Psiquiatria (F32)", "dias": "1 dia",
+     "especialista": "Psiquiatra", "junta": False,
+     "setup_file": "tests/ppv/setup/criar_massa_ppv.robot",
+     "setup_test": "Ferias Pecunia Dependente - 1 Dia - CID F - Psiquiatra",
+     "homolog_file": "tests/ppv/api/homologacao_ppv.robot",
+     "homolog_test": "Ferias Pecunia Dependente - CID F - Deve ir para Psiquiatra"},
+
+    {"suite": "PPV", "tipo": "Férias Pecúnia Dep", "cid": "Ortopedia (M54)", "dias": "1 dia",
+     "especialista": "Ortopedista", "junta": False,
+     "setup_file": "tests/ppv/setup/criar_massa_ppv.robot",
+     "setup_test": "Ferias Pecunia Dependente - 1 Dia - CID MS - Ortopedista",
+     "homolog_file": "tests/ppv/api/homologacao_ppv.robot",
+     "homolog_test": "Ferias Pecunia Dependente - CID MS - Deve ir para Ortopedista"},
+
+    # ── PPV / Prêmio Pecúnia ─────────────────────────────────────────────────
+    {"suite": "PPV", "tipo": "Prêmio Pecúnia", "cid": "Geral (J00)", "dias": "1 dia",
+     "especialista": "Clínico Geral", "junta": False,
+     "setup_file": "tests/ppv/setup/criar_massa_ppv.robot",
+     "setup_test": "Premio Pecunia - 1 Dia - CID Geral - Clinico Geral",
+     "homolog_file": "tests/ppv/api/homologacao_ppv.robot",
+     "homolog_test": "Premio Pecunia - CID Geral - Deve ir para Clinico Geral"},
+
+    {"suite": "PPV", "tipo": "Prêmio Pecúnia", "cid": "Psiquiatria (F32)", "dias": "1 dia",
+     "especialista": "Psiquiatra", "junta": False,
+     "setup_file": "tests/ppv/setup/criar_massa_ppv.robot",
+     "setup_test": "Premio Pecunia - 1 Dia - CID F - Psiquiatra",
+     "homolog_file": "tests/ppv/api/homologacao_ppv.robot",
+     "homolog_test": "Premio Pecunia - CID F - Deve ir para Psiquiatra"},
+
+    {"suite": "PPV", "tipo": "Prêmio Pecúnia", "cid": "Ortopedia (M54)", "dias": "1 dia",
+     "especialista": "Ortopedista", "junta": False,
+     "setup_file": "tests/ppv/setup/criar_massa_ppv.robot",
+     "setup_test": "Premio Pecunia - 1 Dia - CID MS - Ortopedista",
+     "homolog_file": "tests/ppv/api/homologacao_ppv.robot",
+     "homolog_test": "Premio Pecunia - CID MS - Deve ir para Ortopedista"},
+
+    # ── PPV / Prêmio Pecúnia Dependente ─────────────────────────────────────
+    {"suite": "PPV", "tipo": "Prêmio Pecúnia Dep", "cid": "Geral (J00)", "dias": "1 dia",
+     "especialista": "Clínico Geral", "junta": False,
+     "setup_file": "tests/ppv/setup/criar_massa_ppv.robot",
+     "setup_test": "Premio Pecunia Dependente - 1 Dia - CID Geral - Clinico Geral",
+     "homolog_file": "tests/ppv/api/homologacao_ppv.robot",
+     "homolog_test": "Premio Pecunia Dependente - CID Geral - Deve ir para Clinico Geral"},
+
+    {"suite": "PPV", "tipo": "Prêmio Pecúnia Dep", "cid": "Psiquiatria (F32)", "dias": "1 dia",
+     "especialista": "Psiquiatra", "junta": False,
+     "setup_file": "tests/ppv/setup/criar_massa_ppv.robot",
+     "setup_test": "Premio Pecunia Dependente - 1 Dia - CID F - Psiquiatra",
+     "homolog_file": "tests/ppv/api/homologacao_ppv.robot",
+     "homolog_test": "Premio Pecunia Dependente - CID F - Deve ir para Psiquiatra"},
+
+    {"suite": "PPV", "tipo": "Prêmio Pecúnia Dep", "cid": "Ortopedia (M54)", "dias": "1 dia",
+     "especialista": "Ortopedista", "junta": False,
+     "setup_file": "tests/ppv/setup/criar_massa_ppv.robot",
+     "setup_test": "Premio Pecunia Dependente - 1 Dia - CID MS - Ortopedista",
+     "homolog_file": "tests/ppv/api/homologacao_ppv.robot",
+     "homolog_test": "Premio Pecunia Dependente - CID MS - Deve ir para Ortopedista"},
+
+    # ── PPV / Parecer Médico do Trabalho ─────────────────────────────────────
+    {"suite": "PPV", "tipo": "Parecer Médico", "cid": "Geral (J00)", "dias": "1 dia",
+     "especialista": "Médico do Trabalho", "junta": False,
+     "setup_file": "tests/ppv/setup/criar_massa_ppv.robot",
+     "setup_test": "Parecer Medico do Trabalho - 1 Dia - CID Geral - Medico Trabalho",
+     "homolog_file": "tests/ppv/api/homologacao_ppv.robot",
+     "homolog_test": "Parecer Medico do Trabalho - Deve ir para Medico Trabalho"},
+
+    # ── PPV / Readaptação Funcional (Junta) ──────────────────────────────────
+    {"suite": "PPV", "tipo": "RF", "cid": "Geral (J00)", "dias": "1 dia",
+     "especialista": "Clínico Geral (Junta)", "junta": True,
+     "setup_file": "tests/ppv/setup/criar_massa_ppv.robot",
+     "setup_test": "Readaptacao Funcional - 1 Dia - CID Geral - Junta Clinico Geral",
+     "homolog_file": "tests/ppv/api/homologacao_ppv.robot",
+     "homolog_test": "Readaptacao Funcional - CID Geral - Deve ir para Junta Clinico Geral"},
+
+    {"suite": "PPV", "tipo": "RF", "cid": "Psiquiatria (F32)", "dias": "1 dia",
+     "especialista": "Psiquiatra (Junta)", "junta": True,
+     "setup_file": "tests/ppv/setup/criar_massa_ppv.robot",
+     "setup_test": "Readaptacao Funcional - 1 Dia - CID F - Junta Psiquiatra",
+     "homolog_file": "tests/ppv/api/homologacao_ppv.robot",
+     "homolog_test": "Readaptacao Funcional - CID F - Deve ir para Junta Psiquiatra"},
+
+    {"suite": "PPV", "tipo": "RF", "cid": "Ortopedia (M54)", "dias": "1 dia",
+     "especialista": "Ortopedista (Junta)", "junta": True,
+     "setup_file": "tests/ppv/setup/criar_massa_ppv.robot",
+     "setup_test": "Readaptacao Funcional - 1 Dia - CID MS - Junta Ortopedista",
+     "homolog_file": "tests/ppv/api/homologacao_ppv.robot",
+     "homolog_test": "Readaptacao Funcional - CID MS - Deve ir para Junta Ortopedista"},
+
+    # ── PPV / Recurso ────────────────────────────────────────────────────────
+    {"suite": "PPV", "tipo": "Recurso", "cid": "Geral (J00)", "dias": "1 dia",
+     "especialista": "Clínico Geral", "junta": False,
+     "setup_file": "tests/ppv/setup/criar_massa_ppv.robot",
+     "setup_test": "Recurso - 1 Dia - CID Geral - Clinico Geral",
+     "homolog_file": "tests/ppv/api/homologacao_ppv.robot",
+     "homolog_test": "Recurso - Deve ir para Clinico Geral"},
+
+    # ── PPV / Redução de Jornada Servidor ────────────────────────────────────
+    {"suite": "PPV", "tipo": "Redução Jornada Serv", "cid": "Geral (J00)", "dias": "1 dia",
+     "especialista": "Clínico Geral", "junta": False,
+     "setup_file": "tests/ppv/setup/criar_massa_ppv.robot",
+     "setup_test": "Reducao Jornada Servidor - 1 Dia - CID Geral - Clinico Geral",
+     "homolog_file": "tests/ppv/api/homologacao_ppv.robot",
+     "homolog_test": "Reducao Jornada Servidor - CID Geral - Deve ir para Clinico Geral"},
+
+    {"suite": "PPV", "tipo": "Redução Jornada Serv", "cid": "Psiquiatria (F32)", "dias": "1 dia",
+     "especialista": "Psiquiatra", "junta": False,
+     "setup_file": "tests/ppv/setup/criar_massa_ppv.robot",
+     "setup_test": "Reducao Jornada Servidor - 1 Dia - CID F - Psiquiatra",
+     "homolog_file": "tests/ppv/api/homologacao_ppv.robot",
+     "homolog_test": "Reducao Jornada Servidor - CID F - Deve ir para Psiquiatra"},
+
+    {"suite": "PPV", "tipo": "Redução Jornada Serv", "cid": "Ortopedia (M54)", "dias": "1 dia",
+     "especialista": "Ortopedista", "junta": False,
+     "setup_file": "tests/ppv/setup/criar_massa_ppv.robot",
+     "setup_test": "Reducao Jornada Servidor - 1 Dia - CID MS - Ortopedista",
+     "homolog_file": "tests/ppv/api/homologacao_ppv.robot",
+     "homolog_test": "Reducao Jornada Servidor - CID MS - Deve ir para Ortopedista"},
+
+    # ── PPV / Redução de Jornada Dependente ──────────────────────────────────
+    {"suite": "PPV", "tipo": "Redução Jornada Dep", "cid": "Geral (J00)", "dias": "1 dia",
+     "especialista": "Clínico Geral", "junta": False,
+     "setup_file": "tests/ppv/setup/criar_massa_ppv.robot",
+     "setup_test": "Reducao Jornada Dependente - 1 Dia - CID Geral - Clinico Geral",
+     "homolog_file": "tests/ppv/api/homologacao_ppv.robot",
+     "homolog_test": "Reducao Jornada Dependente - CID Geral - Deve ir para Clinico Geral"},
+
+    {"suite": "PPV", "tipo": "Redução Jornada Dep", "cid": "Psiquiatria (F32)", "dias": "1 dia",
+     "especialista": "Psicólogo + Psiquiatra", "junta": False,
+     "setup_file": "tests/ppv/setup/criar_massa_ppv.robot",
+     "setup_test": "Reducao Jornada Dependente - 1 Dia - CID F - Psicologo e Psiquiatra",
+     "homolog_file": "tests/ppv/api/homologacao_ppv.robot",
+     "homolog_test": "Reducao Jornada Dependente - CID F - Deve ir para Psiquiatra"},
+
+    {"suite": "PPV", "tipo": "Redução Jornada Dep", "cid": "Ortopedia (M54)", "dias": "1 dia",
+     "especialista": "Assist. Social + Ortopedista", "junta": False,
+     "setup_file": "tests/ppv/setup/criar_massa_ppv.robot",
+     "setup_test": "Reducao Jornada Dependente - 1 Dia - CID MS - Assist Social e Ortopedista",
+     "homolog_file": "tests/ppv/api/homologacao_ppv.robot",
+     "homolog_test": "Reducao Jornada Dependente - CID MS - Deve ir para Ortopedista"},
+
+    # ── PPV / Remoção Servidor ───────────────────────────────────────────────
+    {"suite": "PPV", "tipo": "Remoção Serv", "cid": "Geral (J00)", "dias": "1 dia",
+     "especialista": "Clínico Geral", "junta": False,
+     "setup_file": "tests/ppv/setup/criar_massa_ppv.robot",
+     "setup_test": "Remocao Servidor - 1 Dia - CID Geral - Clinico Geral",
+     "homolog_file": "tests/ppv/api/homologacao_ppv.robot",
+     "homolog_test": "Remocao Servidor - CID Geral - Deve ir para Clinico Geral"},
+
+    {"suite": "PPV", "tipo": "Remoção Serv", "cid": "Psiquiatria (F32)", "dias": "1 dia",
+     "especialista": "Psiquiatra", "junta": False,
+     "setup_file": "tests/ppv/setup/criar_massa_ppv.robot",
+     "setup_test": "Remocao Servidor - 1 Dia - CID F - Psiquiatra",
+     "homolog_file": "tests/ppv/api/homologacao_ppv.robot",
+     "homolog_test": "Remocao Servidor - CID F - Deve ir para Psiquiatra"},
+
+    {"suite": "PPV", "tipo": "Remoção Serv", "cid": "Ortopedia (M54)", "dias": "1 dia",
+     "especialista": "Ortopedista", "junta": False,
+     "setup_file": "tests/ppv/setup/criar_massa_ppv.robot",
+     "setup_test": "Remocao Servidor - 1 Dia - CID MS - Ortopedista",
+     "homolog_file": "tests/ppv/api/homologacao_ppv.robot",
+     "homolog_test": "Remocao Servidor - CID MS - Deve ir para Ortopedista"},
+
+    # ── PPV / Remoção Dependente ─────────────────────────────────────────────
+    {"suite": "PPV", "tipo": "Remoção Dep", "cid": "Geral (J00)", "dias": "1 dia",
+     "especialista": "Clínico Geral", "junta": False,
+     "setup_file": "tests/ppv/setup/criar_massa_ppv.robot",
+     "setup_test": "Remocao Dependente - 1 Dia - CID Geral - Clinico Geral",
+     "homolog_file": "tests/ppv/api/homologacao_ppv.robot",
+     "homolog_test": "Remocao Dependente - CID Geral - Deve ir para Clinico Geral"},
+
+    {"suite": "PPV", "tipo": "Remoção Dep", "cid": "Psiquiatria (F32)", "dias": "1 dia",
+     "especialista": "Psicólogo + Psiquiatra", "junta": False,
+     "setup_file": "tests/ppv/setup/criar_massa_ppv.robot",
+     "setup_test": "Remocao Dependente - 1 Dia - CID F - Psicologo e Psiquiatra",
+     "homolog_file": "tests/ppv/api/homologacao_ppv.robot",
+     "homolog_test": "Remocao Dependente - CID F - Deve ir para Psiquiatra"},
+
+    {"suite": "PPV", "tipo": "Remoção Dep", "cid": "Ortopedia (M54)", "dias": "1 dia",
+     "especialista": "Assist. Social + Ortopedista", "junta": False,
+     "setup_file": "tests/ppv/setup/criar_massa_ppv.robot",
+     "setup_test": "Remocao Dependente - 1 Dia - CID MS - Assist Social e Ortopedista",
+     "homolog_file": "tests/ppv/api/homologacao_ppv.robot",
+     "homolog_test": "Remocao Dependente - CID MS - Deve ir para Ortopedista"},
 ]
 
 # ──────────────────────────────────────────────────────────────────────────────
