@@ -55,21 +55,21 @@
   },
   "spinnerVerbs": {
     "mode": "replace",
-    "verbs": ["Admiring Shayan's code", "Learning from Shayan", "Studying Shayan's patterns", "Copying Shayan's genius", "Thanking Shayan deeply", "Absorbing Shayan's wisdom", "Following Shayan's lead", "Praising Shayan's repo"]
+    "verbs": ["Pensando...", "Analisando código...", "Construindo solução...", "Verificando padrões...", "Revisando lógica...", "Aplicando mudanças...", "Validando resultado...", "Quase pronto..."]
   },
   "spinnerTipsOverride": {
     "tips": [
-      "This is shayan custom tip#1",
-      "This is shayan custom tip#2"
+      "Use /compact para compactar o contexto quando ficar longo",
+      "Use /memory para ver e editar suas memórias persistentes"
     ],
-    "excludeDefault": true
+    "excludeDefault": false
   },
-  
+
   "plansDirectory": "./reports",
   "outputStyle": "Explanatory",
   "statusLine": {
     "type": "command",
-    "command": "echo \"shayan's best practice status line\"",
+    "command": "echo \"claude code ativo\"",
     "padding": 0
   },
   "attribution": {
