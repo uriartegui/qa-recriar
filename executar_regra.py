@@ -849,6 +849,14 @@ class App(tk.Tk):
                                              padx=10, pady=6, activebackground="#94e2d5")
         self._btn_homologar_tudo.pack(fill="x", padx=10, pady=(4, 0))
 
+        self._btn_criar_massa = tk.Button(left, text="📦  Criar Massa",
+                                          command=self._criar_massa,
+                                          bg="#fab387", fg="#1e1e2e",
+                                          font=("Segoe UI", 10, "bold"),
+                                          relief="flat", cursor="hand2",
+                                          padx=10, pady=6, activebackground="#f9e2af")
+        self._btn_criar_massa.pack(fill="x", padx=10, pady=(4, 0))
+
         self._btn_parar = tk.Button(left, text="⏹  Parar",
                                     command=self._parar,
                                     bg="#f38ba8", fg="#1e1e2e",
@@ -952,6 +960,7 @@ class App(tk.Tk):
         self._running = True
         self._btn.pack_forget()
         self._btn_homologar_tudo.pack_forget()
+        self._btn_criar_massa.pack_forget()
         self._btn_parar.pack(fill="x", padx=10)
 
         if self._modo.get() == "categoria":
@@ -1122,6 +1131,58 @@ class App(tk.Tk):
             self._log(f"\n✘ {fase} falhou (código {proc.returncode}).\n", "erro")
         return success
 
+    # ── Criar Massa ───────────────────────────────────────────────────────────
+    def _criar_massa(self):
+        if self._running:
+            return
+        self._running = True
+        self._btn.pack_forget()
+        self._btn_homologar_tudo.pack_forget()
+        self._btn_criar_massa.pack_forget()
+        self._btn_parar.pack(fill="x", padx=10)
+
+        if self._modo.get() == "categoria":
+            nome = self._categ.get().split("  (")[0]
+            regras = _regras_da_categoria(self._suite.get(), nome)
+            if not regras:
+                self._log("Nenhuma regra na categoria selecionada.\n", "erro")
+                self.after(0, self._finalizar)
+                return
+            threading.Thread(target=self._run_criar_massa_lista,
+                             args=(regras, nome), daemon=True).start()
+        else:
+            r = _find_regra(self._suite.get(), self._tipo.get(),
+                            self._cid.get(), self._dias.get())
+            if not r:
+                self._log("Nenhuma regra selecionada.\n", "erro")
+                self.after(0, self._finalizar)
+                return
+            threading.Thread(target=self._run_criar_massa_regra,
+                             args=(r,), daemon=True).start()
+
+    def _run_criar_massa_regra(self, r):
+        self._log(f"\n{'═'*60}\n", "info")
+        self._log(f"  Criar Massa — {r['suite']} / {r['tipo']}\n", "info")
+        self._log(f"{'═'*60}\n\n", "info")
+        self._run_robot(r["setup_file"], r["setup_test"], "CRIAR MASSA")
+        self.after(0, self._finalizar)
+
+    def _run_criar_massa_lista(self, regras, nome_cat):
+        self._log(f"\n{'═'*60}\n", "info")
+        self._log(f"  Criar Massa — Categoria: {nome_cat}\n", "info")
+        self._log(f"  Regras: {len(regras)}\n", "info")
+        self._log(f"{'═'*60}\n\n", "info")
+
+        from collections import defaultdict
+        setup_grupos = defaultdict(list)
+        for r in regras:
+            setup_grupos[r["setup_file"]].append(r["setup_test"])
+
+        for setup_file, tests in setup_grupos.items():
+            self._run_robot(setup_file, tests, "CRIAR MASSA")
+
+        self.after(0, self._finalizar)
+
     # ── Homologar Tudo ────────────────────────────────────────────────────────
     def _homologar_tudo(self):
         if self._running:
@@ -1140,6 +1201,7 @@ class App(tk.Tk):
         self._running = True
         self._btn.pack_forget()
         self._btn_homologar_tudo.pack_forget()
+        self._btn_criar_massa.pack_forget()
         self._btn_parar.pack(fill="x", padx=10)
         threading.Thread(target=self._run_homologar_tudo,
                          args=(homolog_file, suite), daemon=True).start()
@@ -1221,6 +1283,7 @@ class App(tk.Tk):
         self._btn_parar.pack_forget()
         self._btn.pack(fill="x", padx=10)
         self._btn_homologar_tudo.pack(fill="x", padx=10, pady=(4, 0))
+        self._btn_criar_massa.pack(fill="x", padx=10, pady=(4, 0))
 
     # ── Helpers de output ─────────────────────────────────────────────────────
     def _log(self, text, tag=None):
