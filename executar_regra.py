@@ -841,13 +841,21 @@ class App(tk.Tk):
                               padx=10, pady=8, activebackground="#74c7ec")
         self._btn.pack(fill="x", padx=10)
 
-        self._btn_homologar_tudo = tk.Button(left, text="⚡  Homologar Tudo",
-                                             command=self._homologar_tudo,
-                                             bg="#a6e3a1", fg="#1e1e2e",
-                                             font=("Segoe UI", 10, "bold"),
-                                             relief="flat", cursor="hand2",
-                                             padx=10, pady=6, activebackground="#94e2d5")
-        self._btn_homologar_tudo.pack(fill="x", padx=10, pady=(4, 0))
+        self._btn_homologar_pmv = tk.Button(left, text="⚡  Homologar PMV",
+                                            command=lambda: self._homologar_suite("PMV"),
+                                            bg="#a6e3a1", fg="#1e1e2e",
+                                            font=("Segoe UI", 10, "bold"),
+                                            relief="flat", cursor="hand2",
+                                            padx=10, pady=6, activebackground="#94e2d5")
+        self._btn_homologar_pmv.pack(fill="x", padx=10, pady=(4, 0))
+
+        self._btn_homologar_ppv = tk.Button(left, text="⚡  Homologar PPV",
+                                            command=lambda: self._homologar_suite("PPV"),
+                                            bg="#94e2d5", fg="#1e1e2e",
+                                            font=("Segoe UI", 10, "bold"),
+                                            relief="flat", cursor="hand2",
+                                            padx=10, pady=6, activebackground="#a6e3a1")
+        self._btn_homologar_ppv.pack(fill="x", padx=10, pady=(4, 0))
 
         self._btn_criar_massa = tk.Button(left, text="📦  Criar Massa",
                                           command=self._criar_massa,
@@ -959,7 +967,8 @@ class App(tk.Tk):
             return
         self._running = True
         self._btn.pack_forget()
-        self._btn_homologar_tudo.pack_forget()
+        self._btn_homologar_pmv.pack_forget()
+        self._btn_homologar_ppv.pack_forget()
         self._btn_criar_massa.pack_forget()
         self._btn_parar.pack(fill="x", padx=10)
 
@@ -989,11 +998,13 @@ class App(tk.Tk):
         self._log(f"  Regras    : {len(regras)}\n", "info")
         self._log(f"{'═'*60}\n\n", "info")
 
-        # Limpar massa
-        massa_file = os.path.join(ROOT, "results", "massa_criada.json")
-        if os.path.exists(massa_file):
-            os.remove(massa_file)
-            self._log("  massa_criada.json limpo.\n\n", "aviso")
+        # Limpar massa (por suite detectada nas regras)
+        suites_usadas = set(r["suite"] for r in regras)
+        for s in suites_usadas:
+            massa_file = os.path.join(ROOT, "results", f"massa_criada_{s.lower()}.json")
+            if os.path.exists(massa_file):
+                os.remove(massa_file)
+                self._log(f"  massa_criada_{s.lower()}.json limpo.\n\n", "aviso")
 
         # Agrupar por arquivo de setup (pode haver PMV e PPV misturados no "Todas")
         from collections import defaultdict
@@ -1019,7 +1030,7 @@ class App(tk.Tk):
         self.after(0, self._finalizar)
 
     def _run_robot_multi(self, rel_file, test_names, fase):
-        """Roda robot com múltiplos --test em uma única invocação."""
+        """Roda robot com múltiplos --test em uma única invocação sequencial."""
         listener = "resources/keywords/console_listener.py"
         cmd = ["robot", "--outputdir", "results", "--listener", listener]
         for tn in test_names:
@@ -1073,10 +1084,10 @@ class App(tk.Tk):
         self._log(f"{'═'*60}\n\n", "info")
 
         # ── Limpar massa anterior ──
-        massa_file = os.path.join(ROOT, "results", "massa_criada.json")
+        massa_file = os.path.join(ROOT, "results", f"massa_criada_{r['suite'].lower()}.json")
         if os.path.exists(massa_file):
             os.remove(massa_file)
-            self._log("  massa_criada.json limpo.\n\n", "aviso")
+            self._log(f"  massa_criada_{r['suite'].lower()}.json limpo.\n\n", "aviso")
 
         # ── Fase 1: Criar Massa ──
         ok = self._run_robot(r["setup_file"], r["setup_test"], "CRIAR MASSA")
@@ -1137,7 +1148,8 @@ class App(tk.Tk):
             return
         self._running = True
         self._btn.pack_forget()
-        self._btn_homologar_tudo.pack_forget()
+        self._btn_homologar_pmv.pack_forget()
+        self._btn_homologar_ppv.pack_forget()
         self._btn_criar_massa.pack_forget()
         self._btn_parar.pack(fill="x", padx=10)
 
@@ -1179,17 +1191,17 @@ class App(tk.Tk):
             setup_grupos[r["setup_file"]].append(r["setup_test"])
 
         for setup_file, tests in setup_grupos.items():
-            self._run_robot(setup_file, tests, "CRIAR MASSA")
+            self._run_robot_multi(setup_file, tests, "CRIAR MASSA")
 
         self.after(0, self._finalizar)
 
-    # ── Homologar Tudo ────────────────────────────────────────────────────────
-    def _homologar_tudo(self):
+    # ── Homologar Suite (PMV ou PPV) ──────────────────────────────────────────
+    def _homologar_suite(self, suite):
         if self._running:
             return
-        massa_file = os.path.join(ROOT, "results", "massa_criada.json")
+        massa_file = os.path.join(ROOT, "results", f"massa_criada_{suite.lower()}.json")
         if not os.path.exists(massa_file):
-            self._log("ERRO: massa_criada.json não encontrado. Rode criar_massa primeiro.\n", "erro")
+            self._log(f"ERRO: massa_criada_{suite.lower()}.json não encontrado. Rode criar_massa primeiro.\n", "erro")
             return
 
         suite = self._suite.get()
@@ -1200,13 +1212,14 @@ class App(tk.Tk):
 
         self._running = True
         self._btn.pack_forget()
-        self._btn_homologar_tudo.pack_forget()
+        self._btn_homologar_pmv.pack_forget()
+        self._btn_homologar_ppv.pack_forget()
         self._btn_criar_massa.pack_forget()
         self._btn_parar.pack(fill="x", padx=10)
-        threading.Thread(target=self._run_homologar_tudo,
+        threading.Thread(target=self._run_homologar_suite,
                          args=(homolog_file, suite), daemon=True).start()
 
-    def _run_homologar_tudo(self, homolog_file, suite):
+    def _run_homologar_suite(self, homolog_file, suite):
         self._log(f"\n{'═'*60}\n", "info")
         self._log(f"  Homologar Tudo — {suite}\n", "info")
         self._log(f"  Arquivo: {homolog_file}\n", "info")
@@ -1282,7 +1295,8 @@ class App(tk.Tk):
         self._proc = None
         self._btn_parar.pack_forget()
         self._btn.pack(fill="x", padx=10)
-        self._btn_homologar_tudo.pack(fill="x", padx=10, pady=(4, 0))
+        self._btn_homologar_pmv.pack(fill="x", padx=10, pady=(4, 0))
+        self._btn_homologar_ppv.pack(fill="x", padx=10, pady=(4, 0))
         self._btn_criar_massa.pack(fill="x", padx=10, pady=(4, 0))
 
     # ── Helpers de output ─────────────────────────────────────────────────────

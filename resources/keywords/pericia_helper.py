@@ -37,7 +37,12 @@ def _jwt_user_id(token):
     except Exception:
         return None
 
-MASSA_FILE = os.path.join(os.path.dirname(__file__), '..', '..', 'results', 'massa_criada.json')
+_RESULTS_DIR = os.path.join(os.path.dirname(__file__), '..', '..', 'results')
+MASSA_FILE_PMV = os.path.join(_RESULTS_DIR, 'massa_criada_pmv.json')
+MASSA_FILE_PPV = os.path.join(_RESULTS_DIR, 'massa_criada_ppv.json')
+
+def _massa_file(regra):
+    return MASSA_FILE_PMV if str(regra).startswith('PMV_') else MASSA_FILE_PPV
 FICHA_HOMOLOG_TYPE_ID = "bcfc80cf-12ea-4cb5-8ac2-195895418db1"
 _customer_regra = {}
 
@@ -151,15 +156,17 @@ def gerar_data_admissao():
 def gerar_data_hoje():
     return datetime.now().strftime("%Y-%m-%d")
 
-def limpar_massa():
-    if os.path.exists(MASSA_FILE):
-        os.remove(MASSA_FILE)
-    print("massa_criada.json limpo para nova execução.")
+def limpar_massa(suite="PPV"):
+    mf = MASSA_FILE_PMV if suite.upper() == "PMV" else MASSA_FILE_PPV
+    if os.path.exists(mf):
+        os.remove(mf)
+    print(f"massa_criada_{suite.lower()}.json limpo para nova execução.")
 
 def salvar_massa(regra, customer_id, cpf, nome):
+    mf = _massa_file(regra)
     dados = {}
-    if os.path.exists(MASSA_FILE):
-        with open(MASSA_FILE, 'r') as f:
+    if os.path.exists(mf):
+        with open(mf, 'r') as f:
             dados = json.load(f)
     dados[regra] = {
         "customer_id": customer_id,
@@ -175,8 +182,8 @@ def salvar_massa(regra, customer_id, cpf, nome):
         "service_type": None,
         "data_criacao": datetime.now().strftime("%Y-%m-%d %H:%M:%S")
     }
-    os.makedirs(os.path.dirname(MASSA_FILE), exist_ok=True)
-    with open(MASSA_FILE, 'w') as f:
+    os.makedirs(os.path.dirname(mf), exist_ok=True)
+    with open(mf, 'w') as f:
         json.dump(dados, f, indent=2, ensure_ascii=False)
     print(f"Massa salva: {regra} → {nome}")
     _customer_regra[customer_id] = regra
@@ -217,11 +224,12 @@ def criar_customer(api_url, token, regra, company_id, tipo="Main"):
         customer_id = data.get("customerid")
         salvar_massa(regra, customer_id, cpf, nome)
         # salva matrícula logo após criar o customer
-        if os.path.exists(MASSA_FILE):
-            with open(MASSA_FILE, 'r') as _f:
+        mf = _massa_file(regra)
+        if os.path.exists(mf):
+            with open(mf, 'r') as _f:
                 _d = json.load(_f)
             _d[regra]["matricula"] = matricula
-            with open(MASSA_FILE, 'w') as _f:
+            with open(mf, 'w') as _f:
                 json.dump(_d, _f, indent=2, ensure_ascii=False)
         return customer_id, cpf, nome
     raise Exception(f"Erro ao criar customer: {response.status_code} - {response.text[:300]}")
@@ -248,8 +256,9 @@ def criar_pericia_api(api_url, token, customer_id, cpf, cellphone, email,
         response = requests.post(url, data=data, files=files, headers=headers)
     if response.status_code < 300 and customer_id in _customer_regra:
         regra = _customer_regra[customer_id]
-        if os.path.exists(MASSA_FILE):
-            with open(MASSA_FILE, 'r') as ff:
+        mf = _massa_file(regra)
+        if os.path.exists(mf):
+            with open(mf, 'r') as ff:
                 dados = json.load(ff)
             if regra in dados:
                 dados[regra]["cid"] = cid
@@ -273,24 +282,26 @@ def criar_pericia_api(api_url, token, customer_id, cpf, cellphone, email,
                         print(f"attendance_id salvo da criação: {att_id}")
                 except Exception as e:
                     print(f"Erro ao parsear resposta da péricia: {e}")
-                with open(MASSA_FILE, 'w') as ff:
+                with open(mf, 'w') as ff:
                     json.dump(dados, ff, indent=2, ensure_ascii=False)
     print(f"Status: {response.status_code}")
     return response.status_code, response.text
 
 def ler_massa(regra):
-    if not os.path.exists(MASSA_FILE):
-        raise Exception(f"massa_criada.json não encontrado. Rode criar_massa.robot primeiro.")
-    with open(MASSA_FILE, 'r') as f:
+    mf = _massa_file(regra)
+    if not os.path.exists(mf):
+        raise Exception(f"{os.path.basename(mf)} não encontrado. Rode criar_massa.robot primeiro.")
+    with open(mf, 'r') as f:
         dados = json.load(f)
     if regra not in dados:
-        raise Exception(f"Regra '{regra}' não encontrada no massa_criada.json.")
+        raise Exception(f"Regra '{regra}' não encontrada em {os.path.basename(mf)}.")
     return dados[regra]["nome"]
 
 def regra_existe_na_massa(regra):
-    if not os.path.exists(MASSA_FILE):
+    mf = _massa_file(regra)
+    if not os.path.exists(mf):
         return False
-    with open(MASSA_FILE, 'r') as f:
+    with open(mf, 'r') as f:
         dados = json.load(f)
     return regra in dados and dados[regra].get("pericia_id") is not None
 
@@ -337,12 +348,13 @@ def _encontrar_atendimento_na_resposta(data, pericia_id):
 
 
 def verificar_especialista_api(api_url, token, regra):
-    if not os.path.exists(MASSA_FILE):
-        raise Exception("massa_criada.json não encontrado.")
-    with open(MASSA_FILE, 'r') as f:
+    mf = _massa_file(regra)
+    if not os.path.exists(mf):
+        raise Exception(f"{os.path.basename(mf)} não encontrado.")
+    with open(mf, 'r') as f:
         dados = json.load(f)
     if regra not in dados:
-        raise Exception(f"SKIP: Regra '{regra}' não encontrada no massa_criada.json.")
+        raise Exception(f"SKIP: Regra '{regra}' não encontrada em {os.path.basename(mf)}.")
 
     pericia_id = dados[regra].get("pericia_id")
     nome = dados[regra].get("nome", "")
@@ -397,7 +409,7 @@ def verificar_especialista_api(api_url, token, regra):
             reg_id_from_pericia = regs[0].get("registrationid") or regs[0].get("registrationId") or regs[0].get("id")
             print(f"  registration_id da péricia: {reg_id_from_pericia}")
             dados[regra]["registration_id"] = reg_id_from_pericia
-            with open(MASSA_FILE, 'w') as ff:
+            with open(mf, 'w') as ff:
                 json.dump(dados, ff, indent=2, ensure_ascii=False)
         if att_id_from_pericia:
             role, is_junta, board_roles = _buscar_detalhes_attendance(base_url, token, att_id_from_pericia)
@@ -406,14 +418,14 @@ def verificar_especialista_api(api_url, token, regra):
                 dados[regra]["attendance_id"] = att_id_from_pericia
                 dados[regra]["role"]     = role
                 dados[regra]["is_junta"] = is_junta
-                with open(MASSA_FILE, 'w') as ff:
+                with open(mf, 'w') as ff:
                     json.dump(dados, ff, indent=2, ensure_ascii=False)
                 return role, is_junta, board_roles, att_id_from_pericia
         if attendance_id and pericia_role:
             print(f"Especialista via eventType da péricia: role={pericia_role}, attendance_id={attendance_id}")
             dados[regra]["role"]     = pericia_role
             dados[regra]["is_junta"] = pericia_is_junta
-            with open(MASSA_FILE, 'w') as ff:
+            with open(mf, 'w') as ff:
                 json.dump(dados, ff, indent=2, ensure_ascii=False)
             return pericia_role, pericia_is_junta, pericia_br, attendance_id
 
@@ -453,7 +465,7 @@ def verificar_especialista_api(api_url, token, regra):
                 dados[regra]["attendance_id"] = attendance_id
                 dados[regra]["role"]          = role
                 dados[regra]["is_junta"]      = is_junta
-                with open(MASSA_FILE, 'w') as ff:
+                with open(mf, 'w') as ff:
                     json.dump(dados, ff, indent=2, ensure_ascii=False)
                 return role, is_junta, board_roles, attendance_id
             if not (data.get("hasNext", False) if isinstance(data, dict) else False):
@@ -482,9 +494,9 @@ def enviar_para_fila(api_url, token, attendance_id, regra=None):
     # Não foi 2xx — attendance provavelmente já está em queue (rodada anterior)
     print(f"Aviso: /queue retornou {response.status_code} — usando fallback. regra={regra!r}")
 
-    # Tenta role cacheado no massa_criada.json
-    if os.path.exists(MASSA_FILE):
-        with open(MASSA_FILE, 'r') as f:
+    # Tenta role cacheado no massa_criada_{suite}.json
+    if os.path.exists(mf):
+        with open(mf, 'r') as f:
             dados = json.load(f)
         entrada = dados.get(str(regra), {}) if regra else {}
         role_cached     = entrada.get("role") or ""
@@ -922,19 +934,18 @@ def criar_ficha_clinica(api_url, token, customer_id, attendance_id, cpf=None):
         print(f"  Playwright erro: {e}")
         pw_ok = False
 
-    # Verificar se o Playwright já integrou (canProceed/answers)
-    time.sleep(3)
-
-    # Verificar se integrou
+    # Verificar se o Playwright já integrou (canProceed/answers) — poll até 4s
     if ficha_id:
-        cr_resp = requests.get(f"{api_url}/clinical-record/{ficha_id}", headers=headers)
-        cr_data = cr_resp.json() if cr_resp.status_code == 200 else {}
-        answers = cr_data.get("answers", [])
-        can_proceed = cr_data.get("canProceed", False)
-        print(f"  clinical-record pós-Playwright: answers={len(answers)}, canProceed={can_proceed}")
-        if answers or can_proceed:
-            print(f"  Ficha integrada com sucesso!")
-            return response.status_code
+        for _i in range(8):
+            time.sleep(0.5)
+            cr_resp = requests.get(f"{api_url}/clinical-record/{ficha_id}", headers=headers)
+            cr_data = cr_resp.json() if cr_resp.status_code == 200 else {}
+            answers = cr_data.get("answers", [])
+            can_proceed = cr_data.get("canProceed", False)
+            print(f"  poll {_i+1}/8: answers={len(answers)}, canProceed={can_proceed}")
+            if answers or can_proceed:
+                print(f"  Ficha integrada com sucesso!")
+                return response.status_code
 
     print(f"  AVISO: Ficha não integrada — check-clinical-record pode retornar allow:false")
     return response.status_code
@@ -1709,12 +1720,13 @@ def homologar_pericia(api_url, token, regra):
     7. Salva homologação no Mihmo (generate-memed-file)
     Retorna o status final ("Accepted").
     """
-    if not os.path.exists(MASSA_FILE):
-        raise Exception("massa_criada.json não encontrado.")
-    with open(MASSA_FILE, 'r') as f:
+    mf = _massa_file(regra)
+    if not os.path.exists(mf):
+        raise Exception(f"{os.path.basename(mf)} não encontrado.")
+    with open(mf, 'r') as f:
         dados = json.load(f)
     if regra not in dados:
-        raise Exception(f"Regra '{regra}' não encontrada no massa_criada.json.")
+        raise Exception(f"Regra '{regra}' não encontrada em {os.path.basename(mf)}.")
 
     entrada = dados[regra]
     pericia_id    = entrada.get("pericia_id")
