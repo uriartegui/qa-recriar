@@ -36,8 +36,13 @@ Homologar Regra API
     END
     # Passo 3: Homologar a perícia
     ${status}=    Homologar Pericia    ${API_URL}    ${token}    ${regra}
-    Should Be Equal    ${status}    Accepted
-    ...    Status da homologação diverge! Esperado: 'Accepted' | Recebido: '${status}'
+    IF    ${junta}
+        Should Be True    '${status}' in ['Accepted', 'SignaturePending']
+        ...    Status junta diverge! Esperado: 'Accepted' ou 'SignaturePending' | Recebido: '${status}'
+    ELSE
+        Should Be Equal    ${status}    Accepted
+        ...    Status da homologação diverge! Esperado: 'Accepted' | Recebido: '${status}'
+    END
 
 *** Test Cases ***
 

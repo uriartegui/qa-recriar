@@ -17,6 +17,9 @@ PMV_ARTICLES_LTS = [
     {"id": "7e4757a6-f056-4396-96f5-529f66a5700f", "article": "T89-REGISTRO DE ACIDENTE DE TRABALHO - SEM AFASTAMENTO", "applicableCategories": ["301","101","306","410","302","771"], "medicalBoard": False},
 ]
 
+# Thumbprint do certificado BRY instalado no Windows Certificate Store (CurrentUser\My)
+BRY_CERT_THUMBPRINT = "A0FDC817470485E2D26995827B0C7E8C20CB46BE"
+
 # Tipos de serviço que usam PMV_ARTICLES_LTS (hardcoded — API pode retornar artigos obsoletos)
 PMV_SERVICE_TYPES_LTS = {
     "HealthCareLicense",
@@ -1405,71 +1408,56 @@ def gerar_memed_file_mihmo(api_url, token, attendance_id, pericia_id,
     return status
 
 
-def _gerar_chave_certificado_teste():
-    """Gera chave RSA + certificado autoassinado para testes de assinatura digital."""
-    from cryptography import x509
-    from cryptography.x509.oid import NameOID
-    from cryptography.hazmat.primitives import hashes as crypto_hashes, serialization
-    from cryptography.hazmat.primitives.asymmetric import rsa
-    from cryptography.hazmat.backends import default_backend
-    import datetime
-
-    private_key = rsa.generate_private_key(
-        public_exponent=65537, key_size=2048, backend=default_backend()
-    )
-    subject = issuer = x509.Name([
-        x509.NameAttribute(NameOID.COMMON_NAME, "Medico Teste Automacao"),
-        x509.NameAttribute(NameOID.ORGANIZATION_NAME, "Mihmo QA"),
-        x509.NameAttribute(NameOID.COUNTRY_NAME, "BR"),
-    ])
-    cert = (
-        x509.CertificateBuilder()
-        .subject_name(subject)
-        .issuer_name(issuer)
-        .public_key(private_key.public_key())
-        .serial_number(x509.random_serial_number())
-        .not_valid_before(datetime.datetime.utcnow())
-        .not_valid_after(datetime.datetime.utcnow() + datetime.timedelta(days=365))
-        .sign(private_key, crypto_hashes.SHA256(), default_backend())
-    )
-    cert_b64 = base64.b64encode(cert.public_bytes(serialization.Encoding.DER)).decode()
-    return private_key, cert_b64
+def _obter_cert_windows(thumbprint=BRY_CERT_THUMBPRINT):
+    """Retorna cert DER em base64 do Windows Certificate Store (CurrentUser\\My)."""
+    import subprocess
+    script = f"[Convert]::ToBase64String((Get-Item 'Cert:\\CurrentUser\\My\\{thumbprint}').GetRawCertData())"
+    r = subprocess.run(["powershell", "-Command", script], capture_output=True, text=True, timeout=10)
+    if r.returncode != 0:
+        raise Exception(f"Erro ao obter cert Windows: {r.stderr.strip()}")
+    return r.stdout.strip()
 
 
-def _assinar_hashes(private_key, hashes_lista, algoritmo="SHA1"):
-    """Assina lista de hashes (já digeridos) com RSA PKCS1v15."""
-    from cryptography.hazmat.primitives import hashes as crypto_hashes
-    from cryptography.hazmat.primitives.asymmetric import padding
-    from cryptography.hazmat.primitives.asymmetric.utils import Prehashed
-
-    algo_map = {
-        "SHA1":   crypto_hashes.SHA1(),
-        "SHA256": crypto_hashes.SHA256(),
-        "SHA512": crypto_hashes.SHA512(),
-    }
-    hash_algo = algo_map.get(algoritmo.upper(), crypto_hashes.SHA1())
-
-    signed = []
-    for h_b64 in hashes_lista:
-        h_bytes = base64.b64decode(h_b64)
-        signature = private_key.sign(h_bytes, padding.PKCS1v15(), Prehashed(hash_algo))
-        signed.append(base64.b64encode(signature).decode())
-    return signed
+def _assinar_hashes_windows(hashes_lista, algoritmo="SHA1", thumbprint=BRY_CERT_THUMBPRINT):
+    """Assina hashes via Windows CNG usando certificado não-exportável do Certificate Store."""
+    import subprocess
+    hashes_json = json.dumps(hashes_lista)
+    algo_name = "SHA1" if algoritmo.upper() == "SHA1" else algoritmo.upper()
+    script = f"""
+$cert = Get-Item 'Cert:\\CurrentUser\\My\\{thumbprint}'
+$key = [System.Security.Cryptography.X509Certificates.RSACertificateExtensions]::GetRSAPrivateKey($cert)
+$algo = [System.Security.Cryptography.HashAlgorithmName]::{algo_name}
+$pad  = [System.Security.Cryptography.RSASignaturePadding]::Pkcs1
+$hashes = '{hashes_json}' | ConvertFrom-Json
+$results = @()
+foreach ($h in $hashes) {{
+    $bytes = [Convert]::FromBase64String($h)
+    $sig = $key.SignHash($bytes, $algo, $pad)
+    $results += [Convert]::ToBase64String($sig)
+}}
+$results | ConvertTo-Json -Compress
+"""
+    r = subprocess.run(["powershell", "-Command", script], capture_output=True, text=True, timeout=30)
+    if r.returncode != 0:
+        raise Exception(f"Erro ao assinar via Windows CNG: {r.stderr.strip()}")
+    raw = r.stdout.strip()
+    parsed = json.loads(raw)
+    return [parsed] if isinstance(parsed, str) else parsed
 
 
 def assinar_pericia(api_url, token, pericia_id):
     """
     Executa o fluxo completo de assinatura digital da perícia (junta médica):
-    1. Gera certificado de teste autoassinado
+    1. Obtém certificado BRY do Windows Certificate Store
     2. POST /sign/initialize  → recebe hashes para assinar
-    3. Assina os hashes com RSA + SHA1
+    3. Assina os hashes via Windows CNG (chave não-exportável)
     4. POST /sign/finalize    → envia assinatura
     Retorna o status retornado pelo finalize.
     """
     base = api_url.rsplit('/backend-nest', 1)[0]
     headers = {"Authorization": f"Bearer {token}", "Content-Type": "application/json"}
 
-    private_key, cert_b64 = _gerar_chave_certificado_teste()
+    cert_b64 = _obter_cert_windows()
 
     # 1. Initialize
     init_url = f"{base}/backend-nest/medical-expert-report-request/sign/initialize"
@@ -1484,13 +1472,13 @@ def assinar_pericia(api_url, token, pericia_id):
     assinaturas_resp = init_data.get("assinaturas", [])
     nonce_global = init_data.get("nonce", "")
 
-    # 2. Assinar cada bloco de hashes
+    # 2. Assinar cada bloco de hashes via Windows CNG
     assinaturas_payload = []
     for bloco in assinaturas_resp:
         algoritmo  = bloco.get("algoritmoHash", "SHA1")
         nonce      = bloco.get("nonce", "")
         hashes_raw = bloco.get("hashes", [])
-        signed     = _assinar_hashes(private_key, hashes_raw, algoritmo)
+        signed     = _assinar_hashes_windows(hashes_raw, algoritmo)
         assinaturas_payload.append({"hashes": signed, "nonce": nonce})
 
     # 3. Finalize
@@ -1705,14 +1693,6 @@ def _homologar_junta(api_url, token_clinica, attendance_id, entrada):
             do_finish=is_last
         )
         print(f"Profissional {i+1}/{total} memed file concluído. Status: {status}")
-
-    # 5. Fase 2: todos assinam após o último ter finalizado a perícia
-    print(f"\n{'='*60}")
-    print(f"Fase de assinatura — {total} profissional(is)")
-    print(f"{'='*60}")
-    for i, (prof, token_medico) in enumerate(zip(selected_users, tokens_medicos)):
-        print(f"Assinando [{i+1}/{total}]: {prof['role_name']} ({prof['cred_key']})")
-        assinar_pericia(api_url, token_medico, pericia_id)
 
     return status
 

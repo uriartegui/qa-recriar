@@ -41,7 +41,7 @@ LTS - 1 Dia - CID Geral - Medico Trabalho
     [Tags]    setup    pmv    lts    lts_geral    borda
     ${token}=    Autenticar No Mihmo
     ${id}    ${cpf}    ${nome}=    Criar Customer
-    ...    ${API_URL}    ${token}    LTS_1DIA_GERAL    ${COMPANY_PMV}
+    ...    ${API_URL}    ${token}    PMV_LTS_1DIA_GERAL    ${COMPANY_PMV}
     ${status}    ${body}=    Criar Pericia Api
     ...    ${API_URL}    ${token}    ${id}    ${cpf}
     ...    ${CELL_TESTE}    ${EMAIL_TESTE}
@@ -52,7 +52,7 @@ LTS - 3 Dias - CID Geral - Limite Medico Trabalho
     [Tags]    setup    pmv    lts    lts_geral    borda
     ${token}=    Autenticar No Mihmo
     ${id}    ${cpf}    ${nome}=    Criar Customer
-    ...    ${API_URL}    ${token}    LTS_3DIAS_GERAL    ${COMPANY_PMV}
+    ...    ${API_URL}    ${token}    PMV_LTS_3DIAS_GERAL    ${COMPANY_PMV}
     ${status}    ${body}=    Criar Pericia Api
     ...    ${API_URL}    ${token}    ${id}    ${cpf}
     ...    ${CELL_TESTE}    ${EMAIL_TESTE}
@@ -63,7 +63,7 @@ LTS - 4 Dias - CID Geral - Inicio Clinico Geral
     [Tags]    setup    pmv    lts    lts_geral    borda
     ${token}=    Autenticar No Mihmo
     ${id}    ${cpf}    ${nome}=    Criar Customer
-    ...    ${API_URL}    ${token}    LTS_4DIAS_GERAL    ${COMPANY_PMV}
+    ...    ${API_URL}    ${token}    PMV_LTS_4DIAS_GERAL    ${COMPANY_PMV}
     ${status}    ${body}=    Criar Pericia Api
     ...    ${API_URL}    ${token}    ${id}    ${cpf}
     ...    ${CELL_TESTE}    ${EMAIL_TESTE}
@@ -74,7 +74,7 @@ LTS - 14 Dias - CID Geral - Limite Faixa 4-14
     [Tags]    setup    pmv    lts    lts_geral    borda
     ${token}=    Autenticar No Mihmo
     ${id}    ${cpf}    ${nome}=    Criar Customer
-    ...    ${API_URL}    ${token}    LTS_14DIAS_GERAL    ${COMPANY_PMV}
+    ...    ${API_URL}    ${token}    PMV_LTS_14DIAS_GERAL    ${COMPANY_PMV}
     ${status}    ${body}=    Criar Pericia Api
     ...    ${API_URL}    ${token}    ${id}    ${cpf}
     ...    ${CELL_TESTE}    ${EMAIL_TESTE}
@@ -85,7 +85,7 @@ LTS - 15 Dias - CID Geral - Inicio Faixa 15-59
     [Tags]    setup    pmv    lts    lts_geral    borda
     ${token}=    Autenticar No Mihmo
     ${id}    ${cpf}    ${nome}=    Criar Customer
-    ...    ${API_URL}    ${token}    LTS_15DIAS_GERAL    ${COMPANY_PMV}
+    ...    ${API_URL}    ${token}    PMV_LTS_15DIAS_GERAL    ${COMPANY_PMV}
     ${status}    ${body}=    Criar Pericia Api
     ...    ${API_URL}    ${token}    ${id}    ${cpf}
     ...    ${CELL_TESTE}    ${EMAIL_TESTE}
@@ -96,7 +96,7 @@ LTS - 59 Dias - CID Geral - Limite Antes Junta
     [Tags]    setup    pmv    lts    lts_geral    borda
     ${token}=    Autenticar No Mihmo
     ${id}    ${cpf}    ${nome}=    Criar Customer
-    ...    ${API_URL}    ${token}    LTS_59DIAS_GERAL    ${COMPANY_PMV}
+    ...    ${API_URL}    ${token}    PMV_LTS_59DIAS_GERAL    ${COMPANY_PMV}
     ${status}    ${body}=    Criar Pericia Api
     ...    ${API_URL}    ${token}    ${id}    ${cpf}
     ...    ${CELL_TESTE}    ${EMAIL_TESTE}
@@ -107,7 +107,7 @@ LTS - 61 Dias - CID Geral - Junta Medica Clinico Geral
     [Tags]    setup    pmv    lts    lts_geral    borda    junta
     ${token}=    Autenticar No Mihmo
     ${id}    ${cpf}    ${nome}=    Criar Customer
-    ...    ${API_URL}    ${token}    LTS_60DIAS_GERAL    ${COMPANY_PMV}
+    ...    ${API_URL}    ${token}    PMV_LTS_60DIAS_GERAL    ${COMPANY_PMV}
     ${status}    ${body}=    Criar Pericia Api
     ...    ${API_URL}    ${token}    ${id}    ${cpf}
     ...    ${CELL_TESTE}    ${EMAIL_TESTE}
@@ -123,7 +123,7 @@ LTS - 4 Dias - CID F - Inicio Clinico Geral
     [Tags]    setup    pmv    lts    lts_psiquiatria    borda
     ${token}=    Autenticar No Mihmo
     ${id}    ${cpf}    ${nome}=    Criar Customer
-    ...    ${API_URL}    ${token}    LTS_4DIAS_PSIQ    ${COMPANY_PMV}
+    ...    ${API_URL}    ${token}    PMV_LTS_4DIAS_PSIQ    ${COMPANY_PMV}
     ${status}    ${body}=    Criar Pericia Api
     ...    ${API_URL}    ${token}    ${id}    ${cpf}
     ...    ${CELL_TESTE}    ${EMAIL_TESTE}
@@ -134,7 +134,7 @@ LTS - 29 Dias - CID F - Limite Clinico Geral
     [Tags]    setup    pmv    lts    lts_psiquiatria    borda
     ${token}=    Autenticar No Mihmo
     ${id}    ${cpf}    ${nome}=    Criar Customer
-    ...    ${API_URL}    ${token}    LTS_29DIAS_PSIQ    ${COMPANY_PMV}
+    ...    ${API_URL}    ${token}    PMV_LTS_29DIAS_PSIQ    ${COMPANY_PMV}
     ${status}    ${body}=    Criar Pericia Api
     ...    ${API_URL}    ${token}    ${id}    ${cpf}
     ...    ${CELL_TESTE}    ${EMAIL_TESTE}
@@ -145,7 +145,7 @@ LTS - 30 Dias - CID F - Inicio Clinico Geral
     [Tags]    setup    pmv    lts    lts_psiquiatria    borda
     ${token}=    Autenticar No Mihmo
     ${id}    ${cpf}    ${nome}=    Criar Customer
-    ...    ${API_URL}    ${token}    LTS_30DIAS_PSIQ    ${COMPANY_PMV}
+    ...    ${API_URL}    ${token}    PMV_LTS_30DIAS_PSIQ    ${COMPANY_PMV}
     ${status}    ${body}=    Criar Pericia Api
     ...    ${API_URL}    ${token}    ${id}    ${cpf}
     ...    ${CELL_TESTE}    ${EMAIL_TESTE}
@@ -156,7 +156,7 @@ LTS - 59 Dias - CID F - Limite Antes Junta
     [Tags]    setup    pmv    lts    lts_psiquiatria    borda
     ${token}=    Autenticar No Mihmo
     ${id}    ${cpf}    ${nome}=    Criar Customer
-    ...    ${API_URL}    ${token}    LTS_59DIAS_PSIQ    ${COMPANY_PMV}
+    ...    ${API_URL}    ${token}    PMV_LTS_59DIAS_PSIQ    ${COMPANY_PMV}
     ${status}    ${body}=    Criar Pericia Api
     ...    ${API_URL}    ${token}    ${id}    ${cpf}
     ...    ${CELL_TESTE}    ${EMAIL_TESTE}
@@ -167,7 +167,7 @@ LTS - 61 Dias - CID F - Junta Medica Psiquiatra e Clinico Geral
     [Tags]    setup    pmv    lts    lts_psiquiatria    borda    junta
     ${token}=    Autenticar No Mihmo
     ${id}    ${cpf}    ${nome}=    Criar Customer
-    ...    ${API_URL}    ${token}    LTS_60DIAS_PSIQ    ${COMPANY_PMV}
+    ...    ${API_URL}    ${token}    PMV_LTS_60DIAS_PSIQ    ${COMPANY_PMV}
     ${status}    ${body}=    Criar Pericia Api
     ...    ${API_URL}    ${token}    ${id}    ${cpf}
     ...    ${CELL_TESTE}    ${EMAIL_TESTE}
@@ -184,7 +184,7 @@ LTS - 4 Dias - CID M S - Inicio Clinico Geral
     [Tags]    setup    pmv    lts    lts_ortopedia    borda
     ${token}=    Autenticar No Mihmo
     ${id}    ${cpf}    ${nome}=    Criar Customer
-    ...    ${API_URL}    ${token}    LTS_4DIAS_ORTOP    ${COMPANY_PMV}
+    ...    ${API_URL}    ${token}    PMV_LTS_4DIAS_ORTOP    ${COMPANY_PMV}
     ${status}    ${body}=    Criar Pericia Api
     ...    ${API_URL}    ${token}    ${id}    ${cpf}
     ...    ${CELL_TESTE}    ${EMAIL_TESTE}
@@ -195,7 +195,7 @@ LTS - 14 Dias - CID M S - Limite Faixa 4-14 Clinico Geral
     [Tags]    setup    pmv    lts    lts_ortopedia    borda
     ${token}=    Autenticar No Mihmo
     ${id}    ${cpf}    ${nome}=    Criar Customer
-    ...    ${API_URL}    ${token}    LTS_14DIAS_ORTOP    ${COMPANY_PMV}
+    ...    ${API_URL}    ${token}    PMV_LTS_14DIAS_ORTOP    ${COMPANY_PMV}
     ${status}    ${body}=    Criar Pericia Api
     ...    ${API_URL}    ${token}    ${id}    ${cpf}
     ...    ${CELL_TESTE}    ${EMAIL_TESTE}
@@ -206,7 +206,7 @@ LTS - 15 Dias - CID M S - Inicio Ortopedista
     [Tags]    setup    pmv    lts    lts_ortopedia    borda
     ${token}=    Autenticar No Mihmo
     ${id}    ${cpf}    ${nome}=    Criar Customer
-    ...    ${API_URL}    ${token}    LTS_15DIAS_ORTOP    ${COMPANY_PMV}
+    ...    ${API_URL}    ${token}    PMV_LTS_15DIAS_ORTOP    ${COMPANY_PMV}
     ${status}    ${body}=    Criar Pericia Api
     ...    ${API_URL}    ${token}    ${id}    ${cpf}
     ...    ${CELL_TESTE}    ${EMAIL_TESTE}
@@ -217,7 +217,7 @@ LTS - 59 Dias - CID M S - Limite Antes Junta Ortopedista
     [Tags]    setup    pmv    lts    lts_ortopedia    borda
     ${token}=    Autenticar No Mihmo
     ${id}    ${cpf}    ${nome}=    Criar Customer
-    ...    ${API_URL}    ${token}    LTS_59DIAS_ORTOP    ${COMPANY_PMV}
+    ...    ${API_URL}    ${token}    PMV_LTS_59DIAS_ORTOP    ${COMPANY_PMV}
     ${status}    ${body}=    Criar Pericia Api
     ...    ${API_URL}    ${token}    ${id}    ${cpf}
     ...    ${CELL_TESTE}    ${EMAIL_TESTE}
@@ -228,7 +228,7 @@ LTS - 61 Dias - CID M S - Junta Medica Ortopedista e Clinico Geral
     [Tags]    setup    pmv    lts    lts_ortopedia    borda    junta
     ${token}=    Autenticar No Mihmo
     ${id}    ${cpf}    ${nome}=    Criar Customer
-    ...    ${API_URL}    ${token}    LTS_60DIAS_ORTOP    ${COMPANY_PMV}
+    ...    ${API_URL}    ${token}    PMV_LTS_60DIAS_ORTOP    ${COMPANY_PMV}
     ${status}    ${body}=    Criar Pericia Api
     ...    ${API_URL}    ${token}    ${id}    ${cpf}
     ...    ${CELL_TESTE}    ${EMAIL_TESTE}
@@ -243,7 +243,7 @@ LTS INSS - 1 Dia - Clinico Geral
     [Tags]    setup    pmv    lts_inss
     ${token}=    Autenticar No Mihmo
     ${id}    ${cpf}    ${nome}=    Criar Customer
-    ...    ${API_URL}    ${token}    LTS_INSS_1DIA    ${COMPANY_PMV}
+    ...    ${API_URL}    ${token}    PMV_LTS_INSS_1DIA    ${COMPANY_PMV}
     ${status}    ${body}=    Criar Pericia Api
     ...    ${API_URL}    ${token}    ${id}    ${cpf}
     ...    ${CELL_TESTE}    ${EMAIL_TESTE}
@@ -260,7 +260,7 @@ LTF - 1 Dia - Medico Trabalho
     [Tags]    setup    pmv    ltf    borda
     ${token}=    Autenticar No Mihmo
     ${id}    ${cpf}    ${nome}=    Criar Customer
-    ...    ${API_URL}    ${token}    LTF_1DIA    ${COMPANY_PMV}
+    ...    ${API_URL}    ${token}    PMV_LTF_1DIA    ${COMPANY_PMV}
     ${status}    ${body}=    Criar Pericia Api
     ...    ${API_URL}    ${token}    ${id}    ${cpf}
     ...    ${CELL_TESTE}    ${EMAIL_TESTE}
@@ -271,7 +271,7 @@ LTF - 3 Dias - Limite Medico Trabalho
     [Tags]    setup    pmv    ltf    borda
     ${token}=    Autenticar No Mihmo
     ${id}    ${cpf}    ${nome}=    Criar Customer
-    ...    ${API_URL}    ${token}    LTF_3DIAS    ${COMPANY_PMV}
+    ...    ${API_URL}    ${token}    PMV_LTF_3DIAS    ${COMPANY_PMV}
     ${status}    ${body}=    Criar Pericia Api
     ...    ${API_URL}    ${token}    ${id}    ${cpf}
     ...    ${CELL_TESTE}    ${EMAIL_TESTE}
@@ -282,7 +282,7 @@ LTF - 4 Dias - Inicio Clinico Geral
     [Tags]    setup    pmv    ltf    borda
     ${token}=    Autenticar No Mihmo
     ${id}    ${cpf}    ${nome}=    Criar Customer
-    ...    ${API_URL}    ${token}    LTF_4DIAS    ${COMPANY_PMV}
+    ...    ${API_URL}    ${token}    PMV_LTF_4DIAS    ${COMPANY_PMV}
     ${status}    ${body}=    Criar Pericia Api
     ...    ${API_URL}    ${token}    ${id}    ${cpf}
     ...    ${CELL_TESTE}    ${EMAIL_TESTE}
@@ -293,7 +293,7 @@ LTF - 59 Dias - Limite Antes Junta
     [Tags]    setup    pmv    ltf    borda
     ${token}=    Autenticar No Mihmo
     ${id}    ${cpf}    ${nome}=    Criar Customer
-    ...    ${API_URL}    ${token}    LTF_59DIAS    ${COMPANY_PMV}
+    ...    ${API_URL}    ${token}    PMV_LTF_59DIAS    ${COMPANY_PMV}
     ${status}    ${body}=    Criar Pericia Api
     ...    ${API_URL}    ${token}    ${id}    ${cpf}
     ...    ${CELL_TESTE}    ${EMAIL_TESTE}
@@ -304,7 +304,7 @@ LTF - 61 Dias - Junta Medica Clinico Geral
     [Tags]    setup    pmv    ltf    borda    junta
     ${token}=    Autenticar No Mihmo
     ${id}    ${cpf}    ${nome}=    Criar Customer
-    ...    ${API_URL}    ${token}    LTF_60DIAS    ${COMPANY_PMV}
+    ...    ${API_URL}    ${token}    PMV_LTF_60DIAS    ${COMPANY_PMV}
     ${status}    ${body}=    Criar Pericia Api
     ...    ${API_URL}    ${token}    ${id}    ${cpf}
     ...    ${CELL_TESTE}    ${EMAIL_TESTE}
@@ -319,7 +319,7 @@ Consulta Medica - 1 Dia - Medico Trabalho
     [Tags]    setup    pmv    outros    consulta
     ${token}=    Autenticar No Mihmo
     ${id}    ${cpf}    ${nome}=    Criar Customer
-    ...    ${API_URL}    ${token}    CONSULTA_1DIA    ${COMPANY_PMV}
+    ...    ${API_URL}    ${token}    PMV_CONSULTA_1DIA    ${COMPANY_PMV}
     ${status}    ${body}=    Criar Pericia Api
     ...    ${API_URL}    ${token}    ${id}    ${cpf}
     ...    ${CELL_TESTE}    ${EMAIL_TESTE}
@@ -330,7 +330,7 @@ Exame Admissional - 1 Dia - Clinico Geral
     [Tags]    setup    pmv    outros    admissional
     ${token}=    Autenticar No Mihmo
     ${id}    ${cpf}    ${nome}=    Criar Customer
-    ...    ${API_URL}    ${token}    EXAME_ADMISSIONAL    ${COMPANY_PMV}
+    ...    ${API_URL}    ${token}    PMV_EXAME_ADMISSIONAL    ${COMPANY_PMV}
     ${status}    ${body}=    Criar Pericia Api
     ...    ${API_URL}    ${token}    ${id}    ${cpf}
     ...    ${CELL_TESTE}    ${EMAIL_TESTE}
@@ -341,7 +341,7 @@ Licenca Gestacao - 120 Dias - Clinico Geral
     [Tags]    setup    pmv    outros    gestacao
     ${token}=    Autenticar No Mihmo
     ${id}    ${cpf}    ${nome}=    Criar Customer
-    ...    ${API_URL}    ${token}    GESTACAO_120DIAS    ${COMPANY_PMV}
+    ...    ${API_URL}    ${token}    PMV_GESTACAO_120DIAS    ${COMPANY_PMV}
     ${status}    ${body}=    Criar Pericia Api
     ...    ${API_URL}    ${token}    ${id}    ${cpf}
     ...    ${CELL_TESTE}    ${EMAIL_TESTE}
@@ -352,7 +352,7 @@ Atividade Com Restricao - 1 Dia - Junta Medica Clinico Geral
     [Tags]    setup    pmv    outros    restricao    junta
     ${token}=    Autenticar No Mihmo
     ${id}    ${cpf}    ${nome}=    Criar Customer
-    ...    ${API_URL}    ${token}    RESTRICAO_1DIA    ${COMPANY_PMV}
+    ...    ${API_URL}    ${token}    PMV_RESTRICAO_1DIA    ${COMPANY_PMV}
     ${status}    ${body}=    Criar Pericia Api
     ...    ${API_URL}    ${token}    ${id}    ${cpf}
     ...    ${CELL_TESTE}    ${EMAIL_TESTE}
@@ -363,7 +363,7 @@ Acidente de Trabalho - 1 Dia - Medico Trabalho
     [Tags]    setup    pmv    outros    acidente
     ${token}=    Autenticar No Mihmo
     ${id}    ${cpf}    ${nome}=    Criar Customer
-    ...    ${API_URL}    ${token}    ACIDENTE_1DIA    ${COMPANY_PMV}
+    ...    ${API_URL}    ${token}    PMV_ACIDENTE_1DIA    ${COMPANY_PMV}
     ${status}    ${body}=    Criar Pericia Api
     ...    ${API_URL}    ${token}    ${id}    ${cpf}
     ...    ${CELL_TESTE}    ${EMAIL_TESTE}
@@ -374,7 +374,7 @@ Processos Administrativos - 1 Dia - Medico Trabalho
     [Tags]    setup    pmv    outros    adm
     ${token}=    Autenticar No Mihmo
     ${id}    ${cpf}    ${nome}=    Criar Customer
-    ...    ${API_URL}    ${token}    PROCESSOS_ADM_1DIA    ${COMPANY_PMV}
+    ...    ${API_URL}    ${token}    PMV_PROCESSOS_ADM_1DIA    ${COMPANY_PMV}
     ${status}    ${body}=    Criar Pericia Api
     ...    ${API_URL}    ${token}    ${id}    ${cpf}
     ...    ${CELL_TESTE}    ${EMAIL_TESTE}

@@ -221,8 +221,8 @@ REGRAS = [
      "especialista": "Clínico Geral (Junta)", "junta": True,
      "setup_file": "tests/pmv/setup/criar_massa.robot",
      "setup_test": "Atividade Com Restricao - 1 Dia - Junta Medica Clinico Geral",
-     "homolog_file": None,
-     "homolog_test": None},
+     "homolog_file": "tests/pmv/api/homologacao.robot",
+     "homolog_test": "Atividade Com Restricao - Deve ir para Junta Clinico Geral"},
 
     # ── PPV / LTS / Geral ───────────────────────────────────────────────────
     {"suite": "PPV", "tipo": "LTS", "cid": "Geral (J00)", "dias": "1 dia",
@@ -841,6 +841,14 @@ class App(tk.Tk):
                               padx=10, pady=8, activebackground="#74c7ec")
         self._btn.pack(fill="x", padx=10)
 
+        self._btn_homologar_tudo = tk.Button(left, text="⚡  Homologar Tudo",
+                                             command=self._homologar_tudo,
+                                             bg="#a6e3a1", fg="#1e1e2e",
+                                             font=("Segoe UI", 10, "bold"),
+                                             relief="flat", cursor="hand2",
+                                             padx=10, pady=6, activebackground="#94e2d5")
+        self._btn_homologar_tudo.pack(fill="x", padx=10, pady=(4, 0))
+
         self._btn_parar = tk.Button(left, text="⏹  Parar",
                                     command=self._parar,
                                     bg="#f38ba8", fg="#1e1e2e",
@@ -943,6 +951,7 @@ class App(tk.Tk):
             return
         self._running = True
         self._btn.pack_forget()
+        self._btn_homologar_tudo.pack_forget()
         self._btn_parar.pack(fill="x", padx=10)
 
         if self._modo.get() == "categoria":
@@ -1113,6 +1122,80 @@ class App(tk.Tk):
             self._log(f"\n✘ {fase} falhou (código {proc.returncode}).\n", "erro")
         return success
 
+    # ── Homologar Tudo ────────────────────────────────────────────────────────
+    def _homologar_tudo(self):
+        if self._running:
+            return
+        massa_file = os.path.join(ROOT, "results", "massa_criada.json")
+        if not os.path.exists(massa_file):
+            self._log("ERRO: massa_criada.json não encontrado. Rode criar_massa primeiro.\n", "erro")
+            return
+
+        suite = self._suite.get()
+        homolog_file = (
+            "tests/pmv/api/homologacao.robot" if suite == "PMV"
+            else "tests/ppv/api/homologacao_ppv.robot"
+        )
+
+        self._running = True
+        self._btn.pack_forget()
+        self._btn_homologar_tudo.pack_forget()
+        self._btn_parar.pack(fill="x", padx=10)
+        threading.Thread(target=self._run_homologar_tudo,
+                         args=(homolog_file, suite), daemon=True).start()
+
+    def _run_homologar_tudo(self, homolog_file, suite):
+        self._log(f"\n{'═'*60}\n", "info")
+        self._log(f"  Homologar Tudo — {suite}\n", "info")
+        self._log(f"  Arquivo: {homolog_file}\n", "info")
+        self._log(f"  Regras sem massa → SKIP automático\n", "info")
+        self._log(f"{'═'*60}\n\n", "info")
+        self._run_robot_file(homolog_file, f"HOMOLOGAÇÃO COMPLETA {suite}")
+        self.after(0, self._finalizar)
+
+    def _run_robot_file(self, rel_file, fase):
+        """Roda robot no arquivo inteiro, sem filtro --test."""
+        listener = "resources/keywords/console_listener.py"
+        cmd = ["robot", "--outputdir", "results", "--listener", listener, rel_file]
+
+        self._log(f"\n── {fase} ──────────────────────────────────────\n", "aviso")
+        self._log(f"$ robot {rel_file}\n\n", "info")
+
+        try:
+            self._proc = subprocess.Popen(
+                cmd,
+                stdout=subprocess.PIPE,
+                stderr=subprocess.STDOUT,
+                cwd=ROOT,
+                encoding="utf-8",
+                errors="replace",
+            )
+        except FileNotFoundError:
+            self._log("ERRO: 'robot' não encontrado no PATH.\n", "erro")
+            return False
+
+        proc = self._proc
+        for line in proc.stdout:
+            tag = None
+            low = line.lower()
+            if "→" in line:
+                tag = "info"
+            elif "| pass |" in low or "passed" in low or "| skip |" in low or "skipped" in low:
+                tag = "ok"
+            elif "| fail |" in low or "failed" in low or "error" in low:
+                tag = "erro"
+            self._log(line, tag)
+
+        proc.wait()
+        rc = proc.returncode
+        if rc == 0:
+            self._log(f"\n✔ {fase} — todos os testes passaram.\n", "ok")
+        elif rc == 4:
+            self._log(f"\n✔ {fase} — testes concluídos (alguns skipped/failed).\n", "aviso")
+        else:
+            self._log(f"\n✘ {fase} falhou (código {rc}).\n", "erro")
+        return rc in (0, 4)
+
     def _parar(self):
         if self._proc and self._proc.poll() is None:
             self._proc.terminate()
@@ -1137,6 +1220,7 @@ class App(tk.Tk):
         self._proc = None
         self._btn_parar.pack_forget()
         self._btn.pack(fill="x", padx=10)
+        self._btn_homologar_tudo.pack(fill="x", padx=10, pady=(4, 0))
 
     # ── Helpers de output ─────────────────────────────────────────────────────
     def _log(self, text, tag=None):
