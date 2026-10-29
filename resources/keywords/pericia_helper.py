@@ -46,26 +46,47 @@ def _massa_file(regra):
 FICHA_HOMOLOG_TYPE_ID = "bcfc80cf-12ea-4cb5-8ac2-195895418db1"
 _customer_regra = {}
 
-# Credenciais para auto-login Firebase (não precisam de atualização manual)
+def _carregar_env():
+    """Carrega o .env da raiz do projeto sem sobrescrever variáveis já definidas."""
+    caminho = os.path.join(os.path.dirname(__file__), '..', '..', '.env')
+    if not os.path.exists(caminho):
+        return
+    with open(caminho, encoding='utf-8') as f:
+        for linha in f:
+            linha = linha.strip()
+            if linha and not linha.startswith('#') and '=' in linha:
+                chave, valor = linha.split('=', 1)
+                os.environ.setdefault(chave.strip(), valor.strip().strip('"\''))
+
+_carregar_env()
+
+# Credenciais para auto-login Firebase — lidas do .env (veja .env.example)
+_CRED_ENV = {
+    "CLINICA":           "CLINICA",
+    "Clínico Geral":     "CLINICO_GERAL",
+    "Clínico Geral 2":   "CLINICO_GERAL2",
+    "Clínico Geral 3":   "CLINICO_GERAL3",
+    "Médico Trabalho":   "MEDICO_TRABALHO",
+    "Ortopedista":       "ORTOPEDISTA",
+    "Psiquiatra":        "PSIQUIATRA",
+    "Assistente Social": "ASSISTENTE_SOCIAL",
+    "Psicólogo":         "PSICOLOGO",
+    "Enfermeiro":        "ENFERMEIRO",
+}
 CREDENTIALS = {
-    "CLINICA":             {"email": "gestormihmo@mihmo.com.br",      "password": "REMOVIDO"},
-    "Clínico Geral":       {"email": "clinicogeral1@mihmo.com.br",    "password": "REMOVIDO"},
-    "Clínico Geral 2":     {"email": "clinicogeral2@mihmo.com.br",    "password": "REMOVIDO"},
-    "Clínico Geral 3":     {"email": "clinicogeral3@mihmo.com.br",    "password": "REMOVIDO"},
-    "Médico Trabalho":     {"email": "medicopmv@mihmo.com.br",        "password": "REMOVIDO"},
-    "Ortopedista":         {"email": "ortopedista1@mihmo.com.br",     "password": "REMOVIDO"},
-    "Psiquiatra":          {"email": "psiquiatra1@mihmo.com.br",      "password": "REMOVIDO"},
-    "Assistente Social":   {"email": "assistente.social@mihmo.com.br","password": "REMOVIDO"},
-    "Psicólogo":           {"email": "psicologo@mihmo.com.br",        "password": "REMOVIDO"},
-    "Enfermeiro":          {"email": "teste@mihmo.com.br",            "password": "REMOVIDO"},
+    role: {
+        "email": os.environ.get(f"CREDENTIALS_{env}_EMAIL", ""),
+        "password": os.environ.get(f"CREDENTIALS_{env}_SENHA", ""),
+    }
+    for role, env in _CRED_ENV.items()
 }
 
 # Mapeamento email → chave de credencial (para identificar squad users pelos nossos logins)
-_EMAIL_TO_CRED_KEY = {v["email"]: k for k, v in CREDENTIALS.items()}
+_EMAIL_TO_CRED_KEY = {v["email"]: k for k, v in CREDENTIALS.items() if v["email"]}
 
 FIREBASE_AUTH_URL = (
     "https://www.googleapis.com/identitytoolkit/v3/relyingparty/verifyPassword"
-    "?key=REMOVIDO"
+    f"?key={os.environ.get('FIREBASE_API_KEY', '')}"
 )
 
 # Cache em memória: role → {"token": "...", "exp": timestamp}
@@ -87,8 +108,8 @@ def _obter_token(role: str) -> str:
     creds = CREDENTIALS.get(role)
     if not creds:
         raise Exception(f"Credenciais não configuradas para role '{role}'. Adicione em CREDENTIALS.")
-    if creds["email"].startswith("SEU_"):
-        raise Exception(f"Credenciais não configuradas para role '{role}'. Preencha o e-mail em CREDENTIALS.")
+    if not creds["email"] or not creds["password"]:
+        raise Exception(f"Credenciais não configuradas para role '{role}'. Preencha CREDENTIALS_{_CRED_ENV[role]}_EMAIL/_SENHA no .env.")
 
     print(f"[auto-login] Obtendo token para '{role}' ({creds['email']})...")
     payload = {"email": creds["email"], "password": creds["password"], "returnSecureToken": True}
@@ -531,8 +552,8 @@ def iniciar_atendimento(base_url, token, attendance_id, squad_user_id):
 
 
 LIMESURVEY_URL = "https://mihmosaude.limesurvey.net"
-LIMESURVEY_USER = "admin"
-LIMESURVEY_PASS = "REMOVIDO"  # ajuste se necessário
+LIMESURVEY_USER = os.environ.get("LIMESURVEY_USER", "")
+LIMESURVEY_PASS = os.environ.get("LIMESURVEY_SENHA", "")
 MIHMO_URL = "https://homolog.mihmo.com.br"
 
 
@@ -1521,7 +1542,7 @@ def obter_squad_users_por_role(api_url, token, role_id, count=1):
     if len(with_creds) < count:
         raise Exception(
             f"Precisamos de {count} squad user(s) com credenciais para role {role_id}, "
-            f"mas só temos {len(with_creds)}. Adicione mais credenciais em CREDENTIALS."
+            f"mas só temos {len(with_creds)}. Adicione mais credenciais no .env."
         )
     return with_creds[:count]
 
